@@ -1,0 +1,12 @@
+{
+  "completed_modules": [
+    "basics_1",
+    "technical_analysis_basics"
+  ],
+  "quiz_scores": {
+    "basics_1": 100
+  },
+  "total_xp": 250,
+  "level": 1,
+  "current_parcours": "debutant"
+}

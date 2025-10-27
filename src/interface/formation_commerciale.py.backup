@@ -1,0 +1,2773 @@
+import customtkinter as ctk
+from tkinter import messagebox
+import json
+import os
+from datetime import datetime, timedelta
+import threading
+import time
+
+class FormationCommerciale(ctk.CTkFrame):
+    """Formation de niveau commercial pour HelixOne - Version stable"""
+    
+    def __init__(self, parent):
+        super().__init__(parent, fg_color="#0a0e12")
+        self.pack(fill="both", expand=True)
+        
+        # Initialisation des données
+        self.setup_directories()
+        self.user_data = self.load_user_data()
+        self.parcours_data = self.load_parcours_data()
+        self.current_module = None
+        self.current_lesson = 0
+        
+        # Interface principale
+        self.setup_main_interface()
+        
+        # Démarrer les animations
+        self.animate_progress_rings()
+    
+    def setup_directories(self):
+        """Crée les dossiers nécessaires"""
+        os.makedirs("data/formation_commerciale", exist_ok=True)
+        print("[DEBUG] Dossiers formation commerciale créés")
+    
+    def load_user_data(self):
+        """Charge les données utilisateur"""
+        try:
+            with open("data/formation_commerciale/user_formation.json", 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except:
+            return {
+                "user_id": "trader_001",
+                "subscription": "premium",
+                "level": 1,
+                "experience": 247,
+                "parcours_actuel": "debutant",
+                "modules_completed": [],
+                "quiz_scores": {},
+                "time_spent": 15,
+                "last_session": None,
+                "streak_days": 3,
+                "achievements": [],
+                "preferred_learning": "visual",
+                "strengths": [],
+                "weaknesses": [],
+                "learning_path": "standard",
+                "certification_progress": {},
+                "mentor_sessions": 0
+            }
+    
+    def load_parcours_data(self):
+        """Structure des parcours de formation"""
+        return {
+            "debutant": {
+                "titre": "🎯 Trader Débutant",
+                "description": "Maîtrisez les fondamentaux du trading",
+                "duree_estimee": "25 heures",
+                "modules_count": 6,
+                "prerequis": "Aucun",
+                "certification": "Certificat Trading Fondamental",
+                "couleur": "#00BFFF"
+            },
+            "intermediaire": {
+                "titre": "📈 Trader Confirmé", 
+                "description": "Développez vos stratégies avancées",
+                "duree_estimee": "40 heures",
+                "modules_count": 8,
+                "prerequis": "Parcours Débutant complété",
+                "certification": "Certificat Trading Avancé",
+                "couleur": "#FFA500"
+            },
+            "expert": {
+                "titre": "🏆 Trader Expert",
+                "description": "Maîtrisez les techniques professionnelles",
+                "duree_estimee": "30 heures", 
+                "modules_count": 6,
+                "prerequis": "Parcours Intermédiaire complété",
+                "certification": "Certificat Trading Professionnel",
+                "couleur": "#FF4444"
+            }
+        }
+    
+    def setup_main_interface(self):
+        """Interface principale moderne"""
+        # Header avec branding
+        self.create_header()
+        
+        # Container principal avec sidebar
+        main_container = ctk.CTkFrame(self, fg_color="transparent")
+        main_container.pack(fill="both", expand=True, padx=10, pady=10)
+        
+        # Sidebar avec navigation
+        self.sidebar = self.create_sidebar(main_container)
+        self.sidebar.pack(side="left", fill="y", padx=(0, 10))
+        
+        # Zone de contenu principale
+        self.content_area = ctk.CTkFrame(main_container, fg_color="#1c1f26")
+        self.content_area.pack(side="right", fill="both", expand=True)
+        
+        # Afficher dashboard par défaut
+        self.show_dashboard()
+    
+    def create_header(self):
+        """Header moderne avec statistiques"""
+        header = ctk.CTkFrame(self, height=80, fg_color="#161920")
+        header.pack(fill="x", padx=10, pady=(10, 0))
+        header.pack_propagate(False)
+        
+        # Logo et titre
+        title_frame = ctk.CTkFrame(header, fg_color="transparent")
+        title_frame.pack(side="left", fill="y", padx=20)
+        
+        title = ctk.CTkLabel(
+            title_frame,
+            text="🎓 HelixOne Academy",
+            font=("Arial", 24, "bold"),
+            text_color="#00BFFF"
+        )
+        title.pack(anchor="w", pady=(10, 0))
+        
+        subtitle = ctk.CTkLabel(
+            title_frame,
+            text="Formation Trading Professionnelle",
+            font=("Arial", 12),
+            text_color="#888888"
+        )
+        subtitle.pack(anchor="w")
+        
+        # Stats utilisateur
+        self.create_user_stats_simple(header)
+    
+    def create_user_stats_simple(self, parent):
+        """Statistiques utilisateur simplifiées"""
+        stats_frame = ctk.CTkFrame(parent, fg_color="#2a2d36")
+        stats_frame.pack(side="right", fill="y", padx=20, pady=10)
+        
+        # Niveau
+        level_label = ctk.CTkLabel(
+            stats_frame,
+            text=f"Niveau {self.user_data['level']}",
+            font=("Arial", 14, "bold"),
+            text_color="#00BFFF"
+        )
+        level_label.pack(side="left", padx=15)
+        
+        # XP
+        xp_label = ctk.CTkLabel(
+            stats_frame,
+            text=f"{self.user_data['experience']}/1000 XP",
+            font=("Arial", 12),
+            text_color="#CCCCCC"
+        )
+        xp_label.pack(side="left", padx=15)
+        
+        # Streak
+        streak_label = ctk.CTkLabel(
+            stats_frame,
+            text=f"🔥 {self.user_data['streak_days']} jours",
+            font=("Arial", 12),
+            text_color="#FF4444"
+        )
+        streak_label.pack(side="left", padx=15)
+    
+    def create_sidebar(self, parent):
+        """Sidebar de navigation moderne"""
+        sidebar = ctk.CTkFrame(parent, width=280, fg_color="#161920")
+        sidebar.pack_propagate(False)
+        
+        # Navigation principale
+        nav_items = [
+            ("🏠", "Dashboard", self.show_dashboard),
+            ("🎯", "Parcours", self.show_parcours),
+            ("📚", "Bibliothèque", self.show_bibliotheque),
+            ("🎮", "Simulateur", self.show_simulateur),
+            ("🏆", "Certifications", self.show_certifications),
+            ("📊", "Progrès", self.show_progress),
+            ("👥", "Communauté", self.show_community),
+            ("⚙️", "Paramètres", self.show_settings)
+        ]
+        
+        nav_frame = ctk.CTkFrame(sidebar, fg_color="transparent")
+        nav_frame.pack(fill="x", padx=15, pady=20)
+        
+        self.nav_buttons = []
+        for icon, text, command in nav_items:
+            btn = ctk.CTkButton(
+                nav_frame,
+                text=f"{icon}  {text}",
+                font=("Arial", 14),
+                height=45,
+                fg_color="transparent",
+                text_color="#CCCCCC",
+                hover_color="#2a2d36",
+                anchor="w",
+                command=command
+            )
+            btn.pack(fill="x", pady=2)
+            self.nav_buttons.append(btn)
+        
+        # Section parcours rapide
+        self.create_quick_access(sidebar)
+        
+        return sidebar
+    
+    def create_quick_access(self, parent):
+        """Accès rapide aux parcours"""
+        separator = ctk.CTkFrame(parent, height=1, fg_color="#333333")
+        separator.pack(fill="x", padx=15, pady=20)
+        
+        quick_label = ctk.CTkLabel(
+            parent,
+            text="Accès Rapide",
+            font=("Arial", 12, "bold"),
+            text_color="#888888"
+        )
+        quick_label.pack(padx=15, anchor="w")
+        
+        quick_frame = ctk.CTkFrame(parent, fg_color="transparent")
+        quick_frame.pack(fill="x", padx=15, pady=10)
+        
+        for parcours_id, data in self.parcours_data.items():
+            progress = self.calculate_parcours_progress(parcours_id)
+            
+            parcours_btn = ctk.CTkFrame(quick_frame, fg_color="#2a2d36")
+            parcours_btn.pack(fill="x", pady=3)
+            
+            # Titre et progression
+            title_label = ctk.CTkLabel(
+                parcours_btn,
+                text=data["titre"],
+                font=("Arial", 11, "bold"),
+                text_color=data["couleur"]
+            )
+            title_label.pack(anchor="w", padx=10, pady=(8, 2))
+            
+            # Barre de progression
+            progress_bar = ctk.CTkProgressBar(
+                parcours_btn,
+                width=220,
+                progress_color=data["couleur"]
+            )
+            progress_bar.pack(padx=10, pady=(0, 8))
+            progress_bar.set(progress / 100)
+    
+    def show_dashboard(self):
+        """Dashboard principal avec métriques et recommandations"""
+        self.clear_content_area()
+        self.highlight_nav_button(0)
+        
+        # Container scrollable
+        scroll_frame = ctk.CTkScrollableFrame(self.content_area)
+        scroll_frame.pack(fill="both", expand=True, padx=20, pady=20)
+        
+        # Welcome message personnalisé
+        welcome_frame = ctk.CTkFrame(scroll_frame, fg_color="#2a2d36")
+        welcome_frame.pack(fill="x", pady=(0, 20))
+        
+        welcome_text = self.get_personalized_welcome()
+        welcome_label = ctk.CTkLabel(
+            welcome_frame,
+            text=welcome_text,
+            font=("Arial", 16),
+            wraplength=600,
+            justify="left"
+        )
+        welcome_label.pack(padx=20, pady=15)
+        
+        # Métriques en temps réel
+        self.create_metrics_cards(scroll_frame)
+        
+        # Recommandations IA
+        self.create_ai_recommendations(scroll_frame)
+        
+        # Section activité récente simplifiée
+        self.create_activity_section(scroll_frame)
+    
+    def create_metrics_cards(self, parent):
+        """Cartes de métriques"""
+        metrics_container = ctk.CTkFrame(parent, fg_color="transparent")
+        metrics_container.pack(fill="x", pady=20)
+        
+        # Grid layout pour les cartes
+        cards_data = [
+            {
+                "title": "Progression Globale",
+                "value": f"{self.calculate_global_progress()}%",
+                "subtitle": "Tous parcours confondus",
+                "color": "#00BFFF",
+                "icon": "📈"
+            },
+            {
+                "title": "Temps d'Étude",
+                "value": f"{self.user_data['time_spent']}h",
+                "subtitle": "Cette semaine: 5h",
+                "color": "#00FF88",
+                "icon": "⏱️"
+            },
+            {
+                "title": "Score Moyen Quiz",
+                "value": f"{self.calculate_average_quiz_score()}%",
+                "subtitle": "Progression: +5%",
+                "color": "#FFA500",
+                "icon": "🎯"
+            },
+            {
+                "title": "Rang Communauté",
+                "value": f"#{self.get_community_rank()}",
+                "subtitle": "Top 15% cette semaine",
+                "color": "#FF4444",
+                "icon": "🏆"
+            }
+        ]
+        
+        for i, card_data in enumerate(cards_data):
+            card = self.create_metric_card(metrics_container, card_data)
+            card.grid(row=0, column=i, padx=10, pady=10, sticky="ew")
+        
+        # Configurer grid weights
+        for i in range(4):
+            metrics_container.grid_columnconfigure(i, weight=1)
+    
+    def create_metric_card(self, parent, data):
+        """Crée une carte métrique"""
+        card = ctk.CTkFrame(parent, fg_color="#2a2d36", width=200, height=120)
+        card.grid_propagate(False)
+        
+        # Icon
+        icon_label = ctk.CTkLabel(
+            card,
+            text=data["icon"],
+            font=("Arial", 24)
+        )
+        icon_label.place(x=15, y=15)
+        
+        # Title
+        title_label = ctk.CTkLabel(
+            card,
+            text=data["title"],
+            font=("Arial", 12),
+            text_color="#888888"
+        )
+        title_label.place(x=55, y=20)
+        
+        # Value
+        value_label = ctk.CTkLabel(
+            card,
+            text=data["value"],
+            font=("Arial", 24, "bold"),
+            text_color=data["color"]
+        )
+        value_label.place(x=15, y=50)
+        
+        # Subtitle
+        subtitle_label = ctk.CTkLabel(
+            card,
+            text=data["subtitle"],
+            font=("Arial", 10),
+            text_color="#666666"
+        )
+        subtitle_label.place(x=15, y=85)
+        
+        return card
+    
+    def create_ai_recommendations(self, parent):
+        """Recommandations personnalisées par IA"""
+        ai_frame = ctk.CTkFrame(parent, fg_color="#2a2d36")
+        ai_frame.pack(fill="x", pady=20)
+        
+        ai_title = ctk.CTkLabel(
+            ai_frame,
+            text="🤖 Recommandations Personnalisées",
+            font=("Arial", 18, "bold"),
+            text_color="#00BFFF"
+        )
+        ai_title.pack(anchor="w", padx=20, pady=(15, 10))
+        
+        recommendations = self.get_ai_recommendations()
+        
+        for rec in recommendations:
+            rec_item = ctk.CTkFrame(ai_frame, fg_color="#1c1f26")
+            rec_item.pack(fill="x", padx=20, pady=5)
+            
+            rec_text = ctk.CTkLabel(
+                rec_item,
+                text=f"• {rec}",
+                font=("Arial", 12),
+                wraplength=700,
+                justify="left"
+            )
+            rec_text.pack(anchor="w", padx=15, pady=10)
+        
+        # Bouton action
+        action_btn = ctk.CTkButton(
+            ai_frame,
+            text="📘 Commencer la session recommandée",
+            font=("Arial", 14, "bold"),
+            fg_color="#00BFFF",
+            command=self.start_recommended_session
+        )
+        action_btn.pack(pady=15)
+    
+    def create_activity_section(self, parent):
+        """Section activité récente"""
+        activity_frame = ctk.CTkFrame(parent, fg_color="#2a2d36")
+        activity_frame.pack(fill="x", pady=20)
+        
+        activity_title = ctk.CTkLabel(
+            activity_frame,
+            text="📈 Activité Récente",
+            font=("Arial", 18, "bold"),
+            text_color="#00BFFF"
+        )
+        activity_title.pack(anchor="w", padx=20, pady=15)
+        
+        activities = [
+            "📚 Module complété: 'Les Bases du RSI' (Score: 87%)",
+            "🎯 Quiz réussi: 'Moyennes Mobiles' (15/20 points)",
+            "⏱️ Session d'étude: 45 minutes aujourd'hui",
+            "🏆 Badge débloqué: 'Analyste Technique Débutant'"
+        ]
+        
+        for activity in activities:
+            activity_item = ctk.CTkLabel(
+                activity_frame,
+                text=activity,
+                font=("Arial", 12),
+                anchor="w"
+            )
+            activity_item.pack(fill="x", padx=20, pady=2)
+        
+        # Espacement
+        ctk.CTkLabel(activity_frame, text="").pack(pady=10)
+    
+    def animate_progress_rings(self):
+        """Animation simple pour les statistiques"""
+        def animate():
+            while True:
+                # Animation simple - mise à jour périodique des stats
+                time.sleep(5)
+                if not hasattr(self, 'user_data'):
+                    break
+        
+        threading.Thread(target=animate, daemon=True).start()
+    
+    # Méthodes utilitaires
+    def clear_content_area(self):
+        """Nettoie la zone de contenu"""
+        for widget in self.content_area.winfo_children():
+            widget.destroy()
+    
+    def highlight_nav_button(self, index):
+        """Met en surbrillance le bouton de navigation actif"""
+        for i, btn in enumerate(self.nav_buttons):
+            if i == index:
+                btn.configure(fg_color="#2a2d36", text_color="#00BFFF")
+            else:
+                btn.configure(fg_color="transparent", text_color="#CCCCCC")
+    
+    def calculate_parcours_progress(self, parcours_id):
+        """Calcule le progrès d'un parcours"""
+        base_progress = {"debutant": 65, "intermediaire": 25, "expert": 5}
+        return base_progress.get(parcours_id, 0)
+    
+    def get_personalized_welcome(self):
+        """Message de bienvenue personnalisé"""
+        hour = datetime.now().hour
+        time_greeting = "Bon matin" if hour < 12 else "Bon après-midi" if hour < 18 else "Bonsoir"
+        
+        return f"""
+{time_greeting} ! 👋
+
+Vous avez progressé de 12% cette semaine. Continuez sur cette lancée !
+Dernière leçon: Analyse Technique - RSI
+
+Objectif du jour: Terminer le quiz sur les moyennes mobiles
+        """.strip()
+    
+    def get_ai_recommendations(self):
+        """Recommandations IA basées sur le profil utilisateur"""
+        return [
+            "Vous excellez en analyse technique mais pourriez améliorer la gestion du risque",
+            "Le module 'Position Sizing' serait parfait pour votre niveau actuel",
+            "Votre score aux quiz indique une préférence pour l'apprentissage visuel",
+            "5 autres utilisateurs similaires ont trouvé utile le module 'Psychologie du Trading'"
+        ]
+    
+    def calculate_global_progress(self):
+        """Calcule le progrès global"""
+        return 47
+    
+    def calculate_average_quiz_score(self):
+        """Score moyen aux quiz"""
+        return 78
+    
+    def get_community_rank(self):
+        """Rang dans la communauté"""
+        return 342
+    
+    def start_recommended_session(self):
+        """Démarre une session recommandée"""
+        messagebox.showinfo("Session", "Démarrage de la session personnalisée...")
+    
+    # Placeholders pour les autres vues
+    def show_parcours(self):
+        self.clear_content_area()
+        self.highlight_nav_button(1)
+        
+        title = ctk.CTkLabel(
+            self.content_area,
+            text="🎯 Parcours de Formation",
+            font=("Arial", 24, "bold"),
+            text_color="#00BFFF"
+        )
+        title.pack(pady=50)
+        
+        content = ctk.CTkLabel(
+            self.content_area,
+            text="Section Parcours en développement...",
+            font=("Arial", 16),
+            text_color="#CCCCCC"
+        )
+        content.pack(pady=20)
+    
+    def show_bibliotheque(self):
+        self.clear_content_area()
+        self.highlight_nav_button(2)
+        
+        title = ctk.CTkLabel(
+            self.content_area,
+            text="📚 Bibliothèque",
+            font=("Arial", 24, "bold"),
+            text_color="#00BFFF"
+        )
+        title.pack(pady=50)
+        
+        # Exemple de contenu pour la bibliothèque
+        content_frame = ctk.CTkFrame(self.content_area, fg_color="#2a2d36")
+        content_frame.pack(fill="both", expand=True, padx=50, pady=20)
+        
+        content_label = ctk.CTkLabel(
+            content_frame,
+            text="📖 Ressources disponibles:\n\n• Guides PDF\n• Articles de trading\n• Vidéos explicatives\n• Glossaire financier",
+            font=("Arial", 14),
+            text_color="#CCCCCC",
+            justify="left"
+        )
+        content_label.pack(pady=30)
+    
+    def show_simulateur(self):
+        self.clear_content_area()
+        self.highlight_nav_button(3)
+        
+        title = ctk.CTkLabel(
+            self.content_area,
+            text="🎮 Simulateur",
+            font=("Arial", 24, "bold"),
+            text_color="#00BFFF"
+        )
+        title.pack(pady=50)
+        
+        # Exemple de contenu pour le simulateur
+        content_frame = ctk.CTkFrame(self.content_area, fg_color="#2a2d36")
+        content_frame.pack(fill="both", expand=True, padx=50, pady=20)
+        
+        content_label = ctk.CTkLabel(
+            content_frame,
+            text="🎯 Simulateur de trading:\n\n• Portfolio virtuel: 10,000€\n• Trading en temps réel\n• Historique des transactions\n• Classements",
+            font=("Arial", 14),
+            text_color="#CCCCCC",
+            justify="left"
+        )
+        content_label.pack(pady=30)
+    
+    def show_certifications(self):
+        self.clear_content_area()
+        self.highlight_nav_button(4)
+        
+        title = ctk.CTkLabel(
+            self.content_area,
+            text="🏆 Certifications",
+            font=("Arial", 24, "bold"),
+            text_color="#00BFFF"
+        )
+        title.pack(pady=50)
+        
+        # Exemple de contenu pour les certifications
+        content_frame = ctk.CTkFrame(self.content_area, fg_color="#2a2d36")
+        content_frame.pack(fill="both", expand=True, padx=50, pady=20)
+        
+        content_label = ctk.CTkLabel(
+            content_frame,
+            text="🎓 Certifications disponibles:\n\n✅ Trading Fondamental (Obtenu)\n⏳ Analyse Technique (En cours)\n🔒 Gestion de Portefeuille\n🔒 Trading Avancé",
+            font=("Arial", 14),
+            text_color="#CCCCCC",
+            justify="left"
+        )
+        content_label.pack(pady=30)
+    
+    def show_progress(self):
+        self.clear_content_area()
+        self.highlight_nav_button(5)
+        
+        title = ctk.CTkLabel(
+            self.content_area,
+            text="📊 Progrès",
+            font=("Arial", 24, "bold"),
+            text_color="#00BFFF"
+        )
+        title.pack(pady=50)
+        
+        # Exemple de contenu pour les progrès
+        progress_frame = ctk.CTkFrame(self.content_area, fg_color="#2a2d36")
+        progress_frame.pack(fill="both", expand=True, padx=50, pady=20)
+        
+        # Barres de progression
+        progress_items = [
+            ("Parcours Débutant", 65, "#00BFFF"),
+            ("Parcours Intermédiaire", 25, "#FFA500"),
+            ("Parcours Expert", 5, "#FF4444")
+        ]
+        
+        for name, progress, color in progress_items:
+            item_frame = ctk.CTkFrame(progress_frame, fg_color="#1c1f26")
+            item_frame.pack(fill="x", padx=20, pady=10)
+            
+            name_label = ctk.CTkLabel(item_frame, text=name, font=("Arial", 14))
+            name_label.pack(anchor="w", padx=15, pady=(10, 5))
+            
+            progress_bar = ctk.CTkProgressBar(item_frame, progress_color=color)
+            progress_bar.pack(fill="x", padx=15, pady=(0, 10))
+            progress_bar.set(progress / 100)
+    
+    def show_community(self):
+        self.clear_content_area()
+        self.highlight_nav_button(6)
+        
+        title = ctk.CTkLabel(
+            self.content_area,
+            text="👥 Communauté",
+            font=("Arial", 24, "bold"),
+            text_color="#00BFFF"
+        )
+        title.pack(pady=50)
+        
+        # Exemple de contenu pour la communauté
+        content_frame = ctk.CTkFrame(self.content_area, fg_color="#2a2d36")
+        content_frame.pack(fill="both", expand=True, padx=50, pady=20)
+        
+        content_label = ctk.CTkLabel(
+            content_frame,
+            text="🌟 Activité communauté:\n\n💬 Forum de discussion\n🏆 Classements hebdomadaires\n👨‍🏫 Sessions mentoring\n🤝 Groupes d'étude",
+            font=("Arial", 14),
+            text_color="#CCCCCC",
+            justify="left"
+        )
+        content_label.pack(pady=30)
+    
+    def show_settings(self):
+        self.clear_content_area()
+        self.highlight_nav_button(7)
+        
+        title = ctk.CTkLabel(
+            self.content_area,
+            text="⚙️ Paramètres",
+            font=("Arial", 24, "bold"),
+            text_color="#00BFFF"
+        )
+        title.pack(pady=50)
+        
+        # Interface de paramètres
+        settings_frame = ctk.CTkFrame(self.content_area, fg_color="#2a2d36")
+        settings_frame.pack(fill="both", expand=True, padx=50, pady=20)
+        
+        # Notifications
+        notif_frame = ctk.CTkFrame(settings_frame, fg_color="#1c1f26")
+        notif_frame.pack(fill="x", padx=20, pady=10)
+        
+        ctk.CTkLabel(notif_frame, text="📱 Notifications", font=("Arial", 16, "bold")).pack(anchor="w", padx=15, pady=(10, 5))
+        
+        notif_switch = ctk.CTkSwitch(notif_frame, text="Activer les notifications")
+        notif_switch.pack(anchor="w", padx=15, pady=(0, 10))
+        notif_switch.select()  # Activé par défaut
+        
+        # Mode sombre
+        theme_frame = ctk.CTkFrame(settings_frame, fg_color="#1c1f26")
+        theme_frame.pack(fill="x", padx=20, pady=10)
+        
+        ctk.CTkLabel(theme_frame, text="🌙 Apparence", font=("Arial", 16, "bold")).pack(anchor="w", padx=15, pady=(10, 5))
+        
+        theme_switch = ctk.CTkSwitch(theme_frame, text="Mode sombre")
+        theme_switch.pack(anchor="w", padx=15, pady=(0, 10))
+        theme_switch.select()  # Activé par défaut
+        
+        # Langue
+        lang_frame = ctk.CTkFrame(settings_frame, fg_color="#1c1f26")
+        lang_frame.pack(fill="x", padx=20, pady=10)
+        
+        ctk.CTkLabel(lang_frame, text="🌍 Langue", font=("Arial", 16, "bold")).pack(anchor="w", padx=15, pady=(10, 5))
+        
+        lang_menu = ctk.CTkOptionMenu(lang_frame, values=["Français", "English"])
+        lang_menu.pack(anchor="w", padx=15, pady=(0, 10))
+
+
+# Fonction d'intégration
+def afficher_formation_commerciale(parent):
+    """Lance la formation de niveau commercial"""
+    print("[DEBUG] Chargement formation commerciale...")
+    
+    try:
+        for widget in parent.winfo_children():
+            widget.destroy()
+        
+        formation = FormationCommerciale(parent)
+        print("[DEBUG] Formation commerciale chargée avec succès")
+        return formation
+        
+    except Exception as e:
+        print(f"[ERROR] Erreur formation commerciale: {e}")
+        import traceback
+        traceback.print_exc()
+        
+        # Interface de fallback
+        error_frame = ctk.CTkFrame(parent, fg_color="#1c1f26")
+        error_frame.pack(fill="both", expand=True, padx=20, pady=20)
+        
+        error_label = ctk.CTkLabel(
+            error_frame,
+            text=f"❌ Erreur de chargement:\n{str(e)}",
+            font=("Arial", 14),
+            text_color="#FF6666"
+        )
+        error_label.pack(pady=50)
+
+
+if __name__ == "__main__":
+    # Test standalone
+    app = ctk.CTk()
+    app.geometry("1400x900")
+    app.title("HelixOne Academy")
+    
+    formation = FormationCommerciale(app)
+    
+    app.mainloop()
+    
+import customtkinter as ctk
+from tkinter import messagebox, filedialog
+import json
+import os
+from datetime import datetime, timedelta
+import threading
+import time
+import random
+
+class FormationCommerciale(ctk.CTkFrame):
+    """Formation de niveau commercial pour HelixOne - Version complète"""
+    
+    def __init__(self, parent):
+        super().__init__(parent, fg_color="#0a0e12")
+        self.pack(fill="both", expand=True)
+        
+        # Initialisation des données
+        self.setup_directories()
+        self.user_data = self.load_user_data()
+        self.parcours_data = self.load_parcours_data()
+        self.modules_data = self.load_modules_data()
+        self.library_data = self.load_library_data()
+        self.current_module = None
+        self.current_lesson = 0
+        
+        # Interface principale
+        self.setup_main_interface()
+        
+        # Démarrer les animations
+        self.animate_progress_rings()
+    
+    def setup_directories(self):
+        """Crée les dossiers nécessaires"""
+        os.makedirs("data/formation_commerciale", exist_ok=True)
+        print("[DEBUG] Dossiers formation commerciale créés")
+    
+    def load_user_data(self):
+        """Charge les données utilisateur"""
+        try:
+            with open("data/formation_commerciale/user_formation.json", 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except:
+            return {
+                "user_id": "trader_001",
+                "subscription": "premium",
+                "level": 1,
+                "experience": 247,
+                "parcours_actuel": "debutant",
+                "modules_completed": [],
+                "quiz_scores": {},
+                "time_spent": 15,
+                "last_session": datetime.now().isoformat(),
+                "streak_days": 3,
+                "achievements": ["first_login", "first_module"],
+                "preferred_learning": "visual",
+                "strengths": ["technical_analysis"],
+                "weaknesses": ["risk_management"],
+                "learning_path": "standard",
+                "certification_progress": {"basic": 30, "intermediate": 0, "advanced": 0},
+                "mentor_sessions": 2,
+                "simulator_balance": 10000,
+                "simulator_trades": []
+            }
+    
+    def load_parcours_data(self):
+        """Structure des parcours de formation"""
+        return {
+            "debutant": {
+                "titre": "Trader Débutant",
+                "description": "Maîtrisez les fondamentaux du trading",
+                "duree_estimee": "25 heures",
+                "modules_count": 6,
+                "prerequis": "Aucun",
+                "certification": "Certificat Trading Fondamental",
+                "couleur": "#00BFFF"
+            },
+            "intermediaire": {
+                "titre": "Trader Confirmé", 
+                "description": "Développez vos stratégies avancées",
+                "duree_estimee": "40 heures",
+                "modules_count": 8,
+                "prerequis": "Parcours Débutant complété",
+                "certification": "Certificat Trading Avancé",
+                "couleur": "#FFA500"
+            },
+            "expert": {
+                "titre": "Trader Expert",
+                "description": "Maîtrisez les techniques professionnelles",
+                "duree_estimee": "30 heures", 
+                "modules_count": 6,
+                "prerequis": "Parcours Intermédiaire complété",
+                "certification": "Certificat Trading Professionnel",
+                "couleur": "#FF4444"
+            }
+        }
+    
+    def load_modules_data(self):
+        """Charge les modules détaillés depuis le fichier JSON"""
+        try:
+            with open("data/formation_commerciale/modules_complets.json", 'r', encoding='utf-8') as f:
+                all_modules = json.load(f)
+
+            # Organiser les modules par parcours
+            modules_by_parcours = {
+                "debutant": [],
+                "intermediaire": [],
+                "expert": []
+            }
+
+            for module in all_modules:
+                parcours = module.get("parcours", "debutant")
+
+                # Adapter le format pour l'interface
+                adapted_module = {
+                    "id": module.get("id", ""),
+                    "title": module.get("titre", ""),
+                    "duration": module.get("durée", "N/A"),
+                    "difficulty": module.get("difficulté", "Débutant"),
+                    "completed": module.get("id") in self.user_data.get("modules_completed", []),
+                    "score": self.user_data.get("quiz_scores", {}).get(module.get("id"), 0),
+                    "content": module.get("description", ""),
+                    "lessons": [section.get("titre", "") for section in module.get("contenu", {}).get("sections", [])],
+                    "full_data": module  # Garder les données complètes pour l'affichage détaillé
+                }
+
+                if parcours in modules_by_parcours:
+                    modules_by_parcours[parcours].append(adapted_module)
+
+            return modules_by_parcours
+
+        except Exception as e:
+            print(f"[ERROR] Erreur chargement modules: {e}")
+            # Fallback vers données par défaut si erreur
+            return {
+                "debutant": [],
+                "intermediaire": [],
+                "expert": []
+            }
+    
+    def load_library_data(self):
+        """Charge les données de la bibliothèque"""
+        return {
+            "articles": [
+                {"title": "Guide Complet du RSI", "type": "PDF", "size": "2.3 MB", "downloads": 1250},
+                {"title": "Les 10 Erreurs du Débutant", "type": "Article", "size": "850 KB", "downloads": 2100},
+                {"title": "Stratégies de Scalping", "type": "PDF", "size": "4.1 MB", "downloads": 890},
+                {"title": "Gestion du Risque Avancée", "type": "eBook", "size": "12 MB", "downloads": 3200}
+            ],
+            "videos": [
+                {"title": "Webinaire: Market Making", "duration": "45 min", "views": 5600},
+                {"title": "Tutorial: TradingView", "duration": "30 min", "views": 12000},
+                {"title": "Analyse Live CAC40", "duration": "60 min", "views": 3400}
+            ],
+            "tools": [
+                {"name": "Calculateur Position Size", "description": "Calcule la taille optimale des positions"},
+                {"name": "Risk/Reward Calculator", "description": "Analyse le ratio risque/récompense"},
+                {"name": "Backtesting Tool", "description": "Teste vos stratégies sur données historiques"}
+            ]
+        }
+    
+    def setup_main_interface(self):
+        """Interface principale moderne"""
+        # Header avec branding
+        self.create_header()
+        
+        # Container principal avec sidebar
+        main_container = ctk.CTkFrame(self, fg_color="transparent")
+        main_container.pack(fill="both", expand=True, padx=10, pady=10)
+        
+        # Sidebar avec navigation
+        self.sidebar = self.create_sidebar(main_container)
+        self.sidebar.pack(side="left", fill="y", padx=(0, 10))
+        
+        # Zone de contenu principale
+        self.content_area = ctk.CTkFrame(main_container, fg_color="#1c1f26")
+        self.content_area.pack(side="right", fill="both", expand=True)
+        
+        # Afficher dashboard par défaut
+        self.show_dashboard()
+    
+    def create_header(self):
+        """Header moderne avec statistiques"""
+        header = ctk.CTkFrame(self, height=80, fg_color="#161920")
+        header.pack(fill="x", padx=10, pady=(10, 0))
+        header.pack_propagate(False)
+        
+        # Logo et titre
+        title_frame = ctk.CTkFrame(header, fg_color="transparent")
+        title_frame.pack(side="left", fill="y", padx=20)
+        
+        title = ctk.CTkLabel(
+            title_frame,
+            text="HelixOne Academy",
+            font=("Arial", 24, "bold"),
+            text_color="#00BFFF"
+        )
+        title.pack(anchor="w", pady=(10, 0))
+        
+        subtitle = ctk.CTkLabel(
+            title_frame,
+            text="Formation Trading Professionnelle",
+            font=("Arial", 12),
+            text_color="#888888"
+        )
+        subtitle.pack(anchor="w")
+        
+        # Stats utilisateur
+        self.create_user_stats_simple(header)
+    
+    def create_user_stats_simple(self, parent):
+        """Statistiques utilisateur simplifiées"""
+        stats_frame = ctk.CTkFrame(parent, fg_color="#2a2d36")
+        stats_frame.pack(side="right", fill="y", padx=20, pady=10)
+        
+        # Niveau
+        level_label = ctk.CTkLabel(
+            stats_frame,
+            text=f"Niveau {self.user_data['level']}",
+            font=("Arial", 14, "bold"),
+            text_color="#00BFFF"
+        )
+        level_label.pack(side="left", padx=15)
+        
+        # XP
+        xp_label = ctk.CTkLabel(
+            stats_frame,
+            text=f"{self.user_data['experience']}/1000 XP",
+            font=("Arial", 12),
+            text_color="#CCCCCC"
+        )
+        xp_label.pack(side="left", padx=15)
+        
+        # Streak
+        streak_label = ctk.CTkLabel(
+            stats_frame,
+            text=f"Série: {self.user_data['streak_days']} jours",
+            font=("Arial", 12),
+            text_color="#FF4444"
+        )
+        streak_label.pack(side="left", padx=15)
+    
+    def create_sidebar(self, parent):
+        """Sidebar de navigation moderne"""
+        sidebar = ctk.CTkFrame(parent, width=280, fg_color="#161920")
+        sidebar.pack_propagate(False)
+        
+        # Navigation principale
+        nav_items = [
+            ("Dashboard", self.show_dashboard),
+            ("Parcours", self.show_parcours),
+            ("Bibliothèque", self.show_bibliotheque),
+            ("Simulateur", self.show_simulateur),
+            ("Certifications", self.show_certifications),
+            ("Progrès", self.show_progress),
+            ("Communauté", self.show_community),
+            ("Paramètres", self.show_settings)
+        ]
+        
+        nav_frame = ctk.CTkFrame(sidebar, fg_color="transparent")
+        nav_frame.pack(fill="x", padx=15, pady=20)
+        
+        self.nav_buttons = []
+        for text, command in nav_items:
+            btn = ctk.CTkButton(
+                nav_frame,
+                text=text,
+                font=("Arial", 14),
+                height=45,
+                fg_color="transparent",
+                text_color="#CCCCCC",
+                hover_color="#2a2d36",
+                anchor="w",
+                command=command
+            )
+            btn.pack(fill="x", pady=2)
+            self.nav_buttons.append(btn)
+        
+        # Section parcours rapide
+        self.create_quick_access(sidebar)
+        
+        return sidebar
+    
+    def create_quick_access(self, parent):
+        """Accès rapide aux parcours"""
+        separator = ctk.CTkFrame(parent, height=1, fg_color="#333333")
+        separator.pack(fill="x", padx=15, pady=20)
+        
+        quick_label = ctk.CTkLabel(
+            parent,
+            text="Accès Rapide",
+            font=("Arial", 12, "bold"),
+            text_color="#888888"
+        )
+        quick_label.pack(padx=15, anchor="w")
+        
+        quick_frame = ctk.CTkFrame(parent, fg_color="transparent")
+        quick_frame.pack(fill="x", padx=15, pady=10)
+        
+        for parcours_id, data in self.parcours_data.items():
+            progress = self.calculate_parcours_progress(parcours_id)
+            
+            parcours_btn = ctk.CTkFrame(quick_frame, fg_color="#2a2d36")
+            parcours_btn.pack(fill="x", pady=3)
+            
+            # Titre et progression
+            title_label = ctk.CTkLabel(
+                parcours_btn,
+                text=data["titre"],
+                font=("Arial", 11, "bold"),
+                text_color=data["couleur"]
+            )
+            title_label.pack(anchor="w", padx=10, pady=(8, 2))
+            
+            # Barre de progression
+            progress_bar = ctk.CTkProgressBar(
+                parcours_btn,
+                width=220,
+                progress_color=data["couleur"]
+            )
+            progress_bar.pack(padx=10, pady=(0, 8))
+            progress_bar.set(progress / 100)
+    
+    def show_dashboard(self):
+        """Dashboard principal avec métriques et recommandations"""
+        self.clear_content_area()
+        self.highlight_nav_button(0)
+        
+        # Container scrollable
+        scroll_frame = ctk.CTkScrollableFrame(self.content_area)
+        scroll_frame.pack(fill="both", expand=True, padx=20, pady=20)
+        
+        # Welcome message personnalisé
+        welcome_frame = ctk.CTkFrame(scroll_frame, fg_color="#2a2d36")
+        welcome_frame.pack(fill="x", pady=(0, 20))
+        
+        welcome_text = self.get_personalized_welcome()
+        welcome_label = ctk.CTkLabel(
+            welcome_frame,
+            text=welcome_text,
+            font=("Arial", 16),
+            wraplength=600,
+            justify="left"
+        )
+        welcome_label.pack(padx=20, pady=15)
+        
+        # Métriques en temps réel
+        self.create_metrics_cards(scroll_frame)
+        
+        # Recommandations IA
+        self.create_ai_recommendations(scroll_frame)
+        
+        # Section activité récente
+        self.create_activity_section(scroll_frame)
+    
+    def show_parcours(self):
+        """Interface complète des parcours de formation"""
+        self.clear_content_area()
+        self.highlight_nav_button(1)
+        
+        scroll_frame = ctk.CTkScrollableFrame(self.content_area)
+        scroll_frame.pack(fill="both", expand=True, padx=20, pady=20)
+        
+        title = ctk.CTkLabel(
+            scroll_frame,
+            text="Parcours de Formation",
+            font=("Arial", 24, "bold"),
+            text_color="#00BFFF"
+        )
+        title.pack(pady=(0, 20))
+        
+        # Parcours sélecteur
+        parcours_frame = ctk.CTkFrame(scroll_frame, fg_color="#2a2d36")
+        parcours_frame.pack(fill="x", pady=(0, 20))
+        
+        ctk.CTkLabel(
+            parcours_frame,
+            text="Sélectionnez votre parcours:",
+            font=("Arial", 16, "bold")
+        ).pack(padx=20, pady=(15, 10))
+        
+        parcours_tabs = ctk.CTkSegmentedButton(
+            parcours_frame,
+            values=["Débutant", "Intermédiaire", "Expert"],
+            command=self.change_parcours
+        )
+        parcours_tabs.pack(padx=20, pady=(0, 15))
+        parcours_tabs.set("Débutant")
+        
+        # Modules du parcours
+        self.modules_container = ctk.CTkFrame(scroll_frame, fg_color="transparent")
+        self.modules_container.pack(fill="both", expand=True, pady=10)
+        
+        self.display_modules("debutant")
+    
+    def change_parcours(self, value):
+        """Change le parcours affiché"""
+        parcours_map = {"Débutant": "debutant", "Intermédiaire": "intermediaire", "Expert": "expert"}
+        self.display_modules(parcours_map[value])
+    
+    def display_modules(self, parcours_key):
+        """Affiche les modules d'un parcours"""
+        # Clear existing modules
+        for widget in self.modules_container.winfo_children():
+            widget.destroy()
+        
+        modules = self.modules_data.get(parcours_key, [])
+        
+        for module in modules:
+            module_card = ctk.CTkFrame(self.modules_container, fg_color="#2a2d36")
+            module_card.pack(fill="x", pady=10, padx=20)
+            
+            # Header du module
+            header_frame = ctk.CTkFrame(module_card, fg_color="transparent")
+            header_frame.pack(fill="x", padx=20, pady=(15, 10))
+            
+            # Titre et statut
+            title_frame = ctk.CTkFrame(header_frame, fg_color="transparent")
+            title_frame.pack(side="left", fill="x", expand=True)
+            
+            ctk.CTkLabel(
+                title_frame,
+                text=module["title"],
+                font=("Arial", 18, "bold"),
+                text_color="#FFFFFF",
+                anchor="w"
+            ).pack(anchor="w")
+            
+            info_text = f"Durée: {module['duration']} • Difficulté: {module['difficulty']}"
+            ctk.CTkLabel(
+                title_frame,
+                text=info_text,
+                font=("Arial", 12),
+                text_color="#AAAAAA",
+                anchor="w"
+            ).pack(anchor="w", pady=(5, 0))
+            
+            # Status badge
+            status_color = "#00AA00" if module["completed"] else "#FFA500"
+            status_text = f"Complété ({module['score']}%)" if module["completed"] else "En cours"
+            
+            status_label = ctk.CTkLabel(
+                header_frame,
+                text=status_text,
+                font=("Arial", 12, "bold"),
+                text_color=status_color
+            )
+            status_label.pack(side="right")
+            
+            # Description
+            desc_label = ctk.CTkLabel(
+                module_card,
+                text=module["content"],
+                font=("Arial", 13),
+                text_color="#CCCCCC",
+                wraplength=600,
+                justify="left"
+            )
+            desc_label.pack(anchor="w", padx=20, pady=(0, 10))
+            
+            # Leçons
+            lessons_frame = ctk.CTkFrame(module_card, fg_color="#1c1f26")
+            lessons_frame.pack(fill="x", padx=20, pady=(0, 15))
+            
+            ctk.CTkLabel(
+                lessons_frame,
+                text="Leçons incluses:",
+                font=("Arial", 12, "bold"),
+                text_color="#00BFFF"
+            ).pack(anchor="w", padx=15, pady=(10, 5))
+            
+            for lesson in module["lessons"]:
+                ctk.CTkLabel(
+                    lessons_frame,
+                    text=f"• {lesson}",
+                    font=("Arial", 11),
+                    text_color="#CCCCCC"
+                ).pack(anchor="w", padx=30, pady=1)
+            
+            # Bouton d'action
+            btn_text = "Réviser" if module["completed"] else "Commencer"
+            action_btn = ctk.CTkButton(
+                module_card,
+                text=btn_text,
+                command=lambda m=module: self.start_module(m),
+                fg_color="#00BFFF",
+                width=120
+            )
+            action_btn.pack(anchor="e", padx=20, pady=(0, 15))
+    
+    def start_module(self, module):
+        """Démarre un module de formation et affiche son contenu détaillé"""
+        self.clear_content_area()
+
+        # Récupérer les données complètes du module
+        full_module = module.get("full_data", {})
+
+        # Container principal avec scroll
+        main_frame = ctk.CTkScrollableFrame(
+            self.content_area,
+            fg_color="#1c1f26"
+        )
+        main_frame.pack(fill="both", expand=True, padx=20, pady=20)
+
+        # Header du module
+        header_frame = ctk.CTkFrame(main_frame, fg_color="#2a2d36")
+        header_frame.pack(fill="x", pady=(0, 20))
+
+        # Titre principal
+        title_label = ctk.CTkLabel(
+            header_frame,
+            text=module["title"],
+            font=("Arial", 26, "bold"),
+            text_color="#00BFFF"
+        )
+        title_label.pack(pady=(20, 10), padx=20)
+
+        # Informations du module
+        info_frame = ctk.CTkFrame(header_frame, fg_color="transparent")
+        info_frame.pack(pady=(0, 20), padx=20)
+
+        info_items = [
+            f"⏱️ Durée: {module['duration']}",
+            f"📊 Difficulté: {module['difficulty']}",
+            f"🎯 Points XP: {full_module.get('points_xp', 0)}"
+        ]
+
+        info_label = ctk.CTkLabel(
+            info_frame,
+            text="  •  ".join(info_items),
+            font=("Arial", 13),
+            text_color="#AAAAAA"
+        )
+        info_label.pack()
+
+        # Description
+        desc_label = ctk.CTkLabel(
+            header_frame,
+            text=module["content"],
+            font=("Arial", 14),
+            text_color="#CCCCCC",
+            wraplength=800,
+            justify="left"
+        )
+        desc_label.pack(pady=(0, 20), padx=20)
+
+        # Introduction
+        contenu = full_module.get("contenu", {})
+        if contenu.get("introduction"):
+            intro_frame = ctk.CTkFrame(main_frame, fg_color="#2a2d36")
+            intro_frame.pack(fill="x", pady=(0, 15))
+
+            ctk.CTkLabel(
+                intro_frame,
+                text="📖 Introduction",
+                font=("Arial", 20, "bold"),
+                text_color="#00BFFF"
+            ).pack(anchor="w", pady=(15, 10), padx=20)
+
+            intro_text = ctk.CTkTextbox(
+                intro_frame,
+                font=("Arial", 13),
+                wrap="word",
+                height=150
+            )
+            intro_text.pack(fill="x", padx=20, pady=(0, 15))
+            intro_text.insert("1.0", contenu["introduction"])
+            intro_text.configure(state="disabled")
+
+        # Sections du contenu
+        sections = contenu.get("sections", [])
+        for i, section in enumerate(sections, 1):
+            section_frame = ctk.CTkFrame(main_frame, fg_color="#2a2d36")
+            section_frame.pack(fill="x", pady=(0, 15))
+
+            # Titre de la section
+            section_title = ctk.CTkLabel(
+                section_frame,
+                text=f"{i}. {section.get('titre', 'Section')}",
+                font=("Arial", 18, "bold"),
+                text_color="#FFA500"
+            )
+            section_title.pack(anchor="w", pady=(15, 10), padx=20)
+
+            # Contenu de la section
+            section_content = section.get("contenu", "")
+            if section_content:
+                content_text = ctk.CTkTextbox(
+                    section_frame,
+                    font=("Arial", 12),
+                    wrap="word",
+                    height=400
+                )
+                content_text.pack(fill="both", expand=True, padx=20, pady=(0, 15))
+                content_text.insert("1.0", section_content)
+                content_text.configure(state="disabled")
+
+            # Points clés
+            points_cles = section.get("points_cles", [])
+            if points_cles:
+                points_frame = ctk.CTkFrame(section_frame, fg_color="#1c1f26")
+                points_frame.pack(fill="x", padx=20, pady=(0, 15))
+
+                ctk.CTkLabel(
+                    points_frame,
+                    text="💡 Points clés à retenir:",
+                    font=("Arial", 13, "bold"),
+                    text_color="#00FF88"
+                ).pack(anchor="w", padx=15, pady=(10, 5))
+
+                for point in points_cles:
+                    ctk.CTkLabel(
+                        points_frame,
+                        text=f"✓ {point}",
+                        font=("Arial", 12),
+                        text_color="#CCCCCC",
+                        wraplength=700,
+                        justify="left"
+                    ).pack(anchor="w", padx=30, pady=2)
+
+                ctk.CTkLabel(points_frame, text="").pack(pady=5)  # Spacing
+
+        # Résumé
+        if contenu.get("resume"):
+            resume_frame = ctk.CTkFrame(main_frame, fg_color="#2a2d36")
+            resume_frame.pack(fill="x", pady=(0, 15))
+
+            ctk.CTkLabel(
+                resume_frame,
+                text="📝 Résumé",
+                font=("Arial", 20, "bold"),
+                text_color="#00BFFF"
+            ).pack(anchor="w", pady=(15, 10), padx=20)
+
+            resume_text = ctk.CTkTextbox(
+                resume_frame,
+                font=("Arial", 13),
+                wrap="word",
+                height=120
+            )
+            resume_text.pack(fill="x", padx=20, pady=(0, 15))
+            resume_text.insert("1.0", contenu["resume"])
+            resume_text.configure(state="disabled")
+
+        # Ressources complémentaires
+        ressources = contenu.get("ressources_complementaires", [])
+        if ressources:
+            ressources_frame = ctk.CTkFrame(main_frame, fg_color="#2a2d36")
+            ressources_frame.pack(fill="x", pady=(0, 15))
+
+            ctk.CTkLabel(
+                ressources_frame,
+                text="📚 Ressources Complémentaires",
+                font=("Arial", 18, "bold"),
+                text_color="#FFA500"
+            ).pack(anchor="w", pady=(15, 10), padx=20)
+
+            for ressource in ressources:
+                ctk.CTkLabel(
+                    ressources_frame,
+                    text=f"• {ressource}",
+                    font=("Arial", 12),
+                    text_color="#CCCCCC",
+                    wraplength=700,
+                    justify="left"
+                ).pack(anchor="w", padx=30, pady=2)
+
+            ctk.CTkLabel(ressources_frame, text="").pack(pady=10)
+
+        # Boutons d'action en bas
+        actions_frame = ctk.CTkFrame(main_frame, fg_color="#2a2d36")
+        actions_frame.pack(fill="x", pady=(0, 20))
+
+        button_container = ctk.CTkFrame(actions_frame, fg_color="transparent")
+        button_container.pack(pady=20)
+
+        # Bouton Quiz
+        quiz_btn = ctk.CTkButton(
+            button_container,
+            text="📝 Passer le Quiz",
+            command=lambda: self.start_quiz(module),
+            fg_color="#00AA00",
+            hover_color="#008800",
+            width=180,
+            height=40,
+            font=("Arial", 14, "bold")
+        )
+        quiz_btn.pack(side="left", padx=10)
+
+        # Bouton Exercices
+        if full_module.get("exercices"):
+            exercices_btn = ctk.CTkButton(
+                button_container,
+                text="✏️ Exercices Pratiques",
+                command=lambda: self.show_exercices(module),
+                fg_color="#FFA500",
+                hover_color="#FF8800",
+                width=180,
+                height=40,
+                font=("Arial", 14, "bold")
+            )
+            exercices_btn.pack(side="left", padx=10)
+
+        # Bouton Retour
+        back_btn = ctk.CTkButton(
+            button_container,
+            text="← Retour",
+            command=self.show_dashboard,
+            fg_color="#555555",
+            hover_color="#444444",
+            width=120,
+            height=40,
+            font=("Arial", 14)
+        )
+        back_btn.pack(side="left", padx=10)
+
+    def start_quiz(self, module):
+        """Lance le quiz du module"""
+        messagebox.showinfo(
+            "Quiz",
+            f"Quiz du module '{module['title']}' à venir!\n\nCette fonctionnalité sera bientôt disponible."
+        )
+
+    def show_exercices(self, module):
+        """Affiche les exercices du module"""
+        messagebox.showinfo(
+            "Exercices",
+            f"Exercices du module '{module['title']}' à venir!\n\nCette fonctionnalité sera bientôt disponible."
+        )
+    
+    def show_bibliotheque(self):
+        """Bibliothèque complète avec ressources"""
+        self.clear_content_area()
+        self.highlight_nav_button(2)
+        
+        scroll_frame = ctk.CTkScrollableFrame(self.content_area)
+        scroll_frame.pack(fill="both", expand=True, padx=20, pady=20)
+        
+        title = ctk.CTkLabel(
+            scroll_frame,
+            text="Bibliothèque de Ressources",
+            font=("Arial", 24, "bold"),
+            text_color="#00BFFF"
+        )
+        title.pack(pady=(0, 20))
+        
+        # Search bar
+        search_frame = ctk.CTkFrame(scroll_frame, fg_color="#2a2d36")
+        search_frame.pack(fill="x", pady=(0, 20))
+        
+        search_entry = ctk.CTkEntry(
+            search_frame,
+            placeholder_text="Rechercher dans la bibliothèque...",
+            font=("Arial", 14),
+            width=400
+        )
+        search_entry.pack(pady=15)
+        
+        # Categories tabs
+        categories_frame = ctk.CTkFrame(scroll_frame, fg_color="transparent")
+        categories_frame.pack(fill="x", pady=(0, 20))
+        
+        category_tabs = ctk.CTkSegmentedButton(
+            categories_frame,
+            values=["Articles", "Vidéos", "Outils"],
+            command=self.change_library_category
+        )
+        category_tabs.pack()
+        category_tabs.set("Articles")
+        
+        # Content container
+        self.library_content = ctk.CTkFrame(scroll_frame, fg_color="transparent")
+        self.library_content.pack(fill="both", expand=True)
+        
+        self.display_library_articles()
+    
+    def change_library_category(self, category):
+        """Change la catégorie de bibliothèque affichée"""
+        if category == "Articles":
+            self.display_library_articles()
+        elif category == "Vidéos":
+            self.display_library_videos()
+        else:
+            self.display_library_tools()
+    
+    def display_library_articles(self):
+        """Affiche les articles de la bibliothèque"""
+        for widget in self.library_content.winfo_children():
+            widget.destroy()
+        
+        for article in self.library_data["articles"]:
+            article_card = ctk.CTkFrame(self.library_content, fg_color="#2a2d36")
+            article_card.pack(fill="x", pady=10, padx=20)
+            
+            info_frame = ctk.CTkFrame(article_card, fg_color="transparent")
+            info_frame.pack(fill="x", padx=20, pady=15)
+            
+            # Title and type
+            title_frame = ctk.CTkFrame(info_frame, fg_color="transparent")
+            title_frame.pack(side="left", fill="x", expand=True)
+            
+            ctk.CTkLabel(
+                title_frame,
+                text=article["title"],
+                font=("Arial", 16, "bold"),
+                text_color="#FFFFFF",
+                anchor="w"
+            ).pack(anchor="w")
+            
+            details = f"{article['type']} • {article['size']} • {article['downloads']} téléchargements"
+            ctk.CTkLabel(
+                title_frame,
+                text=details,
+                font=("Arial", 11),
+                text_color="#AAAAAA",
+                anchor="w"
+            ).pack(anchor="w", pady=(2, 0))
+            
+            # Download button
+            download_btn = ctk.CTkButton(
+                info_frame,
+                text="Télécharger",
+                width=100,
+                command=lambda a=article: self.download_resource(a)
+            )
+            download_btn.pack(side="right")
+    
+    def display_library_videos(self):
+        """Affiche les vidéos de la bibliothèque"""
+        for widget in self.library_content.winfo_children():
+            widget.destroy()
+        
+        for video in self.library_data["videos"]:
+            video_card = ctk.CTkFrame(self.library_content, fg_color="#2a2d36")
+            video_card.pack(fill="x", pady=10, padx=20)
+            
+            info_frame = ctk.CTkFrame(video_card, fg_color="transparent")
+            info_frame.pack(fill="x", padx=20, pady=15)
+            
+            title_frame = ctk.CTkFrame(info_frame, fg_color="transparent")
+            title_frame.pack(side="left", fill="x", expand=True)
+            
+            ctk.CTkLabel(
+                title_frame,
+                text=video["title"],
+                font=("Arial", 16, "bold"),
+                text_color="#FFFFFF",
+                anchor="w"
+            ).pack(anchor="w")
+            
+            details = f"Durée: {video['duration']} • {video['views']} vues"
+            ctk.CTkLabel(
+                title_frame,
+                text=details,
+                font=("Arial", 11),
+                text_color="#AAAAAA",
+                anchor="w"
+            ).pack(anchor="w", pady=(2, 0))
+            
+            play_btn = ctk.CTkButton(
+                info_frame,
+                text="Regarder",
+                width=100,
+                fg_color="#FF6B6B",
+                command=lambda v=video: self.play_video(v)
+            )
+            play_btn.pack(side="right")
+    
+    def display_library_tools(self):
+        """Affiche les outils de la bibliothèque"""
+        for widget in self.library_content.winfo_children():
+            widget.destroy()
+        
+        for tool in self.library_data["tools"]:
+            tool_card = ctk.CTkFrame(self.library_content, fg_color="#2a2d36")
+            tool_card.pack(fill="x", pady=10, padx=20)
+            
+            info_frame = ctk.CTkFrame(tool_card, fg_color="transparent")
+            info_frame.pack(fill="x", padx=20, pady=15)
+            
+            title_frame = ctk.CTkFrame(info_frame, fg_color="transparent")
+            title_frame.pack(side="left", fill="x", expand=True)
+            
+            ctk.CTkLabel(
+                title_frame,
+                text=tool["name"],
+                font=("Arial", 16, "bold"),
+                text_color="#FFFFFF",
+                anchor="w"
+            ).pack(anchor="w")
+            
+            ctk.CTkLabel(
+                title_frame,
+                text=tool["description"],
+                font=("Arial", 11),
+                text_color="#AAAAAA",
+                anchor="w",
+                wraplength=400
+            ).pack(anchor="w", pady=(2, 0))
+            
+            launch_btn = ctk.CTkButton(
+                info_frame,
+                text="Utiliser",
+                width=100,
+                fg_color="#4ECDC4",
+                command=lambda t=tool: self.launch_tool(t)
+            )
+            launch_btn.pack(side="right")
+    
+    def show_simulateur(self):
+        """Simulateur de trading fonctionnel"""
+        self.clear_content_area()
+        self.highlight_nav_button(3)
+        
+        scroll_frame = ctk.CTkScrollableFrame(self.content_area)
+        scroll_frame.pack(fill="both", expand=True, padx=20, pady=20)
+        
+        title = ctk.CTkLabel(
+            scroll_frame,
+            text="Simulateur de Trading",
+            font=("Arial", 24, "bold"),
+            text_color="#00BFFF"
+        )
+        title.pack(pady=(0, 20))
+        
+        # Portfolio overview
+        portfolio_frame = ctk.CTkFrame(scroll_frame, fg_color="#2a2d36")
+        portfolio_frame.pack(fill="x", pady=(0, 20))
+        
+        ctk.CTkLabel(
+            portfolio_frame,
+            text="Votre Portfolio Virtuel",
+            font=("Arial", 18, "bold"),
+            text_color="#00BFFF"
+        ).pack(padx=20, pady=(15, 10))
+        
+        # Balance and stats
+        stats_container = ctk.CTkFrame(portfolio_frame, fg_color="transparent")
+        stats_container.pack(fill="x", padx=20, pady=(0, 15))
+        
+        # Balance
+        balance_frame = ctk.CTkFrame(stats_container, fg_color="#1c1f26")
+        balance_frame.pack(side="left", fill="x", expand=True, padx=(0, 10))
+        
+        ctk.CTkLabel(
+            balance_frame,
+            text="Solde Total",
+            font=("Arial", 12),
+            text_color="#AAAAAA"
+        ).pack(pady=(10, 5))
+        
+        balance_value = self.user_data.get("simulator_balance", 10000)
+        ctk.CTkLabel(
+            balance_frame,
+            text=f"{balance_value:,.2f} €",
+            font=("Arial", 20, "bold"),
+            text_color="#00FF88"
+        ).pack(pady=(0, 10))
+        
+        # P&L
+        pnl_frame = ctk.CTkFrame(stats_container, fg_color="#1c1f26")
+        pnl_frame.pack(side="left", fill="x", expand=True, padx=(5, 5))
+        
+        ctk.CTkLabel(
+            pnl_frame,
+            text="P&L Aujourd'hui",
+            font=("Arial", 12),
+            text_color="#AAAAAA"
+        ).pack(pady=(10, 5))
+        
+        pnl_value = random.uniform(-500, 800)  # Simulation
+        pnl_color = "#00FF88" if pnl_value >= 0 else "#FF6B6B"
+        ctk.CTkLabel(
+            pnl_frame,
+            text=f"{pnl_value:+.2f} €",
+            font=("Arial", 20, "bold"),
+            text_color=pnl_color
+        ).pack(pady=(0, 10))
+        
+        # Trades count
+        trades_frame = ctk.CTkFrame(stats_container, fg_color="#1c1f26")
+        trades_frame.pack(side="left", fill="x", expand=True, padx=(10, 0))
+        
+        ctk.CTkLabel(
+            trades_frame,
+            text="Trades Totaux",
+            font=("Arial", 12),
+            text_color="#AAAAAA"
+        ).pack(pady=(10, 5))
+        
+        trades_count = len(self.user_data.get("simulator_trades", []))
+        ctk.CTkLabel(
+            trades_frame,
+            text=str(trades_count),
+            font=("Arial", 20, "bold"),
+            text_color="#FFA500"
+        ).pack(pady=(0, 10))
+        
+        # Trading interface
+        trading_frame = ctk.CTkFrame(scroll_frame, fg_color="#2a2d36")
+        trading_frame.pack(fill="x", pady=(0, 20))
+        
+        ctk.CTkLabel(
+            trading_frame,
+            text="Interface de Trading",
+            font=("Arial", 18, "bold"),
+            text_color="#00BFFF"
+        ).pack(padx=20, pady=(15, 10))
+        
+        # Order form
+        order_container = ctk.CTkFrame(trading_frame, fg_color="transparent")
+        order_container.pack(fill="x", padx=20, pady=(0, 15))
+        
+        # Symbol selection
+        symbol_frame = ctk.CTkFrame(order_container, fg_color="#1c1f26")
+        symbol_frame.pack(side="left", fill="both", expand=True, padx=(0, 10))
+        
+        ctk.CTkLabel(symbol_frame, text="Symbole", font=("Arial", 12, "bold")).pack(pady=(10, 5))
+        symbol_entry = ctk.CTkEntry(symbol_frame, placeholder_text="Ex: AAPL")
+        symbol_entry.pack(pady=(0, 10))
+        
+        # Quantity
+        qty_frame = ctk.CTkFrame(order_container, fg_color="#1c1f26")
+        qty_frame.pack(side="left", fill="both", expand=True, padx=(5, 5))
+        
+        ctk.CTkLabel(qty_frame, text="Quantité", font=("Arial", 12, "bold")).pack(pady=(10, 5))
+        qty_entry = ctk.CTkEntry(qty_frame, placeholder_text="100")
+        qty_entry.pack(pady=(0, 10))
+        
+        # Order type
+        type_frame = ctk.CTkFrame(order_container, fg_color="#1c1f26")
+        type_frame.pack(side="left", fill="both", expand=True, padx=(10, 0))
+        
+        ctk.CTkLabel(type_frame, text="Type d'ordre", font=("Arial", 12, "bold")).pack(pady=(10, 5))
+        order_type = ctk.CTkOptionMenu(type_frame, values=["Marché", "Limite", "Stop"])
+        order_type.pack(pady=(0, 10))
+        
+        # Buy/Sell buttons
+        buttons_frame = ctk.CTkFrame(trading_frame, fg_color="transparent")
+        buttons_frame.pack(fill="x", padx=20, pady=(0, 15))
+        
+        buy_btn = ctk.CTkButton(
+            buttons_frame,
+            text="ACHETER",
+            font=("Arial", 14, "bold"),
+            fg_color="#00FF88",
+            hover_color="#00CC6A",
+            width=120,
+            command=lambda: self.place_order("BUY", symbol_entry.get(), qty_entry.get())
+        )
+        buy_btn.pack(side="left", padx=(0, 10))
+        
+        sell_btn = ctk.CTkButton(
+            buttons_frame,
+            text="VENDRE",
+            font=("Arial", 14, "bold"),
+            fg_color="#FF6B6B",
+            hover_color="#FF5252",
+            width=120,
+            command=lambda: self.place_order("SELL", symbol_entry.get(), qty_entry.get())
+        )
+        sell_btn.pack(side="left")
+        
+        # Recent trades
+        trades_frame = ctk.CTkFrame(scroll_frame, fg_color="#2a2d36")
+        trades_frame.pack(fill="both", expand=True)
+        
+        ctk.CTkLabel(
+            trades_frame,
+            text="Historique des Trades",
+            font=("Arial", 18, "bold"),
+            text_color="#00BFFF"
+        ).pack(padx=20, pady=(15, 10))
+        
+        # Trades list (simplified)
+        if trades_count == 0:
+            ctk.CTkLabel(
+                trades_frame,
+                text="Aucun trade effectué. Commencez votre première transaction !",
+                font=("Arial", 14),
+                text_color="#AAAAAA"
+            ).pack(pady=30)
+        else:
+            # Sample trade history
+            sample_trades = [
+                {"symbol": "AAPL", "type": "BUY", "qty": 10, "price": 150.25, "time": "14:32"},
+                {"symbol": "GOOGL", "type": "SELL", "qty": 5, "price": 2750.80, "time": "13:15"},
+                {"symbol": "MSFT", "type": "BUY", "qty": 15, "price": 310.90, "time": "11:45"}
+            ]
+            
+            for trade in sample_trades:
+                trade_item = ctk.CTkFrame(trades_frame, fg_color="#1c1f26")
+                trade_item.pack(fill="x", padx=20, pady=5)
+                
+                trade_info = f"{trade['time']} | {trade['type']} {trade['qty']} {trade['symbol']} @ {trade['price']:.2f}€"
+                ctk.CTkLabel(
+                    trade_item,
+                    text=trade_info,
+                    font=("Arial", 12),
+                    text_color="#CCCCCC"
+                ).pack(padx=15, pady=8)
+    
+    def place_order(self, order_type, symbol, quantity):
+        """Place un ordre dans le simulateur"""
+        if not symbol or not quantity:
+            messagebox.showwarning("Erreur", "Veuillez remplir tous les champs")
+            return
+        
+        try:
+            qty = int(quantity)
+            # Simulation simple
+            price = random.uniform(100, 300)  # Prix simulé
+            
+            messagebox.showinfo(
+                "Ordre exécuté",
+                f"Ordre {order_type} exécuté:\n{qty} actions {symbol} @ {price:.2f}€"
+            )
+            
+            # Save to user trades (simplified)
+            trade = {
+                "type": order_type,
+                "symbol": symbol,
+                "quantity": qty,
+                "price": price,
+                "timestamp": datetime.now().isoformat()
+            }
+            
+            if "simulator_trades" not in self.user_data:
+                self.user_data["simulator_trades"] = []
+            self.user_data["simulator_trades"].append(trade)
+            
+            # Update balance (simplified)
+            if order_type == "BUY":
+                self.user_data["simulator_balance"] -= qty * price
+            else:
+                self.user_data["simulator_balance"] += qty * price
+                
+        except ValueError:
+            messagebox.showerror("Erreur", "La quantité doit être un nombre")
+    
+    def show_certifications(self):
+        """Interface complète des certifications"""
+        self.clear_content_area()
+        self.highlight_nav_button(4)
+        
+        scroll_frame = ctk.CTkScrollableFrame(self.content_area)
+        scroll_frame.pack(fill="both", expand=True, padx=20, pady=20)
+        
+        title = ctk.CTkLabel(
+            scroll_frame,
+            text="Certifications Professionnelles",
+            font=("Arial", 24, "bold"),
+            text_color="#00BFFF"
+        )
+        title.pack(pady=(0, 20))
+        
+        # Certifications disponibles
+        certifications = [
+            {
+                "name": "Trading Fondamental",
+                "level": "Débutant",
+                "progress": 85,
+                "status": "En cours",
+                "requirements": "3 modules + examen final",
+                "color": "#00BFFF"
+            },
+            {
+                "name": "Analyse Technique",
+                "level": "Intermédiaire", 
+                "progress": 30,
+                "status": "Disponible",
+                "requirements": "5 modules + projet pratique",
+                "color": "#FFA500"
+            },
+            {
+                "name": "Gestion de Portefeuille",
+                "level": "Avancé",
+                "progress": 0,
+                "status": "Verrouillé",
+                "requirements": "Certification Analyse Technique requise",
+                "color": "#FF6B6B"
+            }
+        ]
+        
+        for cert in certifications:
+            cert_card = ctk.CTkFrame(scroll_frame, fg_color="#2a2d36")
+            cert_card.pack(fill="x", pady=15, padx=20)
+            
+            # Header
+            header_frame = ctk.CTkFrame(cert_card, fg_color="transparent")
+            header_frame.pack(fill="x", padx=20, pady=(20, 10))
+            
+            # Title and level
+            title_frame = ctk.CTkFrame(header_frame, fg_color="transparent")
+            title_frame.pack(side="left", fill="x", expand=True)
+            
+            ctk.CTkLabel(
+                title_frame,
+                text=f"Certification {cert['name']}",
+                font=("Arial", 18, "bold"),
+                text_color="#FFFFFF",
+                anchor="w"
+            ).pack(anchor="w")
+            
+            ctk.CTkLabel(
+                title_frame,
+                text=f"Niveau: {cert['level']}",
+                font=("Arial", 12),
+                text_color="#AAAAAA",
+                anchor="w"
+            ).pack(anchor="w", pady=(2, 0))
+            
+            # Status badge
+            status_colors = {"En cours": "#00FF88", "Disponible": "#FFA500", "Verrouillé": "#FF6B6B"}
+            status_label = ctk.CTkLabel(
+                header_frame,
+                text=cert["status"],
+                font=("Arial", 12, "bold"),
+                text_color=status_colors[cert["status"]]
+            )
+            status_label.pack(side="right")
+            
+            # Progress bar
+            if cert["progress"] > 0:
+                progress_frame = ctk.CTkFrame(cert_card, fg_color="transparent")
+                progress_frame.pack(fill="x", padx=20, pady=(0, 10))
+                
+                ctk.CTkLabel(
+                    progress_frame,
+                    text=f"Progression: {cert['progress']}%",
+                    font=("Arial", 12),
+                    text_color="#CCCCCC"
+                ).pack(anchor="w")
+                
+                progress_bar = ctk.CTkProgressBar(
+                    progress_frame,
+                    progress_color=cert["color"]
+                )
+                progress_bar.pack(fill="x", pady=(5, 0))
+                progress_bar.set(cert["progress"] / 100)
+            
+            # Requirements
+            req_frame = ctk.CTkFrame(cert_card, fg_color="#1c1f26")
+            req_frame.pack(fill="x", padx=20, pady=(0, 10))
+            
+            ctk.CTkLabel(
+                req_frame,
+                text=f"Prérequis: {cert['requirements']}",
+                font=("Arial", 11),
+                text_color="#AAAAAA"
+            ).pack(padx=15, pady=8)
+            
+            # Action button
+            if cert["status"] != "Verrouillé":
+                btn_text = "Continuer" if cert["progress"] > 0 else "Commencer"
+                action_btn = ctk.CTkButton(
+                    cert_card,
+                    text=btn_text,
+                    fg_color=cert["color"],
+                    command=lambda c=cert: self.start_certification(c)
+                )
+                action_btn.pack(anchor="e", padx=20, pady=(0, 15))
+    
+    def start_certification(self, cert):
+        """Démarre une certification"""
+        messagebox.showinfo(
+            "Certification",
+            f"Démarrage de la certification: {cert['name']}\n\nVous serez redirigé vers le programme de certification."
+        )
+    
+    def show_progress(self):
+        """Analytics détaillés de progression"""
+        self.clear_content_area()
+        self.highlight_nav_button(5)
+        
+        scroll_frame = ctk.CTkScrollableFrame(self.content_area)
+        scroll_frame.pack(fill="both", expand=True, padx=20, pady=20)
+        
+        title = ctk.CTkLabel(
+            scroll_frame,
+            text="Analytics de Progression",
+            font=("Arial", 24, "bold"),
+            text_color="#00BFFF"
+        )
+        title.pack(pady=(0, 20))
+        
+        # Stats overview
+        stats_container = ctk.CTkFrame(scroll_frame, fg_color="transparent")
+        stats_container.pack(fill="x", pady=(0, 20))
+        
+        # Time spent
+        time_card = ctk.CTkFrame(stats_container, fg_color="#2a2d36")
+        time_card.pack(side="left", fill="both", expand=True, padx=(0, 10))
+        
+        ctk.CTkLabel(time_card, text="Temps Total", font=("Arial", 14, "bold")).pack(pady=(15, 5))
+        ctk.CTkLabel(time_card, text="47h 32min", font=("Arial", 20, "bold"), text_color="#00BFFF").pack()
+        ctk.CTkLabel(time_card, text="Cette semaine: +5h 15min", font=("Arial", 10), text_color="#AAAAAA").pack(pady=(5, 15))
+        
+        # Modules completed
+        modules_card = ctk.CTkFrame(stats_container, fg_color="#2a2d36")
+        modules_card.pack(side="left", fill="both", expand=True, padx=(5, 5))
+        
+        ctk.CTkLabel(modules_card, text="Modules Terminés", font=("Arial", 14, "bold")).pack(pady=(15, 5))
+        ctk.CTkLabel(modules_card, text="8 / 20", font=("Arial", 20, "bold"), text_color="#00FF88").pack()
+        ctk.CTkLabel(modules_card, text="Taux de réussite: 92%", font=("Arial", 10), text_color="#AAAAAA").pack(pady=(5, 15))
+        
+        # Average score
+        score_card = ctk.CTkFrame(stats_container, fg_color="#2a2d36")
+        score_card.pack(side="left", fill="both", expand=True, padx=(10, 0))
+        
+        ctk.CTkLabel(score_card, text="Score Moyen", font=("Arial", 14, "bold")).pack(pady=(15, 5))
+        ctk.CTkLabel(score_card, text="84.5%", font=("Arial", 20, "bold"), text_color="#FFA500").pack()
+        ctk.CTkLabel(score_card, text="Objectif: 80%", font=("Arial", 10), text_color="#AAAAAA").pack(pady=(5, 15))
+        
+        # Learning path progress
+        path_frame = ctk.CTkFrame(scroll_frame, fg_color="#2a2d36")
+        path_frame.pack(fill="x", pady=(0, 20))
+        
+        ctk.CTkLabel(
+            path_frame,
+            text="Progression par Parcours",
+            font=("Arial", 18, "bold"),
+            text_color="#00BFFF"
+        ).pack(padx=20, pady=(15, 10))
+        
+        paths_data = [
+            {"name": "Parcours Débutant", "progress": 85, "color": "#00BFFF"},
+            {"name": "Parcours Intermédiaire", "progress": 35, "color": "#FFA500"},
+            {"name": "Parcours Expert", "progress": 10, "color": "#FF6B6B"}
+        ]
+        
+        for path in paths_data:
+            path_item = ctk.CTkFrame(path_frame, fg_color="#1c1f26")
+            path_item.pack(fill="x", padx=20, pady=5)
+            
+            # Path info
+            info_frame = ctk.CTkFrame(path_item, fg_color="transparent")
+            info_frame.pack(fill="x", padx=15, pady=10)
+            
+            ctk.CTkLabel(
+                info_frame,
+                text=f"{path['name']} ({path['progress']}%)",
+                font=("Arial", 14),
+                text_color="#FFFFFF"
+            ).pack(anchor="w")
+            
+            # Progress bar
+            progress_bar = ctk.CTkProgressBar(
+                info_frame,
+                progress_color=path["color"]
+            )
+            progress_bar.pack(fill="x", pady=(5, 0))
+            progress_bar.set(path["progress"] / 100)
+        
+        # Weekly activity
+        activity_frame = ctk.CTkFrame(scroll_frame, fg_color="#2a2d36")
+        activity_frame.pack(fill="both", expand=True)
+        
+        ctk.CTkLabel(
+            activity_frame,
+            text="Activité de la Semaine",
+            font=("Arial", 18, "bold"),
+            text_color="#00BFFF"
+        ).pack(padx=20, pady=(15, 10))
+        
+        # Simple activity chart representation
+        days = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"]
+        activity_values = [45, 60, 30, 75, 90, 20, 40]  # minutes
+        
+        chart_frame = ctk.CTkFrame(activity_frame, fg_color="#1c1f26")
+        chart_frame.pack(fill="x", padx=20, pady=(0, 15))
+        
+        for i, (day, value) in enumerate(zip(days, activity_values)):
+            day_frame = ctk.CTkFrame(chart_frame, fg_color="transparent")
+            day_frame.pack(side="left", fill="x", expand=True, padx=5, pady=15)
+            
+            # Bar (simplified with label)
+            bar_height = max(20, value // 2)  # Scale down for display
+            bar_label = ctk.CTkLabel(
+                day_frame,
+                text="█" * (bar_height // 10 + 1),
+                font=("Arial", 8),
+                text_color="#00BFFF"
+            )
+            bar_label.pack()
+            
+            # Day label
+            ctk.CTkLabel(day_frame, text=day, font=("Arial", 10)).pack(pady=(5, 0))
+            ctk.CTkLabel(day_frame, text=f"{value}min", font=("Arial", 8), text_color="#AAAAAA").pack()
+    
+    def show_community(self):
+        """Interface complète de la communauté"""
+        self.clear_content_area()
+        self.highlight_nav_button(6)
+        
+        scroll_frame = ctk.CTkScrollableFrame(self.content_area)
+        scroll_frame.pack(fill="both", expand=True, padx=20, pady=20)
+        
+        title = ctk.CTkLabel(
+            scroll_frame,
+            text="Communauté HelixOne",
+            font=("Arial", 24, "bold"),
+            text_color="#00BFFF"
+        )
+        title.pack(pady=(0, 20))
+        
+        # Community tabs
+        community_tabs = ctk.CTkSegmentedButton(
+            scroll_frame,
+            values=["Classements", "Forum", "Mentoring"],
+            command=self.change_community_tab
+        )
+        community_tabs.pack(pady=(0, 20))
+        community_tabs.set("Classements")
+        
+        # Content container
+        self.community_content = ctk.CTkFrame(scroll_frame, fg_color="transparent")
+        self.community_content.pack(fill="both", expand=True)
+        
+        self.display_community_leaderboard()
+    
+    def change_community_tab(self, tab):
+        """Change l'onglet communauté affiché"""
+        if tab == "Classements":
+            self.display_community_leaderboard()
+        elif tab == "Forum":
+            self.display_community_forum()
+        else:
+            self.display_community_mentoring()
+    
+    def display_community_leaderboard(self):
+        """Affiche le classement de la communauté"""
+        for widget in self.community_content.winfo_children():
+            widget.destroy()
+        
+        leaderboard_frame = ctk.CTkFrame(self.community_content, fg_color="#2a2d36")
+        leaderboard_frame.pack(fill="both", expand=True)
+        
+        ctk.CTkLabel(
+            leaderboard_frame,
+            text="Classement Hebdomadaire",
+            font=("Arial", 18, "bold"),
+            text_color="#00BFFF"
+        ).pack(padx=20, pady=(15, 10))
+        
+        # Sample leaderboard data
+        users = [
+            {"rank": 1, "name": "TradingMaster2024", "score": 1250, "level": 8},
+            {"rank": 2, "name": "AlphaTrader", "score": 1180, "level": 7},
+            {"rank": 3, "name": "MarketGuru", "score": 1050, "level": 6},
+            {"rank": 15, "name": "Vous", "score": 485, "level": 3, "highlight": True},
+        ]
+        
+        for user in users:
+            user_card = ctk.CTkFrame(
+                leaderboard_frame,
+                fg_color="#00BFFF" if user.get("highlight") else "#1c1f26"
+            )
+            user_card.pack(fill="x", padx=20, pady=5)
+            
+            user_info = ctk.CTkFrame(user_card, fg_color="transparent")
+            user_info.pack(fill="x", padx=15, pady=10)
+            
+            # Rank and name
+            name_frame = ctk.CTkFrame(user_info, fg_color="transparent")
+            name_frame.pack(side="left", fill="x", expand=True)
+            
+            rank_text = f"#{user['rank']} {user['name']}"
+            ctk.CTkLabel(
+                name_frame,
+                text=rank_text,
+                font=("Arial", 14, "bold"),
+                text_color="#000000" if user.get("highlight") else "#FFFFFF",
+                anchor="w"
+            ).pack(anchor="w")
+            
+            # Score and level
+            stats_frame = ctk.CTkFrame(user_info, fg_color="transparent")
+            stats_frame.pack(side="right")
+            
+            stats_text = f"Score: {user['score']} | Niveau: {user['level']}"
+            ctk.CTkLabel(
+                stats_frame,
+                text=stats_text,
+                font=("Arial", 12),
+                text_color="#000000" if user.get("highlight") else "#AAAAAA"
+            ).pack()
+    
+    def display_community_forum(self):
+        """Affiche le forum de la communauté"""
+        for widget in self.community_content.winfo_children():
+            widget.destroy()
+        
+        forum_frame = ctk.CTkFrame(self.community_content, fg_color="#2a2d36")
+        forum_frame.pack(fill="both", expand=True)
+        
+        ctk.CTkLabel(
+            forum_frame,
+            text="Forum de Discussion",
+            font=("Arial", 18, "bold"),
+            text_color="#00BFFF"
+        ).pack(padx=20, pady=(15, 10))
+        
+        # Sample forum topics
+        topics = [
+            {"title": "Meilleure stratégie pour débuter?", "author": "Newbie2024", "replies": 23, "time": "2h"},
+            {"title": "Analyse CAC40 - Semaine du 23/10", "author": "AnalystPro", "replies": 45, "time": "5h"},
+            {"title": "Partage d'expérience: Mon premier mois", "author": "LearnerJohn", "replies": 12, "time": "1j"},
+            {"title": "Question sur les stop-loss", "author": "RiskManager", "replies": 8, "time": "2j"}
+        ]
+        
+        for topic in topics:
+            topic_card = ctk.CTkFrame(forum_frame, fg_color="#1c1f26")
+            topic_card.pack(fill="x", padx=20, pady=5)
+            
+            topic_info = ctk.CTkFrame(topic_card, fg_color="transparent")
+            topic_info.pack(fill="x", padx=15, pady=10)
+            
+            # Topic title and author
+            title_frame = ctk.CTkFrame(topic_info, fg_color="transparent")
+            title_frame.pack(side="left", fill="x", expand=True)
+            
+            ctk.CTkLabel(
+                title_frame,
+                text=topic["title"],
+                font=("Arial", 14, "bold"),
+                text_color="#FFFFFF",
+                anchor="w"
+            ).pack(anchor="w")
+            
+            ctk.CTkLabel(
+                title_frame,
+                text=f"Par {topic['author']}",
+                font=("Arial", 10),
+                text_color="#AAAAAA",
+                anchor="w"
+            ).pack(anchor="w", pady=(2, 0))
+            
+            # Replies and time
+            stats_frame = ctk.CTkFrame(topic_info, fg_color="transparent")
+            stats_frame.pack(side="right")
+            
+            ctk.CTkLabel(
+                stats_frame,
+                text=f"{topic['replies']} réponses",
+                font=("Arial", 12),
+                text_color="#00BFFF"
+            ).pack()
+            
+            ctk.CTkLabel(
+                stats_frame,
+                text=f"Il y a {topic['time']}",
+                font=("Arial", 10),
+                text_color="#AAAAAA"
+            ).pack(pady=(2, 0))
+    
+    def display_community_mentoring(self):
+        """Affiche la section mentoring"""
+        for widget in self.community_content.winfo_children():
+            widget.destroy()
+        
+        mentoring_frame = ctk.CTkFrame(self.community_content, fg_color="#2a2d36")
+        mentoring_frame.pack(fill="both", expand=True)
+        
+        ctk.CTkLabel(
+            mentoring_frame,
+            text="Programme de Mentoring",
+            font=("Arial", 18, "bold"),
+            text_color="#00BFFF"
+        ).pack(padx=20, pady=(15, 10))
+        
+        # Current mentor info
+        mentor_card = ctk.CTkFrame(mentoring_frame, fg_color="#1c1f26")
+        mentor_card.pack(fill="x", padx=20, pady=10)
+        
+        ctk.CTkLabel(
+            mentor_card,
+            text="Votre Mentor Assigné",
+            font=("Arial", 14, "bold"),
+            text_color="#00BFFF"
+        ).pack(padx=15, pady=(10, 5))
+        
+        mentor_info = ctk.CTkFrame(mentor_card, fg_color="transparent")
+        mentor_info.pack(fill="x", padx=15, pady=(0, 10))
+        
+        ctk.CTkLabel(
+            mentor_info,
+            text="Sarah Martinez - Trader Senior",
+            font=("Arial", 16, "bold"),
+            text_color="#FFFFFF"
+        ).pack(anchor="w")
+        
+        ctk.CTkLabel(
+            mentor_info,
+            text="Spécialité: Analyse Technique • 8 ans d'expérience",
+            font=("Arial", 12),
+            text_color="#AAAAAA"
+        ).pack(anchor="w", pady=(2, 5))
+        
+        # Session stats
+        sessions_frame = ctk.CTkFrame(mentoring_frame, fg_color="#1c1f26")
+        sessions_frame.pack(fill="x", padx=20, pady=10)
+        
+        sessions_info = ctk.CTkFrame(sessions_frame, fg_color="transparent")
+        sessions_info.pack(fill="x", padx=15, pady=10)
+        
+        ctk.CTkLabel(
+            sessions_info,
+            text="Sessions Complétées: 2/5",
+            font=("Arial", 14),
+            text_color="#FFFFFF"
+        ).pack(anchor="w")
+        
+        ctk.CTkLabel(
+            sessions_info,
+            text="Prochaine session: Vendredi 25/10 à 14h00",
+            font=("Arial", 12),
+            text_color="#00FF88"
+        ).pack(anchor="w", pady=(5, 0))
+        
+        # Book session button
+        book_btn = ctk.CTkButton(
+            mentoring_frame,
+            text="Réserver une Session",
+            fg_color="#00BFFF",
+            command=self.book_mentor_session
+        )
+        book_btn.pack(pady=15)
+    
+    def book_mentor_session(self):
+        """Réserve une session de mentoring"""
+        messagebox.showinfo(
+            "Session de Mentoring",
+            "Redirection vers le calendrier de réservation...\n\nVotre mentor vous contactera pour confirmer le créneau."
+        )
+    
+    def show_settings(self):
+        """Interface complète des paramètres"""
+        self.clear_content_area()
+        self.highlight_nav_button(7)
+        
+        scroll_frame = ctk.CTkScrollableFrame(self.content_area)
+        scroll_frame.pack(fill="both", expand=True, padx=20, pady=20)
+        
+        title = ctk.CTkLabel(
+            scroll_frame,
+            text="Paramètres",
+            font=("Arial", 24, "bold"),
+            text_color="#00BFFF"
+        )
+        title.pack(pady=(0, 20))
+        
+        # Account settings
+        account_frame = ctk.CTkFrame(scroll_frame, fg_color="#2a2d36")
+        account_frame.pack(fill="x", pady=(0, 15))
+        
+        ctk.CTkLabel(
+            account_frame,
+            text="Paramètres du Compte",
+            font=("Arial", 18, "bold"),
+            text_color="#00BFFF"
+        ).pack(padx=20, pady=(15, 10))
+        
+        # Profile info
+        profile_frame = ctk.CTkFrame(account_frame, fg_color="#1c1f26")
+        profile_frame.pack(fill="x", padx=20, pady=(0, 10))
+        
+        profile_info = ctk.CTkFrame(profile_frame, fg_color="transparent")
+        profile_info.pack(fill="x", padx=15, pady=10)
+        
+        ctk.CTkLabel(profile_info, text="Nom d'utilisateur", font=("Arial", 12, "bold")).pack(anchor="w")
+        username_entry = ctk.CTkEntry(profile_info, placeholder_text="trader_001")
+        username_entry.pack(fill="x", pady=(5, 10))
+        
+        ctk.CTkLabel(profile_info, text="Email", font=("Arial", 12, "bold")).pack(anchor="w")
+        email_entry = ctk.CTkEntry(profile_info, placeholder_text="user@example.com")
+        email_entry.pack(fill="x", pady=(5, 0))
+        
+        # Preferences
+        prefs_frame = ctk.CTkFrame(scroll_frame, fg_color="#2a2d36")
+        prefs_frame.pack(fill="x", pady=(0, 15))
+        
+        ctk.CTkLabel(
+            prefs_frame,
+            text="Préférences d'Apprentissage",
+            font=("Arial", 18, "bold"),
+            text_color="#00BFFF"
+        ).pack(padx=20, pady=(15, 10))
+        
+        # Learning preferences
+        learning_frame = ctk.CTkFrame(prefs_frame, fg_color="#1c1f26")
+        learning_frame.pack(fill="x", padx=20, pady=(0, 15))
+        
+        learning_content = ctk.CTkFrame(learning_frame, fg_color="transparent")
+        learning_content.pack(fill="x", padx=15, pady=10)
+        
+        ctk.CTkLabel(learning_content, text="Style d'apprentissage préféré", font=("Arial", 12, "bold")).pack(anchor="w")
+        learning_style = ctk.CTkOptionMenu(
+            learning_content,
+            values=["Visuel", "Auditif", "Kinesthésique", "Lecture/Écriture"]
+        )
+        learning_style.pack(anchor="w", pady=(5, 10))
+        learning_style.set("Visuel")
+        
+        ctk.CTkLabel(learning_content, text="Rythme d'apprentissage", font=("Arial", 12, "bold")).pack(anchor="w")
+        pace_style = ctk.CTkOptionMenu(
+            learning_content,
+            values=["Lent", "Normal", "Rapide", "Intensif"]
+        )
+        pace_style.pack(anchor="w", pady=(5, 0))
+        pace_style.set("Normal")
+        
+        # Notifications
+        notif_frame = ctk.CTkFrame(scroll_frame, fg_color="#2a2d36")
+        notif_frame.pack(fill="x", pady=(0, 15))
+        
+        ctk.CTkLabel(
+            notif_frame,
+            text="Notifications",
+            font=("Arial", 18, "bold"),
+            text_color="#00BFFF"
+        ).pack(padx=20, pady=(15, 10))
+        
+        notif_content = ctk.CTkFrame(notif_frame, fg_color="#1c1f26")
+        notif_content.pack(fill="x", padx=20, pady=(0, 15))
+        
+        notif_settings = ctk.CTkFrame(notif_content, fg_color="transparent")
+        notif_settings.pack(fill="x", padx=15, pady=15)
+        
+        # Notification switches
+        daily_notif = ctk.CTkSwitch(notif_settings, text="Rappel quotidien d'étude")
+        daily_notif.pack(anchor="w", pady=5)
+        daily_notif.select()
+        
+        progress_notif = ctk.CTkSwitch(notif_settings, text="Notifications de progression")
+        progress_notif.pack(anchor="w", pady=5)
+        progress_notif.select()
+        
+        community_notif = ctk.CTkSwitch(notif_settings, text="Activité communautaire")
+        community_notif.pack(anchor="w", pady=5)
+        
+        mentor_notif = ctk.CTkSwitch(notif_settings, text="Messages de mentor")
+        mentor_notif.pack(anchor="w", pady=5)
+        mentor_notif.select()
+        
+        # Save button
+        save_btn = ctk.CTkButton(
+            scroll_frame,
+            text="Sauvegarder les Paramètres",
+            fg_color="#00BFFF",
+            font=("Arial", 14, "bold"),
+            command=self.save_settings
+        )
+        save_btn.pack(pady=20)
+    
+    def save_settings(self):
+        """Sauvegarde les paramètres"""
+        messagebox.showinfo("Paramètres", "Paramètres sauvegardés avec succès!")
+    
+    # Utility methods
+    def download_resource(self, resource):
+        """Télécharge une ressource"""
+        messagebox.showinfo("Téléchargement", f"Téléchargement de '{resource['title']}' commencé...")
+    
+    def play_video(self, video):
+        """Lance une vidéo"""
+        messagebox.showinfo("Vidéo", f"Lecture de '{video['title']}' (Durée: {video['duration']})")
+    
+    def launch_tool(self, tool):
+        """Lance un outil"""
+        messagebox.showinfo("Outil", f"Lancement de '{tool['name']}'\n\n{tool['description']}")
+    
+    # Existing methods with minor updates
+    def create_metrics_cards(self, parent):
+        """Cartes de métriques améliorées"""
+        metrics_container = ctk.CTkFrame(parent, fg_color="transparent")
+        metrics_container.pack(fill="x", pady=20)
+        
+        cards_data = [
+            {
+                "title": "Progression Globale",
+                "value": f"{self.calculate_global_progress()}%",
+                "subtitle": "Tous parcours confondus",
+                "color": "#00BFFF",
+                "icon": "Progress"
+            },
+            {
+                "title": "Temps d'Étude",
+                "value": f"{self.user_data['time_spent']}h",
+                "subtitle": "Cette semaine: 5h",
+                "color": "#00FF88",
+                "icon": "Time"
+            },
+            {
+                "title": "Score Moyen Quiz",
+                "value": f"{self.calculate_average_quiz_score()}%",
+                "subtitle": "Progression: +5%",
+                "color": "#FFA500",
+                "icon": "Score"
+            },
+            {
+                "title": "Rang Communauté",
+                "value": f"#{self.get_community_rank()}",
+                "subtitle": "Top 15% cette semaine",
+                "color": "#FF4444",
+                "icon": "Rank"
+            }
+        ]
+        
+        for i, card_data in enumerate(cards_data):
+            card = self.create_metric_card(metrics_container, card_data)
+            card.grid(row=0, column=i, padx=10, pady=10, sticky="ew")
+        
+        for i in range(4):
+            metrics_container.grid_columnconfigure(i, weight=1)
+    
+    def create_metric_card(self, parent, data):
+        """Crée une carte métrique"""
+        card = ctk.CTkFrame(parent, fg_color="#2a2d36", width=200, height=120)
+        card.grid_propagate(False)
+        
+        # Title
+        title_label = ctk.CTkLabel(
+            card,
+            text=data["title"],
+            font=("Arial", 12),
+            text_color="#888888"
+        )
+        title_label.place(x=15, y=15)
+        
+        # Value
+        value_label = ctk.CTkLabel(
+            card,
+            text=data["value"],
+            font=("Arial", 24, "bold"),
+            text_color=data["color"]
+        )
+        value_label.place(x=15, y=45)
+        
+        # Subtitle
+        subtitle_label = ctk.CTkLabel(
+            card,
+            text=data["subtitle"],
+            font=("Arial", 10),
+            text_color="#666666"
+        )
+        subtitle_label.place(x=15, y=80)
+        
+        return card
+    
+    def create_ai_recommendations(self, parent):
+        """Recommandations IA améliorées"""
+        ai_frame = ctk.CTkFrame(parent, fg_color="#2a2d36")
+        ai_frame.pack(fill="x", pady=20)
+        
+        ai_title = ctk.CTkLabel(
+            ai_frame,
+            text="Recommandations Personnalisées",
+            font=("Arial", 18, "bold"),
+            text_color="#00BFFF"
+        )
+        ai_title.pack(anchor="w", padx=20, pady=(15, 10))
+        
+        recommendations = self.get_ai_recommendations()
+        
+        for rec in recommendations:
+            rec_item = ctk.CTkFrame(ai_frame, fg_color="#1c1f26")
+            rec_item.pack(fill="x", padx=20, pady=5)
+            
+            rec_text = ctk.CTkLabel(
+                rec_item,
+                text=f"• {rec}",
+                font=("Arial", 12),
+                wraplength=700,
+                justify="left"
+            )
+            rec_text.pack(anchor="w", padx=15, pady=10)
+        
+        action_btn = ctk.CTkButton(
+            ai_frame,
+            text="Commencer la session recommandée",
+            font=("Arial", 14, "bold"),
+            fg_color="#00BFFF",
+            command=self.start_recommended_session
+        )
+        action_btn.pack(pady=15)
+    
+    def create_activity_section(self, parent):
+        """Section activité récente améliorée"""
+        activity_frame = ctk.CTkFrame(parent, fg_color="#2a2d36")
+        activity_frame.pack(fill="x", pady=20)
+        
+        activity_title = ctk.CTkLabel(
+            activity_frame,
+            text="Activité Récente",
+            font=("Arial", 18, "bold"),
+            text_color="#00BFFF"
+        )
+        activity_title.pack(anchor="w", padx=20, pady=15)
+        
+        activities = [
+            "Module complété: 'Les Bases du RSI' (Score: 87%)",
+            "Quiz réussi: 'Moyennes Mobiles' (15/20 points)",
+            "Session d'étude: 45 minutes aujourd'hui",
+            "Badge débloqué: 'Analyste Technique Débutant'",
+            "Nouvelle certification disponible: 'Gestion de Portefeuille'"
+        ]
+        
+        for activity in activities:
+            activity_item = ctk.CTkLabel(
+                activity_frame,
+                text=f"• {activity}",
+                font=("Arial", 12),
+                anchor="w"
+            )
+            activity_item.pack(fill="x", padx=20, pady=2)
+        
+        ctk.CTkLabel(activity_frame, text="").pack(pady=10)
+    
+    def animate_progress_rings(self):
+        """Animation pour les statistiques"""
+        def animate():
+            while True:
+                time.sleep(5)
+                if not hasattr(self, 'user_data'):
+                    break
+        
+        threading.Thread(target=animate, daemon=True).start()
+    
+    def clear_content_area(self):
+        """Nettoie la zone de contenu"""
+        for widget in self.content_area.winfo_children():
+            widget.destroy()
+    
+    def highlight_nav_button(self, index):
+        """Met en surbrillance le bouton de navigation actif"""
+        for i, btn in enumerate(self.nav_buttons):
+            if i == index:
+                btn.configure(fg_color="#2a2d36", text_color="#00BFFF")
+            else:
+                btn.configure(fg_color="transparent", text_color="#CCCCCC")
+    
+    def calculate_parcours_progress(self, parcours_id):
+        """Calcule le progrès d'un parcours"""
+        base_progress = {"debutant": 65, "intermediaire": 25, "expert": 5}
+        return base_progress.get(parcours_id, 0)
+    
+    def get_personalized_welcome(self):
+        """Message de bienvenue personnalisé"""
+        hour = datetime.now().hour
+        time_greeting = "Bon matin" if hour < 12 else "Bon après-midi" if hour < 18 else "Bonsoir"
+        
+        return f"""
+{time_greeting} ! 
+
+Vous avez progressé de 12% cette semaine. Continuez sur cette lancée !
+Dernière leçon: Analyse Technique - RSI
+
+Objectif du jour: Terminer le quiz sur les moyennes mobiles
+        """.strip()
+    
+    def get_ai_recommendations(self):
+        """Recommandations IA basées sur le profil utilisateur"""
+        return [
+            "Vous excellez en analyse technique mais pourriez améliorer la gestion du risque",
+            "Le module 'Position Sizing' serait parfait pour votre niveau actuel",
+            "Votre score aux quiz indique une préférence pour l'apprentissage visuel",
+            "5 autres utilisateurs similaires ont trouvé utile le module 'Psychologie du Trading'",
+            "Nouvelle session de mentoring disponible avec Sarah Martinez"
+        ]
+    
+    def calculate_global_progress(self):
+        return 47
+    
+    def calculate_average_quiz_score(self):
+        return 78
+    
+    def get_community_rank(self):
+        return 342
+    
+    def start_recommended_session(self):
+        messagebox.showinfo("Session", "Démarrage de la session personnalisée...")
+
+
+def afficher_formation_commerciale(parent):
+    """Lance la formation de niveau commercial"""
+    print("[DEBUG] Chargement formation commerciale complète...")
+    
+    try:
+        for widget in parent.winfo_children():
+            widget.destroy()
+        
+        formation = FormationCommerciale(parent)
+        print("[DEBUG] Formation commerciale chargée avec succès")
+        return formation
+        
+    except Exception as e:
+        print(f"[ERROR] Erreur formation commerciale: {e}")
+        import traceback
+        traceback.print_exc()
+        
+        error_frame = ctk.CTkFrame(parent, fg_color="#1c1f26")
+        error_frame.pack(fill="both", expand=True, padx=20, pady=20)
+        
+        error_label = ctk.CTkLabel(
+            error_frame,
+            text=f"Erreur de chargement:\n{str(e)}",
+            font=("Arial", 14),
+            text_color="#FF6666"
+        )
+        error_label.pack(pady=50)
+
+
+if __name__ == "__main__":
+    app = ctk.CTk()
+    app.geometry("1400x900")
+    app.title("HelixOne Academy")
+    
+    formation = FormationCommerciale(app)
+    
+    app.mainloop()

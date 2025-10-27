@@ -1,0 +1,26 @@
+{
+  "general": {
+    "name": "Général",
+    "description": "Discussion générale",
+    "created_by": "system",
+    "created_at": "2025-09-14T23:24:51.096359"
+  },
+  "analyses": {
+    "name": "Analyses",
+    "description": "Partage d'analyses techniques",
+    "created_by": "system",
+    "created_at": "2025-09-14T23:24:51.096359"
+  },
+  "strategies": {
+    "name": "Stratégies",
+    "description": "Discussion sur les stratégies de trading",
+    "created_by": "system",
+    "created_at": "2025-09-14T23:24:51.096359"
+  },
+  "aide": {
+    "name": "Aide",
+    "description": "Entraide entre traders",
+    "created_by": "system",
+    "created_at": "2025-09-14T23:24:51.096359"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "user_id": "trader_001",
+  "subscription": "premium",
+  "level": 1,
+  "experience": 0,
+  "parcours_actuel": "débutant",
+  "modules_completed": [],
+  "quiz_scores": {},
+  "time_spent": 0,
+  "last_session": null,
+  "streak_days": 0,
+  "achievements": [],
+  "preferred_learning": "visual",
+  "strengths": [],
+  "weaknesses": [],
+  "learning_path": "standard",
+  "certification_progress": {},
+  "mentor_sessions": 0
+}

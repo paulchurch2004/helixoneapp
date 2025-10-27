@@ -1,0 +1,1228 @@
+[
+  {
+    "id": "basics_1",
+    "parcours": "débutant",
+    "titre": "🎯 Qu'est-ce que la Bourse ?",
+    "description": "Découvrez le fonctionnement des marchés financiers",
+    "durée": "45 minutes",
+    "difficulté": "Débutant",
+    "points_xp": 100,
+    "prérequis": [],
+    "contenu": {
+      "introduction": "La bourse est un marché organisé où s'échangent des titres financiers...",
+      "sections": [
+        {
+          "titre": "Les acteurs du marché",
+          "contenu": "Les principaux acteurs sont : les émetteurs, les investisseurs, les intermédiaires..."
+        },
+        {
+          "titre": "Types d'instruments",
+          "contenu": "Actions, obligations, ETF, dérivés..."
+        }
+      ]
+    },
+    "quiz": [
+      {
+        "question": "Qu'est-ce qu'une action ?",
+        "options": [
+          "Un prêt à une entreprise",
+          "Une part de propriété d'une entreprise",
+          "Un produit dérivé",
+          "Une obligation"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Une action représente une part de propriété dans une entreprise cotée."
+      }
+    ],
+    "exercices": [
+      {
+        "type": "simulation",
+        "titre": "Passer votre premier ordre",
+        "description": "Simulez l'achat de 10 actions Apple"
+      }
+    ]
+  },
+  {
+    "id": "technical_analysis_basics",
+    "parcours": "débutant",
+    "titre": "📊 Analyse Technique - Les Bases",
+    "description": "Apprenez à lire les graphiques et identifier les tendances",
+    "durée": "60 minutes",
+    "difficulté": "Débutant",
+    "points_xp": 150,
+    "prérequis": [
+      "basics_1"
+    ],
+    "contenu": {
+      "introduction": "L'analyse technique est l'étude des mouvements de prix passés pour prédire les tendances futures. Contrairement à l'analyse fondamentale qui étudie la santé d'une entreprise, l'analyse technique se concentre uniquement sur les graphiques de prix et le volume. Cette discipline repose sur trois principes : le prix reflète toute l'information disponible, les prix évoluent selon des tendances, et l'histoire a tendance à se répéter.",
+      "sections": [
+        {
+          "titre": "📈 Les Chandeliers Japonais (Candlesticks)",
+          "contenu": "Les chandeliers japonais sont la représentation graphique la plus utilisée en trading. Chaque chandelier représente une période (1 minute, 1 heure, 1 jour, etc.) et contient quatre informations essentielles : le prix d'ouverture, le prix de clôture, le plus haut et le plus bas de la période.\n\nStructure d'un chandelier :\n- Le CORPS (rectangulaire) : montre l'écart entre l'ouverture et la clôture\n- Les MÈCHES (lignes fines) : indiquent les extrêmes (plus haut et plus bas)\n- VERT/BLANC : le prix a AUGMENTÉ (clôture > ouverture) → haussier\n- ROUGE/NOIR : le prix a BAISSÉ (clôture < ouverture) → baissier\n\nExemple concret :\nSi AAPL ouvre à 170$, monte à 175$, descend à 168$, et clôture à 173$ :\n- Corps vert de 170$ à 173$ (gain de 3$)\n- Mèche haute jusqu'à 175$\n- Mèche basse jusqu'à 168$\n\nCe chandelier montre une séance haussière avec de la volatilité.",
+          "points_cles": [
+            "Un corps vert = séance haussière (acheteurs dominants)",
+            "Un corps rouge = séance baissière (vendeurs dominants)",
+            "Longues mèches = forte volatilité et indécision",
+            "Petit corps = équilibre entre acheteurs et vendeurs"
+          ]
+        },
+        {
+          "titre": "🛡️ Supports et Résistances",
+          "contenu": "Les supports et résistances sont des niveaux de prix psychologiques où l'offre et la demande s'équilibrent.\n\nLE SUPPORT :\nC'est un niveau de prix où la DEMANDE est suffisamment forte pour empêcher le prix de descendre plus bas. Les acheteurs interviennent massivement à ce niveau. Pensez-y comme un 'plancher' qui retient le prix.\n\nExemple : Si AAPL rebondit régulièrement à 170$, ce niveau devient un support. Les traders savent que c'est une zone d'achat.\n\nLA RÉSISTANCE :\nC'est un niveau de prix où l'OFFRE est suffisamment forte pour empêcher le prix de monter plus haut. Les vendeurs interviennent massivement. C'est un 'plafond' qui bloque la hausse.\n\nExemple : Si AAPL échoue plusieurs fois à dépasser 180$, ce niveau devient une résistance.\n\nPRINCIPE CLÉ : Quand un support est cassé, il devient souvent une résistance (et vice versa). C'est ce qu'on appelle le retournement de polarité.",
+          "points_cles": [
+            "Support = zone où les acheteurs dominent (plancher)",
+            "Résistance = zone où les vendeurs dominent (plafond)",
+            "Plus un niveau est testé, plus il devient significatif",
+            "Un support cassé devient une résistance"
+          ],
+          "exemple_pratique": {
+            "ticker": "AAPL",
+            "scenario": "Observez AAPL : identifiez un support autour de 170$ et une résistance vers 180$. Quand le prix approche ces niveaux, la volatilité augmente."
+          }
+        },
+        {
+          "titre": "📉 Les Tendances (Trends)",
+          "contenu": "Une tendance est la direction générale que prend le prix sur une période. Identifier la tendance est crucial car 'the trend is your friend' (la tendance est votre amie).\n\nTROIS TYPES DE TENDANCES :\n\n1. TENDANCE HAUSSIÈRE (Uptrend) :\n- Succession de plus hauts et de plus bas ascendants\n- Chaque rebond est plus haut que le précédent\n- Stratégie : Acheter les corrections (pullbacks)\n\n2. TENDANCE BAISSIÈRE (Downtrend) :\n- Succession de plus bas et de plus hauts descendants\n- Chaque rebond est plus faible que le précédent\n- Stratégie : Vendre à découvert les rebonds\n\n3. RANGE (Consolidation) :\n- Le prix oscille entre un support et une résistance\n- Pas de direction claire\n- Stratégie : Acheter au support, vendre à la résistance\n\nIDENTIFIER UNE TENDANCE :\nUtilisez la règle simple : tracez une ligne qui relie au moins 2 creux (pour haussière) ou 2 sommets (pour baissière). Si le prix respecte cette ligne, la tendance est valide.",
+          "points_cles": [
+            "Haussière = plus hauts et plus bas ascendants",
+            "Baissière = plus hauts et plus bas descendants",
+            "Range = oscillation entre support/résistance",
+            "Ne tradez JAMAIS contre la tendance principale"
+          ]
+        },
+        {
+          "titre": "📊 Le Volume",
+          "contenu": "Le volume représente le nombre d'actions échangées sur une période. C'est un indicateur de CONVICTION derrière un mouvement de prix.\n\nPRINCIPE FONDAMENTAL :\n- Volume élevé + hausse des prix = forte conviction acheteuse → tendance solide\n- Volume élevé + baisse des prix = forte conviction vendeuse → tendance baissière forte\n- Volume faible + mouvement de prix = peu de conviction → mouvement fragile\n\nSIGNAUX IMPORTANTS :\n\n1. BREAKOUT avec volume élevé :\nQuand le prix casse une résistance avec un volume 2-3x supérieur à la moyenne, c'est un signal très fiable de continuation haussière.\n\n2. DIVERGENCE volume/prix :\nSi le prix monte mais le volume diminue, c'est un signe d'essoufflement. La hausse manque de conviction et pourrait s'inverser.\n\n3. CAPITULATION :\nUn pic de volume extrême en baisse signale souvent un point bas (capitulation des vendeurs).",
+          "points_cles": [
+            "Volume = conviction derrière le mouvement",
+            "Breakout + gros volume = signal fiable",
+            "Prix monte + volume baisse = danger d'inversion",
+            "Pic de volume extrême = souvent un tournant"
+          ]
+        }
+      ],
+      "resume": "Vous avez appris les fondamentaux de l'analyse technique : lire les chandeliers japonais pour comprendre la psychologie du marché, identifier les supports et résistances comme zones clés de décision, reconnaître les tendances pour trader dans la bonne direction, et utiliser le volume pour confirmer la force d'un mouvement. Ces concepts sont la base de toute stratégie de trading technique.",
+      "ressources_complementaires": [
+        "📖 Livre : 'Analyse Technique des Marchés Financiers' de John Murphy",
+        "🎥 Video : Introduction aux chandeliers japonais (YouTube)",
+        "🔗 Site : TradingView.com pour pratiquer la lecture de graphiques",
+        "📄 Guide : Les 10 patterns de chandeliers les plus importants"
+      ]
+    },
+    "quiz": [
+      {
+        "question": "Que signifie un chandelier VERT ?",
+        "options": [
+          "Le prix a baissé pendant la période",
+          "Le prix a augmenté pendant la période",
+          "Le volume était élevé",
+          "C'est un signal de vente"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Un chandelier vert (ou blanc) indique que le prix de clôture est supérieur au prix d'ouverture, donc le prix a AUGMENTÉ pendant la période."
+      },
+      {
+        "question": "Qu'est-ce qu'un SUPPORT ?",
+        "options": [
+          "Un niveau de prix où la demande (acheteurs) est forte",
+          "Un niveau de prix où l'offre (vendeurs) est forte",
+          "Une ligne de tendance ascendante",
+          "Un indicateur technique"
+        ],
+        "bonne_reponse": 0,
+        "explication": "Un support est un niveau de prix où les acheteurs ont tendance à intervenir massivement, créant une demande qui empêche le prix de descendre plus bas. C'est un 'plancher'."
+      },
+      {
+        "question": "Comment identifier une tendance HAUSSIÈRE ?",
+        "options": [
+          "Le prix fait des plus hauts et des plus bas descendants",
+          "Le prix oscille entre un support et une résistance",
+          "Le prix fait des plus hauts et des plus bas ascendants",
+          "Le volume diminue progressivement"
+        ],
+        "bonne_reponse": 2,
+        "explication": "Une tendance haussière se caractérise par une succession de plus hauts et de plus bas ASCENDANTS. Chaque rebond est plus élevé que le précédent."
+      },
+      {
+        "question": "Que signale un BREAKOUT avec un volume élevé ?",
+        "options": [
+          "Le mouvement manque de conviction",
+          "C'est un faux signal à ignorer",
+          "C'est un signal fiable de continuation de la tendance",
+          "Il faut vendre immédiatement"
+        ],
+        "bonne_reponse": 2,
+        "explication": "Quand le prix casse un niveau important (support ou résistance) avec un volume très élevé (2-3x la moyenne), cela montre une forte conviction et confirme la validité du mouvement."
+      },
+      {
+        "question": "Si un support à 170$ est cassé, que devient-il généralement ?",
+        "options": [
+          "Il disparaît complètement",
+          "Il devient une résistance",
+          "Il devient un nouveau support plus bas",
+          "Rien ne change"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Quand un support est cassé, il devient souvent une RÉSISTANCE lors d'un rebond futur. C'est le principe du retournement de polarité : les anciens acheteurs qui ont perdu de l'argent cherchent à sortir à leur prix d'achat."
+      },
+      {
+        "question": "Quelle est la meilleure stratégie dans une tendance haussière confirmée ?",
+        "options": [
+          "Vendre à découvert les rebonds",
+          "Acheter les corrections (pullbacks)",
+          "Ne rien faire et attendre",
+          "Acheter et vendre aléatoirement"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Dans une tendance haussière, la meilleure stratégie est d'ACHETER lors des corrections temporaires (pullbacks). Le principe : 'The trend is your friend' - ne tradez jamais contre la tendance."
+      },
+      {
+        "question": "Que représentent les MÈCHES d'un chandelier ?",
+        "options": [
+          "Les prix d'ouverture et de clôture",
+          "Le volume échangé",
+          "Les plus hauts et plus bas de la période",
+          "La moyenne mobile"
+        ],
+        "bonne_reponse": 2,
+        "explication": "Les mèches (lignes fines) montrent les EXTRÊMES atteints pendant la période : le plus haut (mèche haute) et le plus bas (mèche basse). De longues mèches indiquent une forte volatilité."
+      },
+      {
+        "question": "Si le prix MONTE mais le volume DIMINUE, que faut-il en déduire ?",
+        "options": [
+          "La hausse est très solide",
+          "C'est un signal d'achat fort",
+          "La hausse manque de conviction et pourrait s'inverser",
+          "Le volume n'a aucune importance"
+        ],
+        "bonne_reponse": 2,
+        "explication": "C'est une DIVERGENCE baissière. Si le prix monte mais que le volume diminue, cela signifie que de moins en moins d'acheteurs participent. La hausse manque de conviction et risque de s'essouffler."
+      }
+    ],
+    "exercices": [
+      {
+        "type": "pratique",
+        "titre": "Identifier supports et résistances sur AAPL",
+        "description": "Ouvrez le graphique AAPL en daily. Trouvez au moins 2 niveaux de support et 2 niveaux de résistance en observant où le prix a rebondi plusieurs fois."
+      },
+      {
+        "type": "quiz_visuel",
+        "titre": "Reconnaître les tendances",
+        "description": "On vous montrera 5 graphiques. Pour chacun, identifiez s'il s'agit d'une tendance haussière, baissière ou d'un range."
+      },
+      {
+        "type": "simulation",
+        "titre": "Trader un breakout",
+        "description": "Dans le simulateur, attendez qu'une action casse une résistance avec un fort volume, puis achetez. Observez si le mouvement continue."
+      }
+    ]
+  },
+  {
+    "id": "risk_management_fundamentals",
+    "parcours": "débutant",
+    "titre": "🛡️ Gestion du Risque - Les Fondamentaux",
+    "description": "Maîtrisez les principes essentiels pour protéger votre capital",
+    "durée": "50 minutes",
+    "difficulté": "Débutant",
+    "points_xp": 150,
+    "prérequis": [
+      "basics_1"
+    ],
+    "contenu": {
+      "introduction": "La gestion du risque est LA compétence la plus importante en trading - bien plus que la capacité à trouver de bonnes opportunités. 90% des traders débutants perdent de l'argent, non pas parce qu'ils ne savent pas analyser les marchés, mais parce qu'ils ne gèrent pas correctement leur risque. Comme le dit Warren Buffett : 'Règle n°1 : Ne jamais perdre d'argent. Règle n°2 : Ne jamais oublier la règle n°1.' Ce module vous enseignera comment survivre sur les marchés avant même de chercher à prospérer.",
+      "sections": [
+        {
+          "titre": "💰 La Règle des 1-2% : Protégez Votre Capital",
+          "contenu": "LA RÈGLE D'OR DU TRADING :\nNe JAMAIS risquer plus de 1-2% de votre capital total sur une seule position.\n\nPourquoi cette règle est-elle vitale ?\n\nImaginez deux traders avec 10 000$ :\n\nTRADER A (risque 10% par trade) :\n- Trade 1 : Perte de 10% → Capital : 9 000$\n- Trade 2 : Perte de 10% → Capital : 8 100$\n- Trade 3 : Perte de 10% → Capital : 7 290$\nAprès seulement 3 pertes, il a perdu 27% de son capital. Il lui faut maintenant un gain de 37% juste pour revenir à l'équilibre !\n\nTRADER B (risque 1% par trade) :\n- Trade 1 : Perte de 1% → Capital : 9 900$\n- Trade 2 : Perte de 1% → Capital : 9 801$\n- Trade 3 : Perte de 1% → Capital : 9 703$\nAprès 3 pertes, il n'a perdu que 3% et peut facilement récupérer.\n\nCOMMENT APPLIQUER LA RÈGLE :\nCapital : 10 000$\nRisque maximum par trade : 1% = 100$\n\nSi vous achetez AAPL à 170$ avec un stop-loss à 165$ :\n- Risque par action : 5$\n- Nombre d'actions maximum : 100$ ÷ 5$ = 20 actions\n- Investissement total : 20 × 170$ = 3 400$\n\nMême si vous investissez 3 400$, vous ne risquez que 100$ (1%).",
+          "points_cles": [
+            "Risquez maximum 1-2% de votre capital par trade",
+            "Plus vous risquez, plus vite vous pouvez tout perdre",
+            "Cette règle vous permet de survivre à une série de pertes",
+            "Les traders professionnels risquent souvent moins de 1%"
+          ]
+        },
+        {
+          "titre": "🎯 Le Stop-Loss : Votre Bouée de Sauvetage",
+          "contenu": "Un STOP-LOSS est un ordre automatique qui vend votre position si le prix atteint un niveau prédéfini. C'est votre assurance-vie en trading.\n\nPOURQUOI C'EST OBLIGATOIRE :\n- Sans stop-loss, une seule position peut détruire votre compte\n- Les émotions (espoir, peur) vous empêchent de couper vos pertes manuellement\n- Un stop-loss automatique supprime l'émotion de l'équation\n\nOÙ PLACER VOTRE STOP-LOSS :\n\n1. SOUS UN SUPPORT (pour un achat) :\nSi vous achetez AAPL à 170$ car il rebondit sur un support à 168$, placez votre stop à 167$ (juste sous le support). Si le support casse, votre analyse est invalidée.\n\n2. AU-DESSUS D'UNE RÉSISTANCE (pour une vente à découvert) :\nSi vous shortez à 180$ près d'une résistance, placez votre stop à 181$.\n\n3. BASÉ SUR L'ATR (Average True Range) :\nUtilisez 1.5-2x l'ATR en dessous du prix d'entrée pour éviter d'être sorti par le bruit normal du marché.\n\nERREUR FATALE À ÉVITER :\nNe JAMAIS déplacer votre stop-loss plus loin quand le trade va contre vous. C'est le début de la fin. Si vous avez placé un stop à 165$, respectez-le même si vous êtes tenté de lui 'donner plus d'espace'.",
+          "points_cles": [
+            "TOUJOURS utiliser un stop-loss sur chaque position",
+            "Placez-le sous un support (achat) ou au-dessus d'une résistance (vente)",
+            "Ne JAMAIS déplacer un stop contre vous",
+            "Un stop-loss touché = votre analyse était fausse, acceptez-le"
+          ],
+          "exemple_pratique": {
+            "ticker": "TSLA",
+            "scenario": "Vous achetez TSLA à 250$ car elle rebondit sur un support à 245$. Placez votre stop à 243$ (juste sous le support). Si TSLA tombe à 243$, vous êtes automatiquement sorti avec une petite perte contrôlée."
+          }
+        },
+        {
+          "titre": "⚖️ Le Ratio Risk/Reward : Gagnez Plus que Vous Ne Perdez",
+          "contenu": "Le ratio RISK/REWARD compare votre perte potentielle à votre gain potentiel sur un trade.\n\nFORMULE :\nRisk/Reward = Gain Potentiel ÷ Perte Potentielle\n\nEXEMPLE :\nAchat AAPL à 170$\nStop-loss à 165$ → Risque : 5$\nObjectif de prix à 185$ → Gain potentiel : 15$\nRatio R/R : 15$ ÷ 5$ = 3:1 (ou 1:3 selon convention)\n\nPOURQUOI C'EST CRUCIAL :\nAvec un ratio 1:3, vous pouvez avoir raison seulement 30% du temps et être profitable !\n\nScénario sur 10 trades (risque 100$ par trade, objectif 300$) :\n- 3 trades gagnants : 3 × 300$ = 900$\n- 7 trades perdants : 7 × -100$ = -700$\n- RÉSULTAT : +200$ de profit avec seulement 30% de réussite !\n\nRÈGLE MINIMUM :\nNe prenez JAMAIS un trade avec un ratio inférieur à 1:2. Idéalement, visez 1:3 ou mieux.\n\nCOMMENT L'APPLIQUER :\nAvant d'entrer dans un trade, demandez-vous :\n1. Où est mon stop-loss ? (Risque)\n2. Où est mon objectif de profit ? (Reward)\n3. Le ratio est-il au moins de 1:2 ?\n\nSi non, ne prenez PAS le trade, même s'il semble tentant.",
+          "points_cles": [
+            "Ratio minimum acceptable : 1:2 (risquer 1$ pour gagner 2$)",
+            "Idéalement, visez 1:3 ou mieux",
+            "Un bon ratio vous permet d'être profitable avec 30-40% de winrate",
+            "Ne prenez JAMAIS un trade avec un mauvais ratio, même s'il semble sûr"
+          ]
+        },
+        {
+          "titre": "📊 Diversification : Ne Mettez Pas Tous vos Œufs dans le Même Panier",
+          "contenu": "La diversification consiste à répartir votre capital sur plusieurs positions pour réduire le risque.\n\nPRINCIPES DE BASE :\n\n1. NOMBRE DE POSITIONS :\n- Débutant : Maximum 3-5 positions simultanées\n- Intermédiaire : 5-10 positions\n- Expert : 10-20 positions\n\nPourquoi cette limite ? Avec trop de positions, vous ne pouvez plus suivre correctement chaque trade.\n\n2. DIVERSIFICATION SECTORIELLE :\nNe concentrez pas toutes vos positions dans le même secteur.\n\nMAUVAIS exemple :\n- AAPL (tech)\n- MSFT (tech)\n- GOOGL (tech)\n- NVDA (tech)\n\nSi le secteur tech chute (comme en 2022), TOUTES vos positions souffrent.\n\nBON exemple :\n- AAPL (tech)\n- JNJ (santé)\n- XOM (énergie)\n- JPM (finance)\n\n3. CORRÉLATION :\nÉvitez les actions qui bougent ensemble. Si AAPL et MSFT ont une corrélation de 0.9, les avoir toutes les deux n'apporte presque aucune diversification.\n\nRÈGLE D'OR :\nMême avec 10 positions, si vous risquez 1% par position, votre risque total n'est que de 10% (si tous les stops sont touchés simultanément, ce qui est rare avec une bonne diversification).",
+          "points_cles": [
+            "Maximum 3-5 positions pour un débutant",
+            "Diversifiez entre secteurs différents",
+            "Évitez les actions fortement corrélées",
+            "La diversification réduit le risque mais aussi les gains extrêmes"
+          ]
+        },
+        {
+          "titre": "🧠 Psychologie : L'Ennemi Intérieur",
+          "contenu": "La gestion du risque n'est pas qu'une question de mathématiques - c'est aussi une bataille psychologique.\n\nLES PIÈGES ÉMOTIONNELS :\n\n1. LA REVENGE TRADING (Trading de Revanche) :\nAprès une perte, vous voulez 'vous refaire' immédiatement et prenez un trade impulsif avec trop de risque.\n\nSOLUTION : Après 2 pertes consécutives, faites une pause de 24h. Analysez ce qui n'a pas marché avant de reprendre.\n\n2. LE FEAR OF MISSING OUT (FOMO) :\nVous voyez une action monter et entrez par peur de rater l'opportunité, sans analyse ni stop-loss.\n\nSOLUTION : Il y aura TOUJOURS une nouvelle opportunité demain. Ne tradez que votre plan.\n\n3. L'ESPOIR IRRATIONNEL :\nVotre stop devrait être touché mais vous le déplacez en espérant un rebond.\n\nSOLUTION : Un stop-loss est sacré. Une fois placé, il ne bouge pas (sauf vers le profit).\n\n4. L'OVERCONFIDENCE (Excès de Confiance) :\nAprès 3-4 trades gagnants, vous pensez être invincible et augmentez votre risque.\n\nSOLUTION : Respectez TOUJOURS la règle des 1-2%, même après une série de gains.\n\nLA RÈGLE D'OR PSYCHOLOGIQUE :\nSi vous pensez à votre position plus de 3 fois par jour, vous avez probablement pris trop de risque. Un trade correct vous permet de dormir tranquille.",
+          "points_cles": [
+            "Les émotions sont votre plus grand ennemi",
+            "Ne tradez JAMAIS sous le coup de l'émotion",
+            "Respectez votre plan même quand c'est difficile",
+            "Si vous ne dormez pas bien, réduisez votre taille de position"
+          ]
+        }
+      ],
+      "resume": "La gestion du risque est le pilier du succès en trading. En risquant maximum 1-2% par trade, en utilisant systématiquement des stop-loss, en visant des ratios risk/reward d'au moins 1:2, en diversifiant intelligemment, et en maîtrisant vos émotions, vous vous donnez les moyens de survivre et prospérer sur les marchés. Rappelez-vous : les meilleurs traders ne sont pas ceux qui gagnent le plus sur chaque trade, mais ceux qui perdent le moins quand ils ont tort.",
+      "ressources_complementaires": [
+        "📖 Livre : 'Trading in the Zone' de Mark Douglas (psychologie)",
+        "📖 Livre : 'The New Trading for a Living' de Dr. Alexander Elder",
+        "🎥 Vidéo : Les erreurs fatales des débutants en gestion de risque",
+        "📊 Calculateur : Position Size Calculator (pour calculer votre taille de position)",
+        "📄 Template : Journal de trading pour suivre votre discipline"
+      ]
+    },
+    "quiz": [
+      {
+        "question": "Quel pourcentage maximum de votre capital devriez-vous risquer par trade ?",
+        "options": [
+          "5-10%",
+          "1-2%",
+          "15-20%",
+          "Ça dépend de votre confiance dans le trade"
+        ],
+        "bonne_reponse": 1,
+        "explication": "La règle d'or est de ne JAMAIS risquer plus de 1-2% de votre capital total sur un seul trade. Cela vous permet de survivre à une série de pertes sans détruire votre compte."
+      },
+      {
+        "question": "Vous avez un capital de 5 000$. Combien devriez-vous risquer maximum par trade ?",
+        "options": [
+          "500$ (10%)",
+          "50-100$ (1-2%)",
+          "250$ (5%)",
+          "1 000$ (20%)"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Avec 5 000$ de capital, 1% = 50$ et 2% = 100$. Vous ne devriez donc jamais risquer plus de 50-100$ sur un seul trade."
+      },
+      {
+        "question": "Où devriez-vous placer un stop-loss lors d'un achat ?",
+        "options": [
+          "Au-dessus d'une résistance",
+          "N'importe où selon votre feeling",
+          "Juste sous un support identifié",
+          "Il ne faut pas utiliser de stop-loss"
+        ],
+        "bonne_reponse": 2,
+        "explication": "Pour un achat, le stop-loss doit être placé juste SOUS un support technique. Si ce support est cassé, votre analyse est invalidée et vous devez sortir."
+      },
+      {
+        "question": "Que faire si votre stop-loss devrait être touché mais que vous pensez que le prix va rebondir ?",
+        "options": [
+          "Déplacer le stop-loss plus loin pour donner plus d'espace",
+          "Annuler le stop-loss temporairement",
+          "RESPECTER votre stop-loss sans exception",
+          "Ajouter à votre position pour moyenner"
+        ],
+        "bonne_reponse": 2,
+        "explication": "JAMAIS de compromis : si votre stop-loss est touché, vous devez accepter la perte. Déplacer un stop contre vous est l'erreur fatale qui mène aux catastrophes."
+      },
+      {
+        "question": "Quel est le ratio Risk/Reward MINIMUM acceptable ?",
+        "options": [
+          "1:1 (risquer 1$ pour gagner 1$)",
+          "1:2 (risquer 1$ pour gagner 2$)",
+          "1:3 (risquer 1$ pour gagner 3$)",
+          "2:1 (risquer 2$ pour gagner 1$)"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Le ratio minimum est 1:2 - vous devez viser à gagner au moins 2$ pour chaque 1$ risqué. Idéalement, visez 1:3 ou mieux."
+      },
+      {
+        "question": "Avec un ratio 1:3 et un winrate de 30%, êtes-vous profitable ?",
+        "options": [
+          "Non, il faut au moins 50% de winrate",
+          "Oui, vous êtes profitable",
+          "Non, vous perdez de l'argent",
+          "Ça dépend du nombre de trades"
+        ],
+        "bonne_reponse": 1,
+        "explication": "OUI ! Sur 10 trades : 3 gagnants × 300$ = 900$ et 7 perdants × -100$ = -700$. Résultat : +200$ de profit avec seulement 30% de réussite."
+      },
+      {
+        "question": "Combien de positions maximum devrait avoir un trader DÉBUTANT ?",
+        "options": [
+          "1-2 positions",
+          "3-5 positions",
+          "10-15 positions",
+          "Autant que possible"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Un débutant devrait se limiter à 3-5 positions simultanées maximum pour pouvoir les suivre correctement et apprendre. Trop de positions = perte de contrôle."
+      },
+      {
+        "question": "Qu'est-ce que le 'revenge trading' et que devez-vous faire ?",
+        "options": [
+          "Trader après une perte pour se refaire - c'est une bonne stratégie",
+          "Trader impulsif après une perte - à ÉVITER absolument",
+          "Doubler sa position après une perte",
+          "Une technique avancée pour les experts"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Le revenge trading (trading de revanche) est le fait de trader impulsivement après une perte pour 'se refaire'. C'est TRÈS dangereux. Règle : après 2 pertes, pause de 24h."
+      }
+    ],
+    "exercices": [
+      {
+        "type": "calcul",
+        "titre": "Calculer votre taille de position",
+        "description": "Capital : 10 000$. Vous achetez AAPL à 175$ avec stop à 170$. En risquant 1%, combien d'actions pouvez-vous acheter ? (Réponse : 100$/5$ = 20 actions)"
+      },
+      {
+        "type": "pratique",
+        "titre": "Placer un stop-loss intelligent",
+        "description": "Dans le simulateur, ouvrez TSLA. Identifiez un support, achetez au-dessus, et placez votre stop juste sous ce support. Observez ce qui se passe."
+      },
+      {
+        "type": "analyse",
+        "titre": "Évaluer un ratio Risk/Reward",
+        "description": "On vous présente 5 setups de trading. Pour chacun, calculez le ratio R/R et déterminez lesquels sont acceptables (minimum 1:2)."
+      }
+    ]
+  },
+  {
+    "id": "trading_psychology",
+    "parcours": "débutant",
+    "titre": "🧠 Psychologie du Trading - Maîtrisez votre Mental",
+    "description": "Développez la mentalité des traders gagnants",
+    "durée": "55 minutes",
+    "difficulté": "Débutant",
+    "points_xp": 150,
+    "prérequis": [
+      "basics_1",
+      "risk_management_fundamentals"
+    ],
+    "contenu": {
+      "introduction": "Le trading est 20% de technique et 80% de psychologie. Vous pouvez avoir la meilleure stratégie du monde, si vous ne maîtrisez pas vos émotions, vous perdrez de l'argent. Les études montrent que 90% des traders échouent, non pas à cause d'un manque de connaissances, mais à cause d'erreurs psychologiques répétées. Ce module vous enseignera comment penser et agir comme un trader professionnel, en transformant votre plus grand ennemi (vos émotions) en allié.",
+      "sections": [
+        {
+          "titre": "😨 Les 2 Émotions Fatales : Peur et Avidité",
+          "contenu": "PEUR ET AVIDITÉ sont les deux forces qui détruisent 90% des traders.\n\nLA PEUR :\n\n1. PEUR DE PERDRE :\n- Symptôme : Vous hésitez à entrer dans un trade validé par votre stratégie\n- Conséquence : Vous ratez les meilleures opportunités\n- Exemple : 'Et si AAPL chute juste après mon achat ?' → Vous n'achetez pas → AAPL monte de 10%\n\n2. PEUR DE RATER (FOMO) :\n- Symptôme : Vous voyez une action monter et entrez impulsivement SANS analyse\n- Conséquence : Vous achetez au sommet et perdez de l'argent\n- Exemple : Tesla monte de 20% en 2 jours → Vous achetez par peur de rater → Le lendemain elle corrige de 15%\n\nL'AVIDITÉ :\n\n1. REFUSER DE PRENDRE DES PROFITS :\n- Symptôme : Votre objectif de +10% est atteint mais vous voulez '+encore un peu plus'\n- Conséquence : Le prix retourne et efface vos gains\n- Exemple : Vous êtes à +15% sur NVDA, vous visez 20% → Le prix chute à +5%\n\n2. VOULOIR RÉCUPÉRER RAPIDEMENT UNE PERTE :\n- Symptôme : Après une perte de 200$, vous doublez votre position pour 'vous refaire'\n- Conséquence : Vous violez votre gestion du risque et amplifiez les pertes\n\nCOMMENT LES COMBATTRE :\n✅ Suivez un PLAN écrit AVANT d'entrer dans le trade\n✅ Si l'émotion parle, attendez 30 minutes avant d'agir\n✅ Demandez-vous : 'Est-ce que je prendrais ce trade sans avoir vu le mouvement récent ?'",
+          "points_cles": [
+            "Peur = paralysie (vous ratez les opportunités)",
+            "Avidité = imprudence (vous prenez trop de risque)",
+            "Les émotions apparaissent TOUJOURS après les mouvements de prix",
+            "Un plan écrit à l'avance neutralise les émotions"
+          ]
+        },
+        {
+          "titre": "📝 Le Plan de Trading : Votre Boussole",
+          "contenu": "Un PLAN DE TRADING est un document écrit qui définit EXACTEMENT comment vous tradez, éliminant toute décision émotionnelle.\n\nQUE DOIT CONTENIR VOTRE PLAN :\n\n1. VOS RÈGLES D'ENTRÉE :\n'J'achète UNIQUEMENT si :'\n- Le prix est au-dessus de la MM50\n- ET il rebondit sur un support identifié\n- ET le RSI < 40 (survente)\n- ET le ratio Risk/Reward > 1:2\n\n2. VOS RÈGLES DE SORTIE :\n'Je vends quand :'\n- Mon stop-loss est touché (perte max 1% du capital)\n- OU mon objectif de profit est atteint (+2-3%)\n- OU la structure de tendance se casse\n\n3. VOTRE GESTION DU RISQUE :\n- Risque maximum : 1% par trade\n- Maximum 3 positions simultanées\n- Pause obligatoire après 2 pertes consécutives\n\n4. VOS RÈGLES ÉMOTIONNELLES :\n- Si j'hésite, je ne trade PAS\n- Si je suis en colère/excité, pause de 24h\n- Pas de trading les 30 premières minutes de marché (trop volatil)\n\nEXEMPLE DE SITUATION :\nSANS plan : 'Tesla monte vite, j'achète !' → Achat impulsif à 280$ → Chute à 260$ → Perte de 7%\n\nAVEC plan : 'Tesla monte mais mes critères ne sont pas remplis (pas de support clair, RSI > 70). Je ne trade pas.' → Vous évitez la perte.\n\nRÈGLE D'OR :\nSi UN SEUL de vos critères n'est pas rempli, vous ne prenez PAS le trade. Pas d'exception.",
+          "points_cles": [
+            "Écrivez votre plan AVANT d'ouvrir les graphiques",
+            "Suivez-le à 100%, sans exception",
+            "Un bon plan vous empêche de trader sous le coup de l'émotion",
+            "Mieux vaut rater un trade que violer son plan"
+          ],
+          "exemple_pratique": {
+            "titre": "Template de Plan de Trading",
+            "description": "Téléchargez le template et remplissez-le AVANT votre prochain trade. Affichez-le près de votre écran."
+          }
+        },
+        {
+          "titre": "📊 Le Journal de Trading : Apprenez de vos Erreurs",
+          "contenu": "Un JOURNAL DE TRADING est votre outil d'amélioration continue. Les traders professionnels tiennent TOUS un journal détaillé.\n\nQUE NOTER POUR CHAQUE TRADE :\n\n1. DONNÉES OBJECTIVES :\n- Date et heure\n- Ticker et direction (long/short)\n- Prix d'entrée, stop-loss, objectif\n- Taille de position et risque ($)\n- Prix de sortie et résultat ($)\n\n2. DONNÉES PSYCHOLOGIQUES :\n- Pourquoi ai-je pris ce trade ? (Setup validé ?)\n- Comment me sentais-je AVANT d'entrer ? (Confiant ? Hésitant ? FOMO ?)\n- Ai-je respecté mon plan ?\n- Comment ai-je géré le trade ? (Déplacé mon stop ? Sorti trop tôt ?)\n- Qu'ai-je appris ?\n\nEXEMPLE D'ENTRÉE :\n```\nDate : 12/10/2025\nTrade : Long AAPL\nEntrée : 175$ | Stop : 172$ | Objectif : 181$\nRisque : 100$ (1% du capital)\nRésultat : +150$ (objectif atteint)\n\nPsychologie :\n- Setup parfait selon mon plan (rebond sur support + RSI 35)\n- J'étais confiant et calme\n- J'ai respecté mon plan à 100%\n- Difficulté : J'ai failli prendre des profits à +5% mais j'ai tenu jusqu'à l'objectif\n\nLeçon : Quand je suis mon plan sans émotion, je suis profitable ✅\n```\n\nANALYSE HEBDOMADAIRE :\nChaque dimanche, relisez vos trades de la semaine :\n- Quels trades ont respecté le plan ? (Résultat ?)\n- Quels trades ont violé le plan ? (Résultat ?)\n- Quelle émotion revient le plus souvent ?\n- Quel pattern d'erreur se répète ?\n\nVous découvrirez que vos trades DISCIPLINÉS sont profitables, et vos trades ÉMOTIONNELS sont perdants.",
+          "points_cles": [
+            "Notez CHAQUE trade sans exception",
+            "Incluez les données psychologiques (état mental)",
+            "Relisez votre journal chaque semaine",
+            "Identifiez vos patterns d'erreur pour les éliminer"
+          ]
+        },
+        {
+          "titre": "⚡ Les Biais Cognitifs qui Vous Ruinent",
+          "contenu": "Votre cerveau a des BIAIS COGNITIFS (erreurs de raisonnement) qui sont catastrophiques en trading.\n\nLES 5 BIAIS LES PLUS DANGEREUX :\n\n1. BIAIS DE CONFIRMATION :\nVous cherchez uniquement les infos qui confirment votre opinion.\n\nExemple : Vous êtes haussier sur Tesla. Vous lisez uniquement les analyses positives et ignorez les signaux baissiers sur le graphique. → Vous perdez de l'argent car vous refusez de voir la réalité.\n\nSOLUTION : Cherchez activement les arguments CONTRE votre position. Si vous êtes bull, lisez des analyses bear.\n\n2. AVERSION À LA PERTE :\nLa douleur de perdre 100$ est 2x plus forte que le plaisir de gagner 100$.\n\nExemple : Vous avez une position à -5%. Vous devriez couper selon votre plan mais vous gardez en espérant un rebond. → La perte passe à -15%.\n\nSOLUTION : Acceptez psychologiquement que les pertes font partie du jeu. Un stop touché n'est pas un échec, c'est votre plan qui fonctionne.\n\n3. ANCRAGE :\nVous vous accrochez à un prix de référence arbitraire.\n\nExemple : 'J'ai acheté AAPL à 180$ donc je ne vendrai pas en dessous.' → Le prix descend à 160$ mais vous gardez car '180$ c'est mon prix'. → Vous perdez 11%.\n\nSOLUTION : Le prix auquel vous avez acheté n'a AUCUNE importance pour le marché. Seule compte la situation actuelle.\n\n4. EXCÈS DE CONFIANCE :\nAprès 3-4 trades gagnants, vous pensez avoir tout compris.\n\nExemple : Vous gagnez 4 trades d'affilée → 'Je suis doué' → Vous doublez votre risque → Le 5e trade perd et efface tous vos gains.\n\nSOLUTION : Restez humble TOUJOURS. 4 trades ne prouvent rien statistiquement.\n\n5. BIAIS DU SURVIVANT :\nVous voyez les success stories mais pas les échecs.\n\nExemple : 'Ce trader a fait +500% sur GME, je vais faire pareil !' → Pour 1 trader qui a réussi, 10 000 ont tout perdu.\n\nSOLUTION : Concentrez-vous sur un système reproductible, pas sur les coups de chance.",
+          "points_cles": [
+            "Votre cerveau vous trompe constamment",
+            "Biais de confirmation = vous voyez ce que vous voulez voir",
+            "Aversion à la perte = vous gardez les pertes trop longtemps",
+            "La conscience des biais ne suffit pas, il faut un plan pour les contrer"
+          ]
+        },
+        {
+          "titre": "🎯 La Mentalité du Trader Professionnel",
+          "contenu": "Comment penser comme un trader qui gagne sur le long terme.\n\n1. PENSEZ EN PROBABILITÉS, PAS EN CERTITUDES :\nUN trade ne prouve rien. C'est la performance sur 100 trades qui compte.\n\nMentalité perdante : 'Ce trade VA monter, j'en suis sûr !'\nMentalité gagnante : 'Ce setup a 60% de chances de réussir selon mes stats. Je prends le trade avec une gestion de risque stricte.'\n\n2. ACCEPTEZ LES PERTES COMME NORMALES :\nMême les meilleurs traders ont 40-50% de trades perdants.\n\nMentalité perdante : 'J'ai perdu, je suis nul.'\nMentalité gagnante : 'J'ai perdu mais j'ai respecté mon plan. Sur 100 trades, je serai profitable.'\n\n3. PROCESSUS > RÉSULTAT :\nJugez-vous sur le respect de votre processus, pas sur le résultat d'UN trade.\n\nEXEMPLE :\nTrade A : Vous violez votre plan, entrez sans setup, et gagnez 200$ par chance.\nTrade B : Vous respectez parfaitement votre plan et perdez 100$.\n\nQuel est le 'bon' trade ? Le TRADE B ! Car c'est le processus qui vous rendra profitable long terme.\n\n4. DÉTACHEMENT ÉMOTIONNEL :\nVotre capital de trading n'est pas 'votre argent', c'est votre 'outil de travail'.\n\nMentalité perdante : 'J'ai perdu 200$, c'était mon loyer !'\nMentalité gagnante : 'J'ai perdu 2% de mon capital de trading, c'est le coût du business.'\n\nC'est pourquoi vous ne devez JAMAIS trader de l'argent dont vous avez besoin pour vivre.\n\n5. PATIENCE ET SÉLECTIVITÉ :\nLes pros font 2-5 trades par semaine. Les amateurs font 20 trades par jour.\n\nMentalité perdante : 'Je dois être toujours en position.'\nMentalité gagnante : 'Je n'ai pas de trade validé aujourd'hui. Je ne fais rien.' (Ne rien faire est une position.)",
+          "points_cles": [
+            "Pensez en termes de probabilités sur 100 trades",
+            "Les pertes sont normales et nécessaires",
+            "Jugez-vous sur le processus, pas sur 1 résultat",
+            "Patience : attendre le setup parfait est une compétence",
+            "Ne tradez JAMAIS de l'argent dont vous avez besoin"
+          ]
+        }
+      ],
+      "resume": "La psychologie est la compétence la plus importante en trading. En comprenant vos émotions (peur et avidité), en suivant un plan écrit, en tenant un journal pour apprendre de vos erreurs, en identifiant vos biais cognitifs, et en adoptant la mentalité probabiliste des professionnels, vous transformez le trading d'un jeu émotionnel en un business rationnel. Rappelez-vous : ce n'est pas votre stratégie qui vous fera gagner, c'est votre capacité à la suivre sans émotion.",
+      "ressources_complementaires": [
+        "📖 Livre : 'Trading in the Zone' de Mark Douglas (LA référence)",
+        "📖 Livre : 'The Psychology of Trading' de Brett Steenbarger",
+        "🎥 Vidéo : Comment les émotions détruisent 90% des traders",
+        "📄 Template : Journal de Trading (téléchargement)",
+        "📄 Template : Plan de Trading (téléchargement)",
+        "🧠 Article : Les 12 biais cognitifs les plus dangereux en trading"
+      ]
+    },
+    "quiz": [
+      {
+        "question": "Quelles sont les 2 émotions les plus dangereuses en trading ?",
+        "options": [
+          "Joie et tristesse",
+          "Peur et avidité",
+          "Colère et frustration",
+          "Espoir et désespoir"
+        ],
+        "bonne_reponse": 1,
+        "explication": "PEUR et AVIDITÉ sont les deux émotions qui détruisent le plus de traders. La peur vous paralyse ou vous fait agir impulsivement (FOMO), l'avidité vous pousse à prendre trop de risque."
+      },
+      {
+        "question": "Qu'est-ce que le FOMO et pourquoi est-ce dangereux ?",
+        "options": [
+          "Fear Of Missing Out - entrer impulsivement sans analyse",
+          "First Order Market Operation - une technique avancée",
+          "Fixed Order Money Operation - une stratégie de diversification",
+          "Full Opposite Market Order - vendre à découvert"
+        ],
+        "bonne_reponse": 0,
+        "explication": "FOMO (Fear Of Missing Out = Peur de rater) vous pousse à entrer dans un trade SANS analyse juste parce que vous voyez une action monter. Résultat : vous achetez souvent au sommet."
+      },
+      {
+        "question": "Que devriez-vous faire si UN SEUL de vos critères de plan n'est pas rempli ?",
+        "options": [
+          "Prendre le trade quand même si vous avez un bon feeling",
+          "Ne PAS prendre le trade, sans exception",
+          "Réduire votre taille de position de moitié",
+          "Demander l'avis d'autres traders"
+        ],
+        "bonne_reponse": 1,
+        "explication": "RÈGLE ABSOLUE : Si même UN SEUL critère de votre plan n'est pas rempli, vous ne prenez PAS le trade. Pas d'exception. Mieux vaut rater un trade que violer son plan."
+      },
+      {
+        "question": "Pourquoi tenir un journal de trading est-il essentiel ?",
+        "options": [
+          "C'est obligatoire légalement",
+          "Pour payer moins d'impôts",
+          "Pour identifier vos patterns d'erreur et vous améliorer",
+          "Ce n'est pas vraiment utile"
+        ],
+        "bonne_reponse": 2,
+        "explication": "Le journal de trading vous permet d'identifier vos erreurs répétitives, vos biais émotionnels, et de voir objectivement que vos trades disciplinés sont profitables contrairement aux trades émotionnels."
+      },
+      {
+        "question": "Qu'est-ce que le biais de confirmation ?",
+        "options": [
+          "Confirmer chaque trade avec un autre trader",
+          "Chercher uniquement les infos qui valident votre opinion",
+          "Attendre une confirmation avant d'entrer",
+          "Vérifier que votre ordre est bien passé"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Le biais de confirmation vous pousse à ne voir QUE les informations qui confirment ce que vous pensez déjà, en ignorant les signaux contradictoires. Très dangereux !"
+      },
+      {
+        "question": "Qu'est-ce que l'aversion à la perte ?",
+        "options": [
+          "Éviter de prendre des risques inutiles",
+          "La douleur de perdre est plus forte que le plaisir de gagner",
+          "Refuser de prendre des trades",
+          "Utiliser systématiquement des stop-loss"
+        ],
+        "bonne_reponse": 1,
+        "explication": "L'aversion à la perte est un biais : perdre 100$ fait 2x plus mal que gagner 100$ fait plaisir. Résultat : vous gardez vos positions perdantes trop longtemps en espérant un rebond."
+      },
+      {
+        "question": "Quelle est la bonne mentalité face à une perte ?",
+        "options": [
+          "J'ai perdu, je suis nul en trading",
+          "Je vais doubler ma position pour me refaire",
+          "J'ai respecté mon plan, c'est normal de perdre parfois",
+          "Je change complètement ma stratégie"
+        ],
+        "bonne_reponse": 2,
+        "explication": "La mentalité gagnante : accepter que les pertes sont NORMALES. Si vous avez respecté votre plan, c'est un 'bon' trade même s'il a perdu. C'est la performance sur 100 trades qui compte."
+      },
+      {
+        "question": "Vous respectez votre plan et perdez 100$, puis vous violez votre plan et gagnez 200$. Quel trade est 'meilleur' ?",
+        "options": [
+          "Le trade à +200$ car j'ai gagné",
+          "Le trade à -100$ car j'ai respecté mon plan",
+          "Les deux sont équivalents",
+          "Aucun, il faut arrêter de trader"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Le trade à -100$ est MEILLEUR car vous avez respecté votre processus. Gagner en violant son plan est de la CHANCE, pas une compétence. Sur le long terme, seul le processus gagne."
+      }
+    ],
+    "exercices": [
+      {
+        "type": "reflexion",
+        "titre": "Identifiez vos déclencheurs émotionnels",
+        "description": "Listez 3 situations qui déclenchent vos émotions en trading (ex: voir une perte de -5%, lire une news négative, voir une action monter sans vous). Pour chacune, écrivez une règle pour y réagir rationnellement."
+      },
+      {
+        "type": "pratique",
+        "titre": "Créez votre plan de trading",
+        "description": "Utilisez le template fourni et créez votre plan complet : critères d'entrée, de sortie, gestion du risque, règles émotionnelles. Affichez-le près de votre écran."
+      },
+      {
+        "type": "simulation",
+        "titre": "Tenez un journal sur 5 trades",
+        "description": "Dans le simulateur, faites 5 trades et documentez chacun dans votre journal : données objectives + état émotionnel. Relisez et identifiez un pattern."
+      }
+    ]
+  },
+  {
+    "id": "technical_indicators_intro",
+    "parcours": "débutant",
+    "titre": "📈 Introduction aux Indicateurs Techniques",
+    "description": "Maîtrisez les 3 indicateurs essentiels : RSI, MACD et Moyennes Mobiles",
+    "durée": "65 minutes",
+    "difficulté": "Débutant",
+    "points_xp": 175,
+    "prérequis": [
+      "technical_analysis_basics"
+    ],
+    "contenu": {
+      "introduction": "Les indicateurs techniques sont des outils mathématiques qui analysent les données de prix et de volume pour générer des signaux de trading. Contrairement à l'analyse des chandeliers ou des supports/résistances qui sont visuels, les indicateurs utilisent des formules pour quantifier le marché. Ce module couvre les 3 indicateurs les plus utilisés : les Moyennes Mobiles (tendance), le RSI (momentum), et le MACD (convergence/divergence). Ces outils, utilisés correctement, peuvent considérablement améliorer votre timing d'entrée et sortie.",
+      "sections": [
+        {
+          "titre": "📊 Les Moyennes Mobiles (Moving Averages)",
+          "contenu": "Une MOYENNE MOBILE (MM ou MA) est la moyenne du prix sur N périodes passées. Elle 'lisse' les fluctuations pour révéler la tendance sous-jacente.\n\nTYPES DE MOYENNES MOBILES :\n\n1. MOYENNE MOBILE SIMPLE (SMA) :\nSomme des N derniers prix / N\n\nExemple SMA20 (20 jours) :\n(Prix jour 1 + Prix jour 2 + ... + Prix jour 20) / 20 = Valeur SMA\n\nChaque jour, on retire le prix le plus ancien et on ajoute le nouveau.\n\n2. MOYENNE MOBILE EXPONENTIELLE (EMA) :\nDonne plus de poids aux prix récents.\nPlus réactive que la SMA, idéale pour le day trading.\n\nMOYENNES LES PLUS UTILISÉES :\n- MM20 (20 périodes) : Court terme\n- MM50 (50 périodes) : Moyen terme\n- MM200 (200 périodes) : Long terme (la plus importante !)\n\nCOMMENT LES UTILISER :\n\n✅ IDENTIFIER LA TENDANCE :\n- Prix AU-DESSUS de la MM50/200 = Tendance HAUSSIÈRE\n- Prix EN-DESSOUS de la MM50/200 = Tendance BAISSIÈRE\n- Prix qui COUPE la MM = Changement potentiel de tendance\n\n✅ SIGNAUX D'ACHAT/VENTE :\n- GOLDEN CROSS : MM50 croise au-dessus de la MM200 = Signal d'achat fort\n- DEATH CROSS : MM50 croise en-dessous de la MM200 = Signal de vente fort\n\nExemple concret :\nAAPL à 175$ avec MM50 à 170$ et MM200 à 165$ :\n→ Prix au-dessus des deux MM = tendance haussière confirmée\n→ Stratégie : Acheter les pullbacks (corrections) vers la MM50\n\nATTENTION :\nLes MM sont des indicateurs RETARDÉS (lagging) : elles confirment la tendance mais ne la prédisent pas.",
+          "points_cles": [
+            "MM = moyenne du prix sur N périodes (lisse les fluctuations)",
+            "Prix > MM = tendance haussière, Prix < MM = baissière",
+            "Golden Cross (MM50 > MM200) = signal d'achat puissant",
+            "Death Cross (MM50 < MM200) = signal de vente",
+            "Les MM sont retardées : confirment mais ne prédisent pas"
+          ]
+        },
+        {
+          "titre": "⚡ Le RSI (Relative Strength Index)",
+          "contenu": "Le RSI mesure la FORCE et la VITESSE des mouvements de prix. Il oscille entre 0 et 100 et identifie les zones de surachat et survente.\n\nFORMULE (simplifiée) :\nRSI = 100 - [100 / (1 + (Gains moyens / Pertes moyennes sur 14 périodes))]\n\nPas besoin de la calculer - votre plateforme le fait automatiquement !\n\nINTERPRÉTATION :\n\nRSI > 70 = SURACHAT (Overbought)\n→ L'action a trop monté trop vite\n→ Risque de correction baissière\n→ Signal : Prudence ou prise de profits\n\nRSI < 30 = SURVENTE (Oversold)\n→ L'action a trop baissé trop vite\n→ Opportunité de rebond\n→ Signal : Zone d'achat potentielle\n\nRSI entre 40-60 = NEUTRE\n→ Pas de signal clair\n\nSTRATÉGIES D'UTILISATION :\n\n1. REBOND DE SURVENTE :\nQuand RSI touche 30 ou moins → Attendre qu'il REMONTE au-dessus de 30 → Acheter\nPourquoi attendre ? Car 'le RSI peut rester en survente longtemps dans une forte baisse'\n\n2. DIVERGENCE (AVANCÉ) :\nDIVERGENCE HAUSSIÈRE :\n- Prix fait un nouveau plus bas\n- Mais RSI fait un plus bas PLUS HAUT\n→ Signal de retournement haussier imminent\n\nDIVERGENCE BAISSIÈRE :\n- Prix fait un nouveau plus haut\n- Mais RSI fait un plus haut PLUS BAS\n→ Signal de retournement baissier imminent\n\nExemple concret :\nTSLA à 240$ avec RSI = 28\n→ Zone de survente, rebond probable\n→ Attendre RSI > 30 pour confirmer le rebond\n→ Acheter avec stop sous le plus bas récent\n\nERREUR À ÉVITER :\nNe vendez PAS automatiquement quand RSI > 70 en tendance haussière forte !\nDans une forte hausse, le RSI peut rester > 70 pendant des semaines.",
+          "points_cles": [
+            "RSI mesure la vitesse et la force du mouvement (0-100)",
+            "RSI > 70 = surachat (prudence), RSI < 30 = survente (opportunité)",
+            "Attendre que RSI SORTE de la zone extrême pour trader",
+            "Divergences RSI/prix = signaux de retournement puissants",
+            "En forte tendance, RSI peut rester en zone extrême longtemps"
+          ],
+          "exemple_pratique": {
+            "ticker": "NVDA",
+            "scenario": "NVDA à 490$ avec RSI = 72. Ne vendez pas automatiquement ! Vérifiez la tendance globale. Si MM50 et MM200 sont ascendantes, la hausse peut continuer malgré le RSI élevé."
+          }
+        },
+        {
+          "titre": "📉 Le MACD (Moving Average Convergence Divergence)",
+          "contenu": "Le MACD détecte les CHANGEMENTS DE TENDANCE et la FORCE du momentum. Il combine plusieurs moyennes mobiles pour générer des signaux.\n\nCOMPOSANTS DU MACD :\n\n1. LIGNE MACD (bleue généralement) :\nDifférence entre EMA12 et EMA26\nMACD = EMA12 - EMA26\n\n2. LIGNE DE SIGNAL (rouge/orange) :\nEMA9 de la ligne MACD\nC'est une moyenne mobile de la ligne MACD\n\n3. HISTOGRAMME (barres) :\nDifférence entre ligne MACD et ligne de signal\nPlus les barres sont grandes, plus le momentum est fort\n\nSIGNAUX D'ACHAT/VENTE :\n\n✅ SIGNAL D'ACHAT :\n1. Ligne MACD CROISE AU-DESSUS de la ligne de signal\n2. ET les deux lignes sont EN-DESSOUS de zéro (plus fort)\n3. Histogramme passe de négatif à positif\n\n→ Momentum haussier qui démarre\n\n❌ SIGNAL DE VENTE :\n1. Ligne MACD CROISE EN-DESSOUS de la ligne de signal\n2. ET les deux lignes sont AU-DESSUS de zéro (plus fort)\n3. Histogramme passe de positif à négatif\n\n→ Momentum baissier qui démarre\n\nDIVERGENCE MACD :\n\nDIVERGENCE HAUSSIÈRE :\n- Prix fait des plus bas descendants\n- Mais MACD fait des plus bas ascendants\n→ La pression vendeuse s'affaiblit → Rebond probable\n\nDIVERGENCE BAISSIÈRE :\n- Prix fait des plus hauts ascendants\n- Mais MACD fait des plus hauts descendants\n→ La pression acheteuse s'affaiblit → Correction probable\n\nCROISEMENT DE LA LIGNE ZÉRO :\n- MACD passe AU-DESSUS de zéro = Confirmation tendance haussière\n- MACD passe EN-DESSOUS de zéro = Confirmation tendance baissière\n\nExemple concret :\nAAPL à 175$\n- Ligne MACD croise au-dessus de la ligne de signal\n- Les deux sont sous zéro\n- Histogramme devient positif\n→ Signal d'achat ! Momentum haussier démarre\n\nCOMBINER AVEC D'AUTRES INDICATEURS :\nNe tradez JAMAIS le MACD seul !\nMeilleure combinaison :\n- Prix au-dessus MM50\n- RSI sort de survente (> 30)\n- MACD croise à la hausse\n→ TRIPLE CONFIRMATION = Signal très fiable",
+          "points_cles": [
+            "MACD = détecte changements de tendance et momentum",
+            "Croisement ligne MACD / ligne signal = signal trading",
+            "Histogramme = force du momentum (hauteur des barres)",
+            "Divergences MACD/prix = retournements probables",
+            "Toujours combiner avec d'autres indicateurs"
+          ]
+        },
+        {
+          "titre": "🎯 Combiner les 3 Indicateurs : Stratégie Complète",
+          "contenu": "La vraie puissance vient de la COMBINAISON des indicateurs. Un seul indicateur peut donner de faux signaux, mais 3 indicateurs qui se confirment = haute probabilité.\n\nSTRATÉGIE D'ACHAT COMPLÈTE (DÉBUTANT) :\n\nÉTAPE 1 : TENDANCE (Moyennes Mobiles)\n✅ Prix AU-DESSUS de la MM50\n✅ MM50 AU-DESSUS de la MM200\n→ Tendance haussière confirmée\n\nÉTAPE 2 : SURVENTE (RSI)\n✅ RSI descend sous 40 (ou 30 pour plus de sécurité)\n✅ RSI commence à REMONTER\n→ Correction terminée, rebond commence\n\nÉTAPE 3 : MOMENTUM (MACD)\n✅ Ligne MACD croise AU-DESSUS de la ligne de signal\n✅ Histogramme devient positif\n→ Momentum haussier confirmé\n\nSI LES 3 SONT VRAIS → ACHETER !\n\nExemple complet sur AAPL :\n\nSituation :\n- Prix : 173$ (MM50: 170$, MM200: 165$) ✅\n- RSI était à 35, maintenant à 42 ✅\n- MACD vient de croiser à la hausse ✅\n\nDécision : ACHAT\nEntrée : 173$\nStop-loss : 168$ (sous MM50)\nObjectif : 185$ (résistance précédente)\nRatio R/R : 12$ gain / 5$ risque = 2.4:1 ✅\n\nSTRATÉGIE DE VENTE/SORTIE :\n\nSortir quand UN de ces signaux apparaît :\n❌ Prix repasse SOUS la MM50\n❌ RSI dépasse 70 et commence à redescendre\n❌ MACD croise à la BAISSE\n\nPRINCIPE CLÉ :\nPour ENTRER : Attendez confirmation des 3 indicateurs\nPour SORTIR : Un seul signal négatif suffit (protection du capital)\n\nFAUX SIGNAUX - COMMENT LES ÉVITER :\n\n1. Ne tradez PAS contre la tendance principale\nSi MM200 est descendante, ignorez les signaux d'achat\n\n2. Vérifiez le VOLUME\nUn signal avec volume faible = moins fiable\n\n3. Contexte macro-économique\nMême avec de bons signaux, une news négative peut tout annuler\n\nFRÉQUENCE DES SIGNAUX :\n- En tendance claire : 2-4 signaux de qualité par mois\n- En range : Beaucoup de faux signaux, évitez\n\nRÈGLE D'OR :\nMieux vaut RATER un bon trade que PRENDRE un mauvais trade.\nLa patience est votre meilleur allié.",
+          "points_cles": [
+            "Combiner MM + RSI + MACD = haute probabilité de succès",
+            "Pour entrer : attendre 3 confirmations",
+            "Pour sortir : 1 signal négatif suffit",
+            "Ne tradez jamais contre la tendance MM200",
+            "Volume doit confirmer le signal"
+          ]
+        }
+      ],
+      "resume": "Les indicateurs techniques transforment les données de prix en signaux actionnables. Les Moyennes Mobiles identifient la tendance, le RSI détecte les zones de survente/surachat, et le MACD confirme le momentum. Utilisés ensemble avec une bonne gestion du risque, ils forment un système complet de prise de décision. Rappelez-vous : aucun indicateur n'est parfait à 100%, d'où l'importance de combiner plusieurs sources de confirmation et de toujours utiliser des stop-loss.",
+      "ressources_complementaires": [
+        "📖 Guide : Technical Analysis Explained - Martin Pring (Chapitre sur les indicateurs)",
+        "🎥 Vidéo : RSI et MACD pour débutants (YouTube - The Trading Channel)",
+        "🔗 Outil : TradingView pour tester les indicateurs gratuitement",
+        "📄 Cheat Sheet : Les 3 combinaisons d'indicateurs les plus fiables",
+        "📊 Simulateur : Backtester votre stratégie sur données historiques"
+      ]
+    },
+    "quiz": [
+      {
+        "question": "Que signifie un prix qui se trouve AU-DESSUS de la MM50 ?",
+        "options": [
+          "Le prix va baisser prochainement",
+          "La tendance est haussière à moyen terme",
+          "Il faut vendre immédiatement",
+          "Le volume est élevé"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Quand le prix est au-dessus de sa MM50, cela indique une tendance HAUSSIÈRE à moyen terme. C'est un signal de force."
+      },
+      {
+        "question": "Qu'est-ce qu'un 'Golden Cross' ?",
+        "options": [
+          "Quand le prix croise la MM200",
+          "Quand la MM50 croise AU-DESSUS de la MM200",
+          "Quand le RSI dépasse 70",
+          "Quand le volume double"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Le Golden Cross se produit quand la MM50 croise au-dessus de la MM200. C'est un signal d'achat très puissant qui indique un changement de tendance vers la hausse."
+      },
+      {
+        "question": "Le RSI est à 28. Quelle est la meilleure action ?",
+        "options": [
+          "Vendre immédiatement",
+          "Acheter immédiatement",
+          "Attendre que RSI remonte au-dessus de 30 puis acheter",
+          "Ignorer complètement ce signal"
+        ],
+        "bonne_reponse": 2,
+        "explication": "RSI = 28 indique une SURVENTE, mais on attend qu'il REMONTE au-dessus de 30 pour confirmer que le rebond démarre. Acheter à RSI 28 est risqué car ça peut descendre encore plus."
+      },
+      {
+        "question": "Le RSI est à 75 dans une forte tendance haussière. Que faire ?",
+        "options": [
+          "Vendre immédiatement car RSI > 70",
+          "Ne PAS vendre automatiquement, vérifier la tendance globale",
+          "Acheter encore plus",
+          "Shorter l'action"
+        ],
+        "bonne_reponse": 1,
+        "explication": "En forte tendance haussière, le RSI peut rester > 70 pendant longtemps. Ne vendez pas automatiquement ! Vérifiez les MM et la tendance globale d'abord."
+      },
+      {
+        "question": "Que signale un croisement MACD à la hausse ?",
+        "options": [
+          "Il faut vendre",
+          "Le momentum haussier démarre",
+          "La tendance est baissière",
+          "Rien de particulier"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Quand la ligne MACD croise AU-DESSUS de la ligne de signal, cela indique que le momentum HAUSSIER démarre. C'est un signal d'achat."
+      },
+      {
+        "question": "Qu'est-ce qu'une divergence haussière du MACD ?",
+        "options": [
+          "Prix monte mais MACD descend",
+          "Prix descend mais MACD monte",
+          "Prix et MACD montent ensemble",
+          "Le MACD est au-dessus de zéro"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Divergence haussière = le prix fait des plus bas descendants MAIS le MACD fait des plus bas ascendants. Cela signale un affaiblissement de la pression vendeuse et un rebond probable."
+      },
+      {
+        "question": "Combien d'indicateurs doivent confirmer un signal d'ACHAT dans la stratégie complète ?",
+        "options": [
+          "1 seul indicateur suffit",
+          "2 indicateurs sur 3",
+          "Les 3 indicateurs (MM + RSI + MACD)",
+          "Aucun, il faut trader au feeling"
+        ],
+        "bonne_reponse": 2,
+        "explication": "Dans la stratégie complète, on attend la confirmation des 3 indicateurs AVANT d'acheter : Prix > MM50, RSI rebondit de survente, et MACD croise à la hausse. Triple confirmation = haute probabilité."
+      },
+      {
+        "question": "Pour SORTIR d'une position, combien de signaux négatifs faut-il ?",
+        "options": [
+          "Les 3 indicateurs doivent être négatifs",
+          "2 indicateurs sur 3",
+          "UN SEUL signal négatif suffit",
+          "Jamais sortir, toujours HODL"
+        ],
+        "bonne_reponse": 2,
+        "explication": "Pour protéger votre capital, sortez dès qu'UN SEUL indicateur devient négatif (Prix < MM50, ou RSI > 70 et redescend, ou MACD croise à la baisse). Principe : Entrer avec 3 confirmations, sortir avec 1 alerte."
+      }
+    ],
+    "exercices": [
+      {
+        "type": "pratique",
+        "titre": "Identifier les signaux sur TradingView",
+        "description": "Ouvrez TradingView, ajoutez MM50, MM200, RSI et MACD sur le graphique AAPL. Trouvez un moment où les 3 indicateurs donnaient un signal d'achat simultané dans les 6 derniers mois."
+      },
+      {
+        "type": "simulation",
+        "titre": "Stratégie complète dans le simulateur",
+        "description": "Dans le simulateur HelixOne, attendez qu'une action valide les 3 critères (Prix > MM50, RSI rebondit, MACD croise haussier). Achetez avec stop sous MM50. Documentez le trade dans votre journal."
+      },
+      {
+        "type": "analyse",
+        "titre": "Backtesting de la stratégie",
+        "description": "Prenez le graphique MSFT des 3 derniers mois. Identifiez tous les moments où les 3 indicateurs s'alignaient. Calculez le taux de réussite de ces signaux."
+      }
+    ]
+  },
+  {
+    "id": "trading_patterns_chartistes",
+    "parcours": "intermédiaire",
+    "titre": "📐 Trading Patterns et Figures Chartistes",
+    "description": "Maîtrisez les patterns de continuation et de retournement pour anticiper les mouvements",
+    "durée": "70 minutes",
+    "difficulté": "Intermédiaire",
+    "points_xp": 200,
+    "prérequis": [
+      "technical_analysis_basics",
+      "technical_indicators_intro"
+    ],
+    "contenu": {
+      "introduction": "Les patterns chartistes (ou figures graphiques) sont des formations de prix qui se répètent historiquement et qui ont des probabilités statistiques de résolution dans une direction donnée. Ces patterns combinent la psychologie de masse, les supports/résistances, et les volumes pour créer des configurations prévisibles. Warren Buffett disait 'L'histoire ne se répète pas, mais elle rime' - en trading, ces patterns sont les 'rimes' du marché. Ce module vous enseignera à reconnaître et trader les 8 patterns les plus fiables, utilisés par les traders professionnels du monde entier.",
+      "sections": [
+        {
+          "titre": "🔺 Patterns de Continuation : Triangles",
+          "contenu": "Les patterns de CONTINUATION apparaissent pendant une tendance et signalent que cette tendance va CONTINUER après une pause.\n\nLE TRIANGLE ASCENDANT (Bullish) :\n\nSTRUCTURE :\n- Résistance HORIZONTALE (ligne plate en haut)\n- Support ASCENDANT (ligne montante en bas)\n- Le prix fait des plus bas de plus en plus hauts\n- Volume DIMINUE pendant la formation\n\nPSYCHOLOGIE :\nLes acheteurs deviennent de plus en plus agressifs (plus bas ascendants), tandis qu'il y a un niveau de vendeurs constant (résistance horizontale). La pression acheteuse finit par exploser la résistance.\n\nCOMMENT LE TRADER :\n✅ ENTRÉE : Quand le prix CASSE la résistance avec un volume 2-3x supérieur à la moyenne\n✅ STOP-LOSS : Juste sous le dernier plus bas du triangle\n✅ OBJECTIF : Hauteur du triangle projetée vers le haut depuis le breakout\n\nExemple concret :\nAAPL forme un triangle entre 170$ (résistance) et une ligne montant de 165$ à 168$\n- Hauteur du triangle au départ : 170$ - 165$ = 5$\n- Breakout à 171$ avec gros volume → ACHAT\n- Stop à 167$ (sous dernier plus bas)\n- Objectif : 171$ + 5$ = 176$\n- Ratio R/R : 5$ gain / 4$ risque = 1.25:1 (acceptable)\n\nLE TRIANGLE DESCENDANT (Bearish) :\n\nSTRUCTURE :\n- Support HORIZONTAL (ligne plate en bas)\n- Résistance DESCENDANTE (ligne baissière en haut)\n- Le prix fait des plus hauts de plus en plus bas\n- Volume diminue\n\nPSYCHOLOGIE :\nLes vendeurs deviennent plus agressifs (plus hauts descendants), mais il y a un support constant. La pression vendeuse finit par casser le support.\n\nCOMMENT LE TRADER :\n✅ ENTRÉE : Quand le prix CASSE le support avec gros volume\n✅ STOP-LOSS : Juste au-dessus du dernier plus haut\n✅ OBJECTIF : Hauteur du triangle projetée vers le bas\n\nLE TRIANGLE SYMÉTRIQUE (Neutre) :\n\nSTRUCTURE :\n- Support ASCENDANT\n- Résistance DESCENDANTE\n- Le prix converge vers un apex (sommet du triangle)\n- Indécision du marché\n\nCOMMENT LE TRADER :\nAttendez le BREAKOUT (haussier ou baissier) avec volume.\nNe tradez PAS avant la cassure car la direction est incertaine.\n\nRÈGLES IMPORTANTES :\n⚠️ Le breakout DOIT avoir un volume élevé (2-3x la moyenne)\n⚠️ Plus le triangle est long (3-6 semaines), plus le mouvement après breakout est puissant\n⚠️ Évitez de trader près de l'apex (trop d'indécision)",
+          "points_cles": [
+            "Triangle ascendant = continuation haussière probable",
+            "Triangle descendant = continuation baissière probable",
+            "Triangle symétrique = attendre le breakout pour la direction",
+            "Breakout DOIT être accompagné d'un volume élevé",
+            "Objectif = hauteur du triangle projetée après breakout"
+          ]
+        },
+        {
+          "titre": "📏 Patterns de Continuation : Drapeaux et Fanions",
+          "contenu": "Les DRAPEAUX et FANIONS sont des pauses courtes (1-3 semaines) dans une forte tendance avant que celle-ci ne reprenne.\n\nLE DRAPEAU HAUSSIER (Bull Flag) :\n\nSTRUCTURE :\n- Forte hausse rapide = 'le mât' (10-20% en quelques jours)\n- Correction légère en canal descendant parallèle = 'le drapeau'\n- Volume élevé sur le mât, faible sur le drapeau\n- Durée du drapeau : 1-3 semaines\n\nPSYCHOLOGIE :\nAprès une forte hausse, les premiers acheteurs prennent des profits (correction). Mais la tendance est forte, donc de nouveaux acheteurs arrivent rapidement.\n\nCOMMENT LE TRADER :\n✅ ENTRÉE : Quand le prix casse la résistance supérieure du drapeau avec volume\n✅ STOP-LOSS : Sous le support inférieur du drapeau\n✅ OBJECTIF : Hauteur du mât projetée depuis le breakout\n\nExemple concret :\nNVDA monte de 450$ à 500$ en 5 jours (+11%) = mât\nPuis corrige entre 495$ et 485$ pendant 2 semaines = drapeau\n- Breakout à 496$ avec volume → ACHAT\n- Stop à 483$ (sous drapeau)\n- Hauteur du mât : 50$\n- Objectif : 496$ + 50$ = 546$\n- Ratio R/R : 50$ / 13$ = 3.8:1 (excellent !)\n\nLE DRAPEAU BAISSIER (Bear Flag) :\n\nSTRUCTURE :\n- Forte baisse rapide = mât\n- Rebond léger en canal ascendant = drapeau\n- Le rebond est faible (souvent 30-50% du mât)\n\nCOMMENT LE TRADER :\n✅ ENTRÉE : Cassure du support du drapeau (vente à découvert)\n✅ STOP-LOSS : Au-dessus de la résistance du drapeau\n✅ OBJECTIF : Hauteur du mât projetée vers le bas\n\nLE FANION (Pennant) :\n\nSTRUCTURE :\n- Même principe que le drapeau\n- Mais au lieu d'un canal, c'est un petit TRIANGLE SYMÉTRIQUE\n- Consolidation plus brève (1-2 semaines)\n\nCOMMENT LE TRADER :\nPareil que le drapeau, mais le breakout peut être haussier OU baissier.\nPrivilégiez la direction de la tendance qui précède le fanion.\n\nCRITÈRES DE VALIDITÉ :\n✅ Le mât doit être quasi-vertical (forte impulsion)\n✅ Le drapeau/fanion doit être petit par rapport au mât (max 50% de correction)\n✅ Volume FAIBLE pendant la formation, ÉLEVÉ au breakout\n✅ Durée max : 3 semaines (sinon ce n'est plus un drapeau)\n\nFAUX SIGNAUX À ÉVITER :\n❌ Drapeau qui dure plus de 4 semaines = le momentum est perdu\n❌ Correction du drapeau > 60% du mât = trop de faiblesse\n❌ Breakout sans volume = souvent un faux breakout",
+          "points_cles": [
+            "Drapeau/Fanion = pause courte dans une forte tendance",
+            "Structure : Mât (impulsion forte) + Drapeau (correction légère)",
+            "Objectif = hauteur du mât projetée après breakout",
+            "Volume faible pendant formation, élevé au breakout",
+            "Durée max 3 semaines, sinon le pattern perd sa validité"
+          ],
+          "exemple_pratique": {
+            "ticker": "TSLA",
+            "scenario": "TSLA monte de 240$ à 280$ en 4 jours. Puis consolide entre 275$ et 265$ pendant 10 jours. Si elle casse 276$ avec volume, c'est un bull flag validé. Objectif : 276$ + 40$ = 316$."
+          }
+        },
+        {
+          "titre": "🔄 Patterns de Retournement : Tête et Épaules",
+          "contenu": "Les patterns de RETOURNEMENT signalent la fin d'une tendance et le début d'une nouvelle dans la direction opposée.\n\nTÊTE ET ÉPAULES (Head & Shoulders) - BAISSIER :\n\nSTRUCTURE :\n1. ÉPAULE GAUCHE : Le prix monte à un sommet, puis corrige\n2. TÊTE : Le prix dépasse l'épaule gauche (nouveau plus haut), puis corrige\n3. ÉPAULE DROITE : Le prix remonte mais N'ATTEINT PAS la hauteur de la tête\n4. LIGNE DE COU (Neckline) : Ligne qui relie les deux creux entre épaule gauche/tête et tête/épaule droite\n\nPSYCHOLOGIE :\nLa tête montre un dernier effort des acheteurs pour pousser le prix plus haut. Mais l'épaule droite plus basse montre que les acheteurs s'épuisent. Quand la ligne de cou casse, c'est la capitulation : les acheteurs deviennent vendeurs.\n\nCOMMENT LE TRADER :\n✅ ENTRÉE : Quand le prix casse la ligne de cou à la BAISSE avec volume\n✅ STOP-LOSS : Au-dessus de l'épaule droite\n✅ OBJECTIF : Hauteur de la tête (depuis la ligne de cou) projetée vers le bas\n\nExemple concret :\nAAPL forme un Tête-Épaules :\n- Épaule gauche : 180$\n- Tête : 190$\n- Épaule droite : 182$\n- Ligne de cou : 172$\n- Hauteur tête-cou : 190$ - 172$ = 18$\n\nCassure de la ligne de cou à 171$ avec volume → VENTE (ou short)\n- Stop à 183$ (au-dessus épaule droite)\n- Objectif : 171$ - 18$ = 153$\n- Ratio R/R : 18$ / 12$ = 1.5:1\n\nTÊTE ET ÉPAULES INVERSÉE (Inverse H&S) - HAUSSIER :\n\nSTRUCTURE :\nL'exact opposé du pattern précédent, mais inversé (après une tendance baissière).\n- Épaule gauche : Creux\n- Tête : Creux plus profond\n- Épaule droite : Creux moins profond que la tête\n- Ligne de cou : Ligne qui relie les deux sommets entre les creux\n\nCOMMENT LE TRADER :\n✅ ENTRÉE : Cassure de la ligne de cou à la HAUSSE avec volume\n✅ STOP-LOSS : Sous l'épaule droite\n✅ OBJECTIF : Hauteur projetée vers le haut\n\nCRITÈRES DE VALIDITÉ :\n✅ La ligne de cou peut être légèrement inclinée (max 15°)\n✅ Les deux épaules doivent être à peu près symétriques en hauteur\n✅ Le volume diminue de l'épaule gauche à l'épaule droite\n✅ Le volume EXPLOSE lors de la cassure de la ligne de cou\n\nVARIANTE : TÊTE ET ÉPAULES COMPLEXE :\nParfois, il y a plusieurs épaules de chaque côté, ou une épaule 'double'. Le principe reste le même.\n\nFAUX SIGNAUX :\n❌ Épaule droite aussi haute que la tête = pattern invalide\n❌ Cassure de ligne de cou sans volume = faux breakout probable\n❌ Pattern qui dure moins de 3 semaines = trop court, pas fiable",
+          "points_cles": [
+            "Tête-Épaules = pattern de retournement baissier (fin de hausse)",
+            "Tête-Épaules Inversée = retournement haussier (fin de baisse)",
+            "Structure : Épaule gauche < Tête > Épaule droite",
+            "Entrée à la cassure de la ligne de cou avec VOLUME",
+            "Objectif = hauteur de la tête projetée après breakout"
+          ]
+        },
+        {
+          "titre": "🔀 Patterns de Retournement : Doubles Tops et Bottoms",
+          "contenu": "Les DOUBLE TOP (double sommet) et DOUBLE BOTTOM (double creux) sont parmi les patterns de retournement les plus courants et fiables.\n\nDOUBLE TOP (M) - BAISSIER :\n\nSTRUCTURE :\n1. Le prix monte à un sommet (premier top)\n2. Correction vers un support\n3. Le prix remonte vers le premier sommet mais N'ARRIVE PAS à le dépasser (deuxième top)\n4. Le prix redescend et casse le support (ligne de cou)\n\nForme visuelle : La lettre 'M'\n\nPSYCHOLOGIE :\nLe premier top montre une résistance forte. Le deuxième échec à dépasser ce niveau prouve que les acheteurs sont épuisés. La cassure du support confirme que les vendeurs prennent le contrôle.\n\nCOMMENT LE TRADER :\n✅ IDENTIFICATION : Deux sommets à peu près au même niveau (±2%)\n✅ ENTRÉE : Cassure du support (ligne de cou) avec volume élevé\n✅ STOP-LOSS : Au-dessus du deuxième top\n✅ OBJECTIF : Hauteur du pattern (top - support) projetée vers le bas\n\nExemple concret :\nTSLA forme un Double Top :\n- Premier top : 280$\n- Support (ligne de cou) : 265$\n- Deuxième top : 282$ (échoue à dépasser 280$)\n- Hauteur : 280$ - 265$ = 15$\n\nCassure à 264$ avec volume → VENTE\n- Stop à 283$ (au-dessus du 2e top)\n- Objectif : 264$ - 15$ = 249$\n- Ratio R/R : 15$ / 19$ = 0.79:1 (moyen, mais acceptable pour un pattern fiable)\n\nDOUBLE BOTTOM (W) - HAUSSIER :\n\nSTRUCTURE :\nL'inverse exact du Double Top.\n1. Le prix descend à un creux (premier bottom)\n2. Rebond vers une résistance\n3. Le prix redescend vers le premier creux mais ne va pas plus bas (deuxième bottom)\n4. Le prix remonte et casse la résistance\n\nForme visuelle : La lettre 'W'\n\nPSYCHOLOGIE :\nLe premier bottom teste un support. Le deuxième échec à aller plus bas montre que les vendeurs sont épuisés. La cassure de la résistance confirme le retournement haussier.\n\nCOMMENT LE TRADER :\n✅ ENTRÉE : Cassure de la résistance (ligne de cou) avec volume\n✅ STOP-LOSS : Sous le deuxième bottom\n✅ OBJECTIF : Hauteur projetée vers le haut\n\nExemple concret :\nAAPL forme un Double Bottom :\n- Premier bottom : 165$\n- Résistance (ligne de cou) : 173$\n- Deuxième bottom : 166$ (tient le support)\n- Hauteur : 173$ - 165$ = 8$\n\nCassure à 174$ avec volume → ACHAT\n- Stop à 164$ (sous le 2e bottom)\n- Objectif : 174$ + 8$ = 182$\n\nCRITÈRES DE VALIDITÉ :\n✅ Les deux tops/bottoms doivent être espacés d'au moins 2-4 semaines\n✅ Les deux sommets/creux doivent être à ±2% du même niveau\n✅ Le volume du 2e top/bottom est généralement plus faible (essoufflement)\n✅ Le volume EXPLOSE lors de la cassure de la ligne de cou\n✅ Plus l'écart temporel est long, plus le pattern est puissant\n\nVARIANTES :\n- TRIPLE TOP/BOTTOM : Trois tentatives au lieu de deux (encore plus fiable)\n- La ligne de cou peut être légèrement inclinée\n\nFAUX SIGNAUX À ÉVITER :\n❌ Les deux tops/bottoms trop proches dans le temps (< 1 semaine) = pas assez de conviction\n❌ Le deuxième top/bottom dépasse largement le premier (> 3%) = ce n'est plus un double pattern\n❌ Cassure de ligne de cou sans volume = faux breakout probable",
+          "points_cles": [
+            "Double Top (M) = retournement baissier après échec de franchir résistance",
+            "Double Bottom (W) = retournement haussier après échec de casser support",
+            "Les deux sommets/creux doivent être à ±2% du même niveau",
+            "Espacement minimum : 2-4 semaines entre les deux",
+            "Cassure de ligne de cou avec volume = confirmation du pattern"
+          ],
+          "exemple_pratique": {
+            "ticker": "MSFT",
+            "scenario": "MSFT monte à 380$, corrige à 370$, remonte à 381$ mais échoue, puis casse 370$ avec gros volume. C'est un Double Top validé. Objectif : 370$ - 10$ = 360$."
+          }
+        },
+        {
+          "titre": "🎯 Règles de Trading des Patterns : Do's and Don'ts",
+          "contenu": "Comment trader les patterns chartistes comme un professionnel.\n\nRÈGLES D'OR :\n\n1. LE VOLUME EST ROI :\nUn pattern SANS volume élevé au breakout = 60% de chances d'échec.\nUn pattern AVEC volume 2-3x la moyenne = 75-80% de chances de succès.\n\nRègle : Si le breakout n'a pas de volume exceptionnel, N'ENTREZ PAS.\n\n2. ATTENDEZ LA CLÔTURE :\nNe tradez JAMAIS un breakout intraday (pendant la séance).\n\nPourquoi ?\n- Les faux breakouts sont très fréquents en intraday\n- Les manipulations (stop hunting) arrivent souvent\n\nRègle : Attendez que le chandelier CLÔTURE au-dessus/en-dessous du niveau clé.\n\nExemple :\nAAPL casse une résistance à 175$ et monte à 177$ à 10h du matin.\nÀ 15h, elle redescend à 174$ et clôture à 174.5$.\n→ FAUX BREAKOUT évité si vous attendez la clôture !\n\n3. LE PULLBACK (RETOUR) :\nAprès un breakout, le prix revient souvent tester le niveau cassé avant de continuer.\n\nStratégie CONSERVATRICE (débutants) :\n- Attendez ce pullback pour entrer\n- Risque plus faible, mais vous ratez 30% des trades (ceux sans pullback)\n\nStratégie AGRESSIVE (avancés) :\n- Entrez dès le breakout avec volume\n- Prenez 50% de position au breakout, 50% au pullback\n\n4. CONFLUENCE DE SIGNAUX :\nUn pattern est 2x plus fiable s'il coïncide avec :\n- Un support/résistance majeur\n- Un niveau de Fibonacci\n- Une moyenne mobile importante (MM200)\n\nExemple :\nDouble Bottom à 170$ + MM200 à 169$ = TRÈS forte confluence.\n\n5. CONTEXTE DE TENDANCE :\nNe tradez PAS un pattern de continuation contre la tendance principale.\n\nExemple d'ERREUR :\nVous voyez un bull flag (continuation haussière) mais la MM200 est descendante.\n→ Ignorez ce pattern ! La tendance long terme est baissière.\n\nRègle : Patterns de continuation = même direction que MM200.\nPatterns de retournement = peuvent aller contre MM200.\n\n6. TIMEFRAME MULTIPLE :\nVérifiez le pattern sur plusieurs échelles de temps.\n\nMéthode PRO :\n- Identifiez le pattern sur votre timeframe principal (ex: daily)\n- Vérifiez qu'il n'y a pas de résistance majeure juste au-dessus sur le weekly\n- Utilisez le 4H pour timer précisément votre entrée\n\n7. GESTION DU RISQUE (TOUJOURS) :\nMême avec un pattern parfait :\n- Risquez maximum 1-2% de votre capital\n- Ratio R/R minimum : 1:2\n- Si le ratio n'est pas bon, ne prenez PAS le trade\n\nCHECKLIST AVANT D'ENTRER UN TRADE :\n☐ Pattern clairement formé et identifié\n☐ Breakout avec volume 2-3x la moyenne\n☐ Clôture au-delà du niveau clé\n☐ Confluence avec support/résistance ou MM\n☐ Contexte de tendance favorable (MM200)\n☐ Ratio Risk/Reward ≥ 1:2\n☐ Risque max 1-2% du capital\n☐ Stop-loss placé selon les règles du pattern\n\nSi UN SEUL critère manque → NE TRADEZ PAS.\n\nERREURS FATALES À ÉVITER :\n❌ Entrer AVANT la cassure (anticipation) = 50% d'échec\n❌ Trader un pattern sans volume = 60% d'échec\n❌ Ignorer le stop-loss = catastrophe assurée\n❌ Trader tous les patterns vus = overtrading, perte d'argent\n❌ Forcer un pattern qui n'existe pas = biais de confirmation\n\nMENTALITÉ :\nMieux vaut rater 10 bons trades que prendre 1 mauvais trade.\nLa patience est votre super-pouvoir.",
+          "points_cles": [
+            "Volume élevé au breakout = critère obligatoire",
+            "Attendez la clôture, ne tradez pas les breakouts intraday",
+            "Cherchez la confluence (pattern + support/résistance + MM)",
+            "Respectez la tendance : continuation = direction MM200",
+            "Checklist de 8 critères AVANT chaque trade",
+            "Un seul critère manquant = pas de trade"
+          ]
+        }
+      ],
+      "resume": "Les patterns chartistes sont des formations répétitives qui ont des probabilités statistiques de résolution. Les patterns de continuation (triangles, drapeaux, fanions) signalent que la tendance actuelle va se poursuivre. Les patterns de retournement (tête-épaules, double top/bottom) indiquent un changement de direction imminent. La clé du succès : identifier correctement le pattern, attendre la confirmation par le volume et la clôture, respecter les niveaux de stop-loss et de take-profit calculés selon la hauteur du pattern, et surtout ne trader que les setups qui cochent TOUS les critères de votre checklist. Un pattern avec volume = 75-80% de taux de réussite. Sans volume = 40-50% seulement.",
+      "ressources_complementaires": [
+        "📖 Livre : 'Encyclopedia of Chart Patterns' de Thomas Bulkowski (LA bible)",
+        "📖 Livre : 'Technical Analysis of the Financial Markets' de John Murphy",
+        "🎥 Vidéo : Les 8 patterns les plus rentables (YouTube - Rayner Teo)",
+        "🔗 Site : PatternWizard.com pour identifier automatiquement les patterns",
+        "📊 Outil : TradingView - Scanner de patterns intégré",
+        "📄 Cheat Sheet : Les 10 patterns avec les meilleures probabilités (téléchargement)",
+        "📈 Étude : Statistiques de réussite des patterns sur 10 ans (Bulkowski's research)"
+      ]
+    },
+    "quiz": [
+      {
+        "question": "Quelle est la différence entre un pattern de continuation et un pattern de retournement ?",
+        "options": [
+          "Il n'y a pas de différence",
+          "Continuation = tendance actuelle continue, Retournement = changement de direction",
+          "Continuation = baissier, Retournement = haussier",
+          "C'est la même chose avec des noms différents"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Pattern de CONTINUATION (triangles, drapeaux) = la tendance en cours va se poursuivre. Pattern de RETOURNEMENT (tête-épaules, double top/bottom) = la tendance va s'inverser."
+      },
+      {
+        "question": "Dans un triangle ascendant, où placez-vous votre stop-loss ?",
+        "options": [
+          "Au-dessus de la résistance horizontale",
+          "Juste sous le dernier plus bas du triangle",
+          "Au milieu du triangle",
+          "Pas besoin de stop-loss"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Dans un triangle ascendant (haussier), le stop-loss se place juste SOUS le dernier plus bas du triangle. Si ce niveau casse, le pattern est invalidé."
+      },
+      {
+        "question": "Comment calculer l'objectif de profit d'un bull flag ?",
+        "options": [
+          "Hauteur du drapeau × 2",
+          "Hauteur du mât projetée depuis le breakout",
+          "10% au-dessus du breakout",
+          "Il n'y a pas de règle"
+        ],
+        "bonne_reponse": 1,
+        "explication": "L'objectif d'un bull flag = prendre la HAUTEUR DU MÂT (l'impulsion initiale) et la projeter vers le haut depuis le point de breakout du drapeau."
+      },
+      {
+        "question": "Qu'est-ce qui distingue un vrai breakout d'un faux breakout ?",
+        "options": [
+          "La couleur du chandelier",
+          "Le volume élevé (2-3x la moyenne) et la clôture au-delà du niveau",
+          "L'heure de la journée",
+          "Le jour de la semaine"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Un VRAI breakout a deux critères : volume 2-3x supérieur à la moyenne + chandelier qui CLÔTURE clairement au-delà du niveau cassé. Sans ça, risque élevé de faux signal."
+      },
+      {
+        "question": "Dans un pattern Tête-Épaules, que représente la 'ligne de cou' ?",
+        "options": [
+          "Le niveau le plus haut (la tête)",
+          "La ligne qui relie les deux creux entre les épaules",
+          "Le stop-loss automatique",
+          "La moyenne mobile 200"
+        ],
+        "bonne_reponse": 1,
+        "explication": "La ligne de cou (neckline) relie les deux CREUX : celui entre épaule gauche et tête, et celui entre tête et épaule droite. Sa cassure confirme le pattern."
+      },
+      {
+        "question": "Combien de temps minimum doit séparer les deux tops d'un Double Top ?",
+        "options": [
+          "1 jour",
+          "2-4 semaines minimum",
+          "6 mois",
+          "Peu importe"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Les deux tops doivent être espacés d'au moins 2-4 SEMAINES. Si c'est trop court (quelques jours), ce n'est pas un vrai Double Top et le pattern est moins fiable."
+      },
+      {
+        "question": "Que faire si vous voyez un bull flag dans une tendance baissière (MM200 descendante) ?",
+        "options": [
+          "L'acheter immédiatement",
+          "L'IGNORER - ne pas trader contre la tendance principale",
+          "Le shorter",
+          "Doubler votre position"
+        ],
+        "bonne_reponse": 1,
+        "explication": "RÈGLE : Ne tradez JAMAIS un pattern de continuation contre la tendance long terme (MM200). Un bull flag en tendance baissière est un piège. Ignorez-le."
+      },
+      {
+        "question": "Quelle est la meilleure stratégie pour un débutant après un breakout ?",
+        "options": [
+          "Entrer immédiatement dès le breakout intraday",
+          "Attendre le pullback (retour au niveau cassé) pour entrer",
+          "Ne jamais entrer après un breakout",
+          "Entrer avant le breakout par anticipation"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Pour un DÉBUTANT, la stratégie conservatrice est d'attendre le PULLBACK (retour au niveau cassé) après le breakout. Risque plus faible, mais vous ratez 30% des trades sans pullback."
+      },
+      {
+        "question": "Un pattern est 2x plus fiable quand il coïncide avec quoi ?",
+        "options": [
+          "Une pleine lune",
+          "Un support/résistance majeur, un niveau Fibonacci ou une MM importante",
+          "Un vendredi",
+          "Un nouveau record historique"
+        ],
+        "bonne_reponse": 1,
+        "explication": "CONFLUENCE : Un pattern qui coïncide avec un support/résistance majeur, un niveau de Fibonacci, ou une MM200 a une probabilité de réussite 2x plus élevée. C'est la convergence de plusieurs signaux."
+      },
+      {
+        "question": "Combien de critères de la checklist doivent être validés avant de prendre un trade ?",
+        "options": [
+          "Au moins 5 sur 8",
+          "Les 3 plus importants",
+          "TOUS les critères (8/8)",
+          "Aucun, tradez au feeling"
+        ],
+        "bonne_reponse": 2,
+        "explication": "RÈGLE ABSOLUE : TOUS les critères de votre checklist doivent être validés avant d'entrer un trade. Si UN SEUL manque, ne tradez pas. Mieux vaut rater un trade que perdre de l'argent."
+      }
+    ],
+    "exercices": [
+      {
+        "type": "identification",
+        "titre": "Reconnaître les patterns sur graphiques réels",
+        "description": "Ouvrez TradingView et analysez les graphiques de AAPL, TSLA, MSFT sur les 6 derniers mois (timeframe daily). Identifiez et notez au moins 3 patterns différents (triangle, drapeau, tête-épaules, double top/bottom). Pour chacun, indiquez : type de pattern, points d'entrée/stop/objectif théoriques, et si le pattern s'est réalisé."
+      },
+      {
+        "type": "simulation",
+        "titre": "Trader un bull flag dans le simulateur",
+        "description": "Dans le simulateur HelixOne, attendez qu'une action forme un bull flag (forte hausse + consolidation en canal descendant). Identifiez le breakout avec volume, achetez avec stop sous le drapeau. Documentez : hauteur du mât, point d'entrée, stop, objectif calculé, et résultat final."
+      },
+      {
+        "type": "backtest",
+        "titre": "Backtester la stratégie Double Bottom",
+        "description": "Prenez le graphique NVDA des 12 derniers mois. Trouvez tous les Double Bottoms formés. Pour chacun, calculez : entrée théorique (cassure ligne de cou), stop (sous 2e bottom), objectif (hauteur projetée). Quel aurait été le taux de réussite ?"
+      },
+      {
+        "type": "checklist",
+        "titre": "Créer votre checklist personnalisée",
+        "description": "Créez votre propre checklist de validation de patterns (format imprimable). Incluez les 8 critères essentiels + vos critères personnels. Affichez-la près de votre écran et cochez chaque élément avant d'entrer un trade."
+      }
+    ]
+  },
+  {
+    "id": "trading_strategies_advanced",
+    "parcours": "intermédiaire",
+    "titre": "⚡ Stratégies de Trading Avancées",
+    "description": "Maîtrisez les différents styles de trading et construisez votre stratégie complète",
+    "durée": "75 minutes",
+    "difficulté": "Intermédiaire",
+    "points_xp": 225,
+    "prérequis": [
+      "technical_indicators_intro",
+      "trading_patterns_chartistes",
+      "risk_management_fundamentals"
+    ],
+    "contenu": {
+      "introduction": "Il n'existe pas UNE seule façon de trader - il existe des dizaines de stratégies différentes, chacune adaptée à un profil, un capital, et un style de vie différent. Un day trader qui passe 8h devant ses écrans n'utilisera pas les mêmes stratégies qu'un swing trader qui regarde ses positions 15 minutes par jour. Ce module vous présentera les 4 grands styles de trading (scalping, day trading, swing trading, position trading) et vous enseignera 3 stratégies complètes, testées et validées, que vous pourrez appliquer immédiatement. Vous apprendrez aussi à ADAPTER ces stratégies à votre situation personnelle, car le meilleur trader n'est pas celui qui copie aveuglément, mais celui qui comprend les principes et les ajuste à sa personnalité.",
+      "sections": [
+        {
+          "titre": "⏱️ Les 4 Styles de Trading : Trouvez le Vôtre",
+          "contenu": "Choisir le bon style de trading est crucial. Trader en day trading alors que vous avez un emploi à temps plein = recette pour l'échec.\n\n1️⃣ SCALPING (Minutes à Heures)\n\nDÉFINITION :\nAchat/vente TRÈS rapide pour capturer de petits mouvements (0.1% à 0.5%).\nDurée moyenne d'un trade : 1 minute à 1 heure.\nNombre de trades : 10-100+ par jour.\n\nPROFIL REQUIS :\n✅ Disponible 100% du temps pendant les heures de marché\n✅ Réflexes rapides et excellente concentration\n✅ Tolérance au stress TRÈS élevée\n✅ Capital minimum : 25 000$ (règle PDT aux USA)\n\nAVANTAGES :\n+ Gains quotidiens réguliers possibles\n+ Pas de risque overnight (pas d'exposition la nuit)\n+ Nombreuses opportunités chaque jour\n\nINCONVÉNIENTS :\n- Très stressant et épuisant mentalement\n- Frais de courtage élevés (nombreux trades)\n- Nécessite une connexion ultra-rapide\n- Taux d'échec > 95% pour les débutants\n\nEXEMPLE DE SETUP SCALPING :\nAAPL fait un breakout à 175$ à 10h avec volume explosif.\nAchat : 175.00$\nObjectif : 175.50$ (+0.3%)\nStop : 174.70$ (-0.2%)\nDurée : 5-20 minutes\n\nVERDICT : ❌ DÉCONSEILLÉ aux débutants. Réservé aux pros.\n\n2️⃣ DAY TRADING (Heures - Intraday)\n\nDÉFINITION :\nAchat/vente dans la MÊME journée. Aucune position n'est conservée overnight.\nDurée moyenne d'un trade : 30 minutes à 6 heures.\nNombre de trades : 1-10 par jour.\n\nPROFIL REQUIS :\n✅ Disponible au minimum 2-3h pendant la séance (ouverture + clôture)\n✅ Discipline stricte pour clôturer TOUTES les positions avant 16h (fermeture US)\n✅ Capital minimum : 5 000 - 10 000$\n✅ Bonne gestion du stress\n\nAVANTAGES :\n+ Pas de risque overnight (news, gaps)\n+ Opportunités quotidiennes\n+ Résultats visibles chaque jour\n+ Timeframe gérable (1min, 5min, 15min, 1H)\n\nINCONVÉNIENTS :\n- Nécessite plusieurs heures par jour\n- Coûts de courtage significatifs\n- Pression psychologique quotidienne\n- Incompatible avec un job à temps plein\n\nEXEMPLE DE SETUP DAY TRADING :\nTSLA ouvre à 250$, forme un bull flag sur le 15min.\nAchat : 252$ à 11h30\nObjectif : 258$ (+2.4%)\nStop : 249$ (-1.2%)\nClôture : 257$ à 14h45 (avant la fermeture)\nDurée : 3h15\n\nVERDICT : ⚠️ Possible pour débutants MAIS nécessite temps et discipline.\n\n3️⃣ SWING TRADING (Jours à Semaines)\n\nDÉFINITION :\nAchat/vente sur plusieurs jours à plusieurs semaines pour capturer un 'swing' (mouvement) complet.\nDurée moyenne d'un trade : 2 jours à 3 semaines.\nNombre de trades : 5-20 par mois.\n\nPROFIL REQUIS :\n✅ 15-30 minutes par jour suffisent\n✅ Compatible avec un emploi à temps plein\n✅ Patience et discipline\n✅ Capital minimum : 2 000 - 5 000$\n\nAVANTAGES :\n+ Compatible avec un job (analyse le soir)\n+ Moins stressant (pas besoin de surveiller en continu)\n+ Frais de courtage faibles (peu de trades)\n+ Capture les mouvements significatifs (5-15%)\n+ Le MEILLEUR style pour débuter\n\nINCONVÉNIENTS :\n- Risque overnight (gaps, news)\n- Nécessite plus de patience\n- Moins d'opportunités (mais de meilleure qualité)\n\nEXEMPLE DE SETUP SWING TRADING :\nNVDA forme un double bottom à 480$ sur le graphique daily.\nAchat : 485$ (cassure de la ligne de cou)\nObjectif : 510$ (+5.2%)\nStop : 475$ (-2.1%)\nDurée : 8 jours\n\nVERDICT : ✅ IDÉAL pour débutants et traders à temps partiel.\n\n4️⃣ POSITION TRADING (Semaines à Mois)\n\nDÉFINITION :\nAchat/vente sur plusieurs semaines à plusieurs mois pour suivre les grandes tendances.\nDurée moyenne d'un trade : 1 mois à 1 an.\nNombre de trades : 5-15 par an.\n\nPROFIL REQUIS :\n✅ Patience extrême\n✅ Vision long terme\n✅ Analyse fondamentale + technique\n✅ Capital : variable (dès 1 000$)\n\nAVANTAGES :\n+ Très peu de temps requis (1-2h par semaine)\n+ Stress minimal\n+ Frais de courtage négligeables\n+ Capture les tendances majeures (20-100%+)\n\nINCONVÉNIENTS :\n- Nécessite beaucoup de patience\n- Drawdowns importants (corrections temporaires)\n- Gains lents\n- Capital immobilisé longtemps\n\nEXEMPLE DE SETUP POSITION TRADING :\nAAPL casse la résistance des 180$ sur le weekly avec golden cross.\nAchat : 182$\nObjectif : 220$ (+21%)\nStop : 170$ (-6.6%)\nDurée : 4 mois\n\nVERDICT : ✅ Excellent pour investisseurs patients avec peu de temps.\n\nCOMMENT CHOISIR VOTRE STYLE ?\n\nPosez-vous ces questions :\n1. Combien de temps puis-je consacrer au trading PAR JOUR ?\n   - < 30 min → Position Trading\n   - 30 min - 1h → Swing Trading\n   - 2-4h → Day Trading\n   - 6h+ → Scalping\n\n2. Quel est mon capital disponible ?\n   - < 2 000$ → Position ou Swing\n   - 2 000 - 10 000$ → Swing ou Day Trading\n   - > 25 000$ → Tous styles possibles\n\n3. Quelle est ma tolérance au stress ?\n   - Faible → Position Trading\n   - Moyenne → Swing Trading\n   - Élevée → Day Trading\n   - Très élevée → Scalping\n\n4. Est-ce que j'ai un emploi à temps plein ?\n   - OUI → Swing ou Position Trading UNIQUEMENT\n   - NON → Tous styles possibles\n\nRÈGLE D'OR :\nPour débuter, choisissez le SWING TRADING. C'est le meilleur compromis entre opportunités, gestion du temps, et courbe d'apprentissage.",
+          "points_cles": [
+            "4 styles principaux : Scalping, Day Trading, Swing Trading, Position Trading",
+            "Swing Trading = IDÉAL pour débuter (compatible emploi, moins stressant)",
+            "Day Trading nécessite 2-3h/jour minimum et capital > 5 000$",
+            "Position Trading = long terme, idéal pour investisseurs patients",
+            "Choisissez selon votre temps disponible, capital, et tolérance au stress"
+          ]
+        },
+        {
+          "titre": "📊 Stratégie #1 : Breakout Momentum (Day/Swing Trading)",
+          "contenu": "La stratégie BREAKOUT MOMENTUM consiste à acheter quand un prix casse un niveau clé (résistance) avec un momentum fort (volume et indicateurs).\n\nPRINCIPE :\nQuand un prix est bloqué sous une résistance pendant longtemps et finit par la casser avec force, cela libère souvent un mouvement puissant de continuation.\n\nTIMEFRAME :\n- Day Trading : graphique 5min, 15min, 1H\n- Swing Trading : graphique 1H, 4H, Daily\n\nSETUP COMPLET - CRITÈRES D'ENTRÉE :\n\n1️⃣ IDENTIFIER LA RÉSISTANCE :\nTrouvez un niveau de prix qui a été testé au moins 2-3 fois sans être franchi.\n\nExemple : AAPL teste 175$ trois fois en 2 semaines sans passer au-dessus.\n\n2️⃣ CONFIRMATION PAR LES INDICATEURS :\n✅ Prix AU-DESSUS de la MM50 (tendance haussière)\n✅ RSI entre 50-70 (momentum positif mais pas surachat)\n✅ MACD en territoire positif et croissant\n\n3️⃣ LE BREAKOUT :\n✅ Chandelier qui CLÔTURE au-dessus de la résistance (pas juste une mèche)\n✅ Volume 2-3x supérieur à la moyenne (CRUCIAL)\n✅ Chandelier fort (corps > 60% de la hauteur totale)\n\n4️⃣ TIMING D'ENTRÉE :\n\nOPTION A - AGGRESSIVE (pour day traders expérimentés) :\nAchat dès la clôture du chandelier de breakout.\n\nOPTION B - CONSERVATIVE (recommandée pour débutants) :\nAttendre le PULLBACK (retour au niveau cassé) puis rebond.\nLe prix revient souvent tester l'ancienne résistance (devenue support) avant de repartir.\n\nEXEMPLE COMPLET :\n\nAction : TSLA\nRésistance identifiée : 260$ (testée 3 fois)\nContexte : MM50 = 250$, RSI = 58, MACD positif\n\nJOUR DU BREAKOUT :\n- Ouverture : 258$\n- 11h30 : Chandelier casse 260$ et clôture à 263$\n- Volume : 3.2x la moyenne ✅\n- Corps du chandelier : 80% ✅\n\nDÉCISION : ACHAT (Option B - attendre pullback)\n\nLENDEMAIN :\n- TSLA monte à 268$ puis redescend à 261$ (pullback)\n- Le niveau 260$ (ancienne résistance) devient support\n- RSI redescend à 52 (idéal)\n\nENTRÉE : 261.50$ (rebond sur ancienne résistance)\nSTOP-LOSS : 257$ (sous l'ancienne résistance)\nOBJECTIF : 275$ (ratio 1:3)\n\nGESTION :\n- Si le prix monte à 268$ (+2.5%), déplacer le stop à 262$ (breakeven)\n- Si le prix atteint 270$ (+3.2%), prendre 50% de profits\n- Laisser courir le reste jusqu'à 275$ ou stop trailing\n\nRÉSULTAT PROBABLE :\nTSLA atteint 274$ en 5 jours (+4.8%)\nRisque : 4.50$ (-1.7%)\nGain : 12.50$ (+4.8%)\nRatio R/R réel : 2.8:1 ✅\n\nVARIANTES DE LA STRATÉGIE :\n\n1. BREAKOUT DE RANGE :\nQuand le prix oscille entre support et résistance (range), trader le breakout dans un sens ou l'autre.\n\n2. BREAKOUT DE TRIANGLE :\nUtiliser les triangles ascendants/descendants (Module 6) avec les mêmes critères.\n\n3. BREAKOUT DE RÉSISTANCE MAJEURE :\nPlus la résistance a été testée (4-5 fois+), plus le breakout est puissant.\n\nERREURS À ÉVITER :\n❌ Entrer AVANT le breakout (anticipation) → 50% d'échec\n❌ Ignorer le volume → 60% de faux breakouts\n❌ Ne pas attendre la clôture → souvent des pièges intraday\n❌ Pas de stop-loss → catastrophe si c'est un faux breakout\n\nTAUX DE RÉUSSITE :\nAvec TOUS les critères respectés : 65-75%\nSans volume : 35-40%",
+          "points_cles": [
+            "Breakout Momentum = acheter la cassure d'une résistance testée plusieurs fois",
+            "VOLUME élevé (2-3x) au breakout = critère OBLIGATOIRE",
+            "Option conservative : attendre le pullback pour entrer (moins risqué)",
+            "Stop-loss sous l'ancienne résistance devenue support",
+            "Taux de réussite 65-75% si tous les critères sont respectés"
+          ],
+          "exemple_pratique": {
+            "ticker": "NVDA",
+            "scenario": "NVDA bloquée sous 500$ depuis 3 semaines. Breakout à 502$ avec volume 4x la moyenne. Pullback à 501$. Entrée à 501$, stop 496$, objectif 516$. Ratio 1:3."
+          }
+        },
+        {
+          "titre": "🎯 Stratégie #2 : Mean Reversion (Retour à la Moyenne)",
+          "contenu": "La stratégie MEAN REVERSION (retour à la moyenne) consiste à acheter quand un prix a trop baissé et s'apprête à rebondir vers sa moyenne.\n\nPRINCIPE :\nQuand un prix s'éloigne trop de sa moyenne (MM), il a tendance à y REVENIR. C'est comme un élastique : plus vous l'étirez, plus il revient fort.\n\nTIMEFRAME :\n- Day Trading : 5min, 15min, 1H\n- Swing Trading : 4H, Daily\n\nSETUP COMPLET - CRITÈRES D'ENTRÉE :\n\n1️⃣ IDENTIFIER LA TENDANCE GLOBALE :\n⚠️ CRUCIAL : Ne tradez le mean reversion QUE dans une tendance haussière globale.\n\nCritère : Prix AU-DESSUS de la MM200 sur le daily.\n\nPourquoi ? Car dans une tendance baissière, \"attraper le couteau qui tombe\" = perte assurée.\n\n2️⃣ IDENTIFIER LA SURVENTE :\n✅ Le prix est 3-5% EN-DESSOUS de la MM20 (daily) ou MM50 (swing)\n✅ RSI < 30 (survente extrême) ou < 35 (survente modérée)\n✅ Le prix a baissé 3-4 jours consécutifs (capitulation)\n\n3️⃣ ATTENDRE LE SIGNAL DE RETOURNEMENT :\nNe PAS acheter juste parce que c'est survendu !\n\nSignaux de retournement :\n✅ Premier chandelier vert après plusieurs rouges\n✅ RSI commence à REMONTER (> 30 si il était < 30)\n✅ Volume en hausse sur le rebond\n✅ MACD croise à la hausse\n\n4️⃣ CONFIRMATION PAR SUPPORT :\nIdéalement, le rebond doit se faire sur un support identifié (ancien bas, MM200, niveau psychologique).\n\nEXEMPLE COMPLET :\n\nAction : AAPL\nContexte : Tendance haussière (Prix = 178$, MM200 = 165$) ✅\n\nCORRECTION :\n- Jour 1 : 178$ → 175$ (-1.7%)\n- Jour 2 : 175$ → 172$ (-1.7%)\n- Jour 3 : 172$ → 169$ (-1.7%)\n- Jour 4 : 169$ → 167$ (-1.2%)\n\nSITUATION AU JOUR 4 :\n- AAPL à 167$ (MM20 = 174$) → -4% sous la MM20 ✅\n- RSI = 28 (survente extrême) ✅\n- MM200 = 165$ (juste en dessous, niveau de support) ✅\n- 4 jours de baisse consécutifs ✅\n\nJOUR 5 - SIGNAL D'ENTRÉE :\n- Ouverture : 167$\n- 14h : Chandelier VERT se forme, clôture à 169$ (+1.2%)\n- RSI remonte à 34 ✅\n- Volume 1.5x la moyenne ✅\n- Support MM200 tient (prix ne casse pas 165$) ✅\n\nDÉCISION : ACHAT\n\nENTRÉE : 169.50$ (après confirmation du chandelier vert)\nSTOP-LOSS : 164$ (sous la MM200)\nOBJECTIF 1 : 174$ (retour à la MM20) = +2.7%\nOBJECTIF 2 : 177$ (retour vers le haut récent) = +4.4%\n\nGESTION :\n- Prendre 50% de profits à 174$ (objectif 1 atteint)\n- Déplacer le stop à 171$ (breakeven) pour les 50% restants\n- Objectif final : 177$\n\nRÉSULTAT PROBABLE :\nJours 6-10 : AAPL remonte progressivement\n- Jour 7 : 174$ atteint → 50% vendus (+2.7%)\n- Jour 9 : 176.50$ → Stop trailing activé\n- Jour 10 : 177.50$ → Sortie complète\n\nGain total : ~4.5%\nRisque : 5.50$ (-3.2%)\nRatio R/R : 1.4:1\nDurée : 5-7 jours\n\nVARIANTES :\n\n1. MEAN REVERSION INTRADAY :\nMême principe mais sur graphique 5min/15min.\nLe prix s'éloigne de la MM20 (5min) de 0.5-1%.\nRebond rapide en 30 minutes - 2 heures.\n\n2. MEAN REVERSION SUR OVERSOLD EXTRÊME :\nRSI < 20 (très rare).\nRebond violent souvent > 5-10% en quelques jours.\nPlus risqué mais très rentable.\n\n3. BOLLINGER BANDS BOUNCE :\nQuand le prix touche la bande inférieure de Bollinger.\nPrincipe identique au mean reversion.\n\nERREURS FATALES :\n❌ Trader le mean reversion dans une tendance BAISSIÈRE (MM200 descendante)\n   → Vous achetez un actif qui continue de chuter\n❌ Acheter dès que RSI < 30 SANS attendre le signal de retournement\n   → RSI peut rester < 30 pendant des jours en chute libre\n❌ Pas de stop-loss\n   → Si la baisse continue (news négative), perte énorme\n\nAVANTAGES DE LA STRATÉGIE :\n✅ Nombreuses opportunités (corrections fréquentes)\n✅ Points d'entrée avec bon ratio R/R\n✅ Psychologiquement confortable (acheter la peur)\n✅ Statistiquement fiable en tendance haussière (70%+)\n\nINCONVÉNIENTS :\n❌ Nécessite patience (attendre le signal de retournement)\n❌ Risque de 'couteau qui tombe' si mauvaise lecture\n❌ Ne fonctionne PAS en tendance baissière",
+          "points_cles": [
+            "Mean Reversion = acheter quand le prix s'éloigne trop de sa moyenne (survente)",
+            "OBLIGATOIRE : tendance globale haussière (prix > MM200)",
+            "Attendre le signal de retournement (RSI remonte, chandelier vert)",
+            "Objectif = retour à la MM20 ou MM50 (la 'moyenne')",
+            "Taux de réussite 70%+ en tendance haussière, catastrophique en baissière"
+          ]
+        },
+        {
+          "titre": "🚀 Stratégie #3 : Trend Following avec Moyennes Mobiles",
+          "contenu": "La stratégie TREND FOLLOWING (suivi de tendance) consiste à identifier une tendance forte et à la suivre jusqu'à ce qu'elle s'inverse.\n\nPRINCIPE :\n'The trend is your friend' - Ne combattez jamais la tendance, suivez-la.\nC'est la stratégie la plus simple et la plus rentable sur le long terme.\n\nTIMEFRAME :\n- Swing Trading : Daily\n- Position Trading : Weekly\n\nSETUP COMPLET - SYSTÈME GOLDEN CROSS :\n\nCe système utilise 2 moyennes mobiles : MM50 et MM200.\n\n1️⃣ SIGNAL D'ACHAT (GOLDEN CROSS) :\n\nQuand la MM50 CROISE AU-DESSUS de la MM200 = signal d'achat très puissant.\n\nCritères additionnels pour confirmer :\n✅ Le prix est AU-DESSUS des deux MM\n✅ Le volume augmente lors du croisement\n✅ Les deux MM sont orientées à la HAUSSE (pente positive)\n✅ RSI > 50 (momentum positif)\n\nEXEMPLE COMPLET :\n\nAction : NVDA\nDATE : 15 Mars 2024\n\nSITUATION :\n- MM50 = 485$\n- MM200 = 482$\n- Prix actuel = 490$\n- MM50 vient de croiser AU-DESSUS de la MM200 (Golden Cross) ✅\n- Volume moyen des 10 derniers jours : +20% ✅\n- RSI = 58 ✅\n- Les deux MM montent ✅\n\nDÉCISION : ACHAT (Position long terme)\n\nENTRÉE : 490$ (jour suivant le Golden Cross)\nSTOP-LOSS INITIAL : 470$ (sous la MM200) = -4.1%\nOBJECTIF : Pas d'objectif fixe → On suit la tendance jusqu'au signal de SORTIE\n\nGESTION - TRAILING STOP :\nUtiliser un STOP SUIVEUR (trailing stop) basé sur la MM50 :\n\n- Semaine 1 : Prix = 505$, MM50 = 488$ → Stop à 480$ (2% sous MM50)\n- Semaine 3 : Prix = 530$, MM50 = 502$ → Stop à 492$\n- Semaine 6 : Prix = 560$, MM50 = 525$ → Stop à 515$\n- Semaine 10 : Prix = 590$, MM50 = 555$ → Stop à 545$\n\nLe stop monte avec la MM50 mais ne redescend JAMAIS.\n\n2️⃣ SIGNAL DE SORTIE :\n\nTROIS CRITÈRES DE SORTIE (il suffit d'UN) :\n\n1. DEATH CROSS : MM50 croise EN-DESSOUS de la MM200\n   → Signal de retournement baissier, sortie immédiate\n\n2. PRIX CASSE LA MM50 À LA BAISSE avec chandelier fort\n   → La tendance s'affaiblit, sortie\n\n3. TRAILING STOP TOUCHÉ\n   → Le prix revient toucher votre stop suiveur\n\nRÉSULTAT DE L'EXEMPLE :\n\nSemaine 12 : NVDA atteint 610$ (+24.5%)\nSemaine 13 : Correction soudaine, NVDA tombe à 580$\n           → Casse la MM50 (570$) avec chandelier rouge fort\n           → Trailing stop à 558$ touché\n\nSORTIE : 558$ (+13.9% de gain)\nDurée : 13 semaines (~3 mois)\n\nANALYSE :\n- Gain : +68$ par action (+13.9%)\n- Risque initial : -20$ (-4.1%)\n- Ratio R/R réalisé : 3.4:1 ✅\n- Drawdown max avant sortie : -5% (tolérable)\n\nVARIANTE : SYSTÈME MM20/MM50 (Plus réactif)\n\nPour le swing trading court terme :\n\n- ACHAT : Quand MM20 croise AU-DESSUS de la MM50\n- VENTE : Quand MM20 croise EN-DESSOUS de la MM50\n- Stop : 3% sous la MM20\n\nPlus de signaux (trades plus fréquents) mais aussi plus de faux signaux.\n\nVARIANTE : TRIPLE MOYENNES MOBILES (Avancé)\n\nUtiliser MM20, MM50, MM200 :\n\n- TENDANCE TRÈS HAUSSIÈRE : Prix > MM20 > MM50 > MM200 (toutes ascendantes)\n  → Position longue aggressive\n\n- TENDANCE HAUSSIÈRE MODÉRÉE : Prix > MM50 > MM200 (MM20 peut être sous le prix)\n  → Position longue normale\n\n- TENDANCE NEUTRE/FAIBLE : MM croisées, pas d'ordre clair\n  → Pas de position\n\nCOMBINER AVEC PATTERNS :\n\nStratégie PUISSANTE : Trend Following + Patterns\n\nExemple :\n1. Golden Cross confirmé → Tendance haussière établie\n2. Attendre une correction (mean reversion)\n3. Quand le prix forme un bull flag près de la MM50\n4. Acheter le breakout du flag\n\nRésultat : Triple confirmation = 80%+ de taux de réussite\n\nAVANTAGES :\n✅ Simple à suivre (signaux clairs)\n✅ Capture les grandes tendances (gains de 20-100%+)\n✅ Peu de temps requis (vérification hebdomadaire suffit)\n✅ Psychologiquement confortable (suit le momentum)\n✅ Fonctionne sur tous les marchés (actions, crypto, forex)\n\nINCONVÉNIENTS :\n❌ Signaux RETARDÉS (les MM sont lagging indicators)\n  → Vous n'entrez jamais au plus bas\n  → Vous ne sortez jamais au plus haut\n❌ Mauvais en marché range (oscillations)\n  → Nombreux faux signaux si pas de tendance claire\n❌ Drawdowns importants (corrections de 10-15% possibles)\n❌ Nécessite PATIENCE (tendances peuvent durer 3-12 mois)\n\nQUAND UTILISER CETTE STRATÉGIE ?\n\n✅ Marchés en tendance claire (haussière ou baissière)\n✅ Position trading (long terme)\n✅ Quand vous ne pouvez pas analyser quotidiennement\n✅ Capital > 5 000$ (pour diversifier sur 3-5 positions)\n\n❌ Éviter si vous voulez des résultats rapides\n❌ Éviter en marché range/consolidation",
+          "points_cles": [
+            "Trend Following = suivre la tendance établie jusqu'à son inversion",
+            "Golden Cross (MM50 > MM200) = signal d'achat très puissant",
+            "Trailing stop basé sur la MM50 pour protéger les gains",
+            "Sortie au Death Cross ou cassure de la MM50",
+            "Idéal pour position trading, taux de réussite 60-70% mais gros gains"
+          ],
+          "exemple_pratique": {
+            "ticker": "AAPL",
+            "scenario": "AAPL fait un Golden Cross à 175$. Vous achetez. 6 mois plus tard, elle est à 210$ (+20%). Death Cross se forme, vous sortez à 205$ (+17%). Un seul trade, gain significatif."
+          }
+        },
+        {
+          "titre": "🔧 Construire VOTRE Stratégie Personnalisée",
+          "contenu": "Comment créer une stratégie adaptée à VOTRE profil, pas celui de quelqu'un d'autre.\n\nÉTAPE 1 : DÉFINIR VOTRE PROFIL\n\nRépondez à ces questions :\n\n1. Temps disponible par jour ?\n   - < 30 min → Trend Following (position)\n   - 30 min - 1h → Mean Reversion (swing)\n   - 1-3h → Breakout Momentum (swing/day)\n   - 3h+ → Day trading actif\n\n2. Capital disponible ?\n   - < 2 000$ → 1-2 positions max, strategies simples\n   - 2 000 - 10 000$ → 3-5 positions, toutes stratégies\n   - > 10 000$ → 5-10 positions, diversification\n\n3. Tolérance au risque ?\n   - Faible → Trend Following, ratio R/R 1:3 minimum\n   - Moyenne → Mean Reversion, ratio 1:2\n   - Élevée → Breakout Momentum, plus de trades\n\n4. Personnalité ?\n   - Patient → Position/Swing long terme\n   - Actif → Day trading, nombreux trades\n   - Analytique → Stratégies multi-indicateurs\n   - Intuitif → Price action, patterns simples\n\nÉTAPE 2 : CHOISIR VOS OUTILS\n\nSélectionnez 3-5 indicateurs/outils MAXIMUM :\n\nCOMBINAISONS EFFICACES :\n\n1. SETUP SIMPLE (débutants) :\n   - MM50 + MM200 (tendance)\n   - RSI (momentum)\n   - Supports/Résistances (niveaux)\n   → Trend Following ou Mean Reversion\n\n2. SETUP INTERMÉDIAIRE :\n   - MM20 + MM50 (tendance)\n   - RSI + MACD (momentum)\n   - Volume (confirmation)\n   - Patterns chartistes\n   → Breakout Momentum\n\n3. SETUP AVANCÉ :\n   - EMA9 + EMA21 (tendance courte)\n   - RSI + Stochastic (momentum)\n   - Bollinger Bands (volatilité)\n   - Volume profile (zones clés)\n   → Day trading actif\n\n⚠️ Ne surchargez PAS : Plus d'indicateurs ≠ meilleurs résultats.\n\nÉTAPE 3 : DÉFINIR VOS RÈGLES (PLAN DE TRADING)\n\nÉcrivez NOIR SUR BLANC :\n\n📝 RÈGLES D'ENTRÉE :\n'J'entre en position UNIQUEMENT si :'\n\nExemple pour Breakout Momentum :\n☐ Prix au-dessus MM50\n☐ RSI entre 50-70\n☐ Résistance testée 2-3 fois minimum\n☐ Breakout avec volume 2x+\n☐ Chandelier clôture au-dessus résistance\n☐ Ratio R/R minimum 1:2\n\nSI UN SEUL critère manque → PAS DE TRADE\n\n📝 RÈGLES DE SORTIE :\n'Je sors quand :'\n\n1. STOP-LOSS touché (perte max X%)\n2. OBJECTIF 1 atteint → sortie de 50%\n3. OBJECTIF 2 atteint → sortie de 50% restants\n4. Signal de retournement (MACD croise baissier, etc.)\n\n📝 RÈGLES DE GESTION DU RISQUE :\n- Risque MAX par trade : 1% du capital\n- Nombre MAX de positions simultanées : 3-5\n- Perte MAX par semaine : -5%\n  → Si atteinte, STOP trading jusqu'à la semaine suivante\n\n📝 RÈGLES PSYCHOLOGIQUES :\n- Après 2 pertes consécutives → Pause de 24h\n- Si je suis en colère/frustré/euphorique → Pas de trade\n- Pas de trading les 30 premières minutes (trop volatil)\n- Pas de revenge trading (doubler après une perte)\n\nÉTAPE 4 : BACKTESTER VOTRE STRATÉGIE\n\nAvant de trader avec de l'argent réel :\n\n1. BACKTEST HISTORIQUE :\n   - Prenez les graphiques de 3 actions sur 6-12 mois\n   - Identifiez tous les signaux selon vos critères\n   - Calculez les résultats théoriques\n   - Objectif : Taux de réussite > 50% et ratio R/R > 1:2\n\n2. PAPER TRADING (trading simulé) :\n   - Utilisez un simulateur ou compte démo\n   - Tradez 20-30 positions minimum\n   - Documentez chaque trade dans votre journal\n   - Objectif : Rentabilité sur 1-2 mois minimum\n\n3. TRADING RÉEL (petit capital) :\n   - Commencez avec 10-20% de votre capital\n   - 20 trades minimum\n   - Si profitable → augmentez progressivement\n\nÉTAPE 5 : OPTIMISER ET ADAPTER\n\nAprès 30-50 trades :\n\nANALYSEZ VOS STATISTIQUES :\n- Taux de réussite (winrate) : X%\n- Ratio R/R moyen : X:1\n- Profit factor : (Gains totaux / Pertes totales)\n  → Objectif : > 1.5\n- Drawdown max : X%\n\nIDENTIFIEZ VOS PATTERNS :\n- Quels setups ont le meilleur taux de réussite ?\n- À quel moment perdez-vous le plus ?\n- Quelles erreurs répétez-vous ?\n\nAJUSTEZ :\n- Éliminez les setups peu rentables\n- Renforcez les setups gagnants\n- Ajustez vos stops/objectifs selon résultats\n\nEXEMPLE DE STRATÉGIE COMPLÈTE PERSONNALISÉE :\n\n'MA STRATÉGIE SWING TRADING'\n\nPROFIL :\n- Emploi temps plein (30 min/jour dispo)\n- Capital : 5 000$\n- Tolérance risque : Moyenne\n- Style : Patient et analytique\n\nSTRATÉGIE CHOISIE : Mean Reversion + Patterns\n\nTIMEFRAME : Daily\n\nINDICATEURS :\n- MM50, MM200\n- RSI (14)\n- Supports/Résistances\n\nCRITÈRES D'ENTRÉE :\n☐ Tendance haussière (Prix > MM200)\n☐ Prix 3-5% sous MM50\n☐ RSI < 35\n☐ Support identifié proche\n☐ Chandelier vert de retournement\n☐ RSI remonte > 35\n☐ Ratio R/R > 1:2\n\nGESTION :\n- Risque : 1.5% par trade (75$ max)\n- Positions max : 3 simultanées\n- Stop : Sous support ou -3% max\n- Objectif 1 : Retour MM50 (sortie 50%)\n- Objectif 2 : +5-7% (sortie 50%)\n\nRÈGLES :\n- Analyse chaque soir 20h-20h30\n- Max 5 trades par semaine\n- Si -8% sur le mois → pause d'analyse 1 semaine\n\nCette stratégie est UNIQUE à votre profil.\n\nRÈGLE D'OR FINALE :\nNe copiez JAMAIS aveuglément une stratégie.\nComprenez les principes, testez, adaptez à VOUS.",
+          "points_cles": [
+            "Construisez une stratégie adaptée à VOTRE temps, capital, et personnalité",
+            "Choisissez 3-5 indicateurs maximum (plus ≠ mieux)",
+            "Écrivez un plan de trading détaillé avec critères précis",
+            "Backtestez puis paper tradez avant d'utiliser argent réel",
+            "Optimisez après 30-50 trades basé sur vos statistiques"
+          ]
+        }
+      ],
+      "resume": "Il existe 4 grands styles de trading adaptés à différents profils : scalping (ultra court terme, réservé aux pros), day trading (intraday, 2-3h/jour), swing trading (2-7 jours, idéal pour débutants avec emploi), et position trading (semaines/mois, très patient). Trois stratégies complètes ont été présentées : Breakout Momentum (acheter la cassure de résistance avec volume), Mean Reversion (acheter la survente en tendance haussière), et Trend Following (suivre la tendance avec Golden Cross). La clé du succès : construire VOTRE stratégie personnalisée basée sur votre profil, la backtester rigoureusement, la trader en simulation, puis l'optimiser en continu. N'oubliez jamais : la meilleure stratégie est celle que vous pouvez suivre avec DISCIPLINE sur le long terme.",
+      "ressources_complementaires": [
+        "📖 Livre : 'Come Into My Trading Room' de Dr. Alexander Elder",
+        "📖 Livre : 'The New Trading for a Living' de Dr. Alexander Elder",
+        "🎥 Vidéo : Comparatif des 4 styles de trading (YouTube - Rayner Teo)",
+        "🔗 Outil : TradingView Strategy Tester pour backtesting",
+        "📊 Template : Plan de Trading Complet (téléchargement)",
+        "📊 Template : Journal de Trading avec statistiques (Excel)",
+        "📄 Cheat Sheet : Les 10 meilleures combinaisons d'indicateurs",
+        "🎓 Cours : Comment backtester une stratégie (vidéo 30min)"
+      ]
+    },
+    "quiz": [
+      {
+        "question": "Quel style de trading est IDÉAL pour un débutant avec un emploi à temps plein ?",
+        "options": [
+          "Scalping",
+          "Day Trading",
+          "Swing Trading",
+          "Ça dépend de son capital"
+        ],
+        "bonne_reponse": 2,
+        "explication": "Le SWING TRADING est parfait pour un emploi temps plein : seulement 15-30 min/jour nécessaires, moins stressant, et capture des mouvements de 5-15% sur plusieurs jours."
+      },
+      {
+        "question": "Dans la stratégie Breakout Momentum, quel est le critère LE PLUS important ?",
+        "options": [
+          "Le prix doit être au-dessus de la MM50",
+          "Le volume doit être 2-3x supérieur à la moyenne",
+          "Le RSI doit être entre 50-70",
+          "Le chandelier doit être vert"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Le VOLUME élevé (2-3x la moyenne) est le critère LE PLUS critique. Sans volume, 60% des breakouts sont des FAUX breakouts. Avec volume élevé, le taux de réussite monte à 65-75%."
+      },
+      {
+        "question": "Quelle est l'option d'entrée RECOMMANDÉE pour un débutant sur un breakout ?",
+        "options": [
+          "Acheter avant le breakout (anticipation)",
+          "Acheter dès le breakout (aggressif)",
+          "Attendre le pullback après le breakout (conservateur)",
+          "Ne jamais trader les breakouts"
+        ],
+        "bonne_reponse": 2,
+        "explication": "Pour un DÉBUTANT, l'approche CONSERVATIVE est recommandée : attendre le pullback (retour au niveau cassé) pour entrer. Risque plus faible, mais vous ratez 30% des trades sans pullback."
+      },
+      {
+        "question": "Dans quelle condition faut-il ABSOLUMENT éviter la stratégie Mean Reversion ?",
+        "options": [
+          "Quand le RSI est à 25",
+          "Quand le prix est sous la MM200 (tendance baissière)",
+          "Quand le volume est faible",
+          "Le matin à l'ouverture"
+        ],
+        "bonne_reponse": 1,
+        "explication": "ERREUR FATALE : trader le Mean Reversion dans une tendance BAISSIÈRE (prix < MM200). Vous 'attrapez le couteau qui tombe'. Cette stratégie ne fonctionne QUE en tendance haussière."
+      },
+      {
+        "question": "Qu'est-ce qu'un Golden Cross ?",
+        "options": [
+          "Quand le prix croise la MM50",
+          "Quand le RSI dépasse 70",
+          "Quand la MM50 croise AU-DESSUS de la MM200",
+          "Quand le volume double"
+        ],
+        "bonne_reponse": 2,
+        "explication": "Le GOLDEN CROSS se produit quand la MM50 croise au-dessus de la MM200. C'est un signal d'achat très puissant qui indique le début d'une tendance haussière majeure."
+      },
+      {
+        "question": "Dans la stratégie Trend Following, comment gérer le stop-loss ?",
+        "options": [
+          "Stop fixe, ne jamais le bouger",
+          "Trailing stop basé sur la MM50 (monte mais ne descend jamais)",
+          "Pas de stop, on garde jusqu'au Death Cross",
+          "Stop à -10% systématiquement"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Utilisez un TRAILING STOP (stop suiveur) basé sur la MM50 : il MONTE au fur et à mesure que le prix et la MM montent, protégeant vos gains, mais ne REDESCEND JAMAIS."
+      },
+      {
+        "question": "Combien d'indicateurs MAXIMUM devriez-vous utiliser dans votre stratégie ?",
+        "options": [
+          "Autant que possible pour plus de précision",
+          "10-15 indicateurs différents",
+          "3-5 indicateurs maximum",
+          "1 seul indicateur suffit"
+        ],
+        "bonne_reponse": 2,
+        "explication": "3-5 INDICATEURS MAXIMUM. Au-delà, vous surchargez votre analyse et créez de la confusion. Plus d'indicateurs ≠ meilleurs résultats. Simplicité = efficacité."
+      },
+      {
+        "question": "Avant de trader une stratégie avec de l'argent réel, que devez-vous faire ?",
+        "options": [
+          "L'essayer directement, on apprend en pratiquant",
+          "Lire 10 livres sur le sujet",
+          "Backtester puis paper trader (simulateur) 20-30 trades minimum",
+          "Demander à quelqu'un de le faire pour vous"
+        ],
+        "bonne_reponse": 2,
+        "explication": "Processus obligatoire : 1) BACKTEST sur données historiques, 2) PAPER TRADING (simulateur) 20-30 trades minimum, 3) Si profitable, trading réel avec petit capital. Ne skip pas ces étapes !"
+      },
+      {
+        "question": "Si vous perdez 2 trades consécutifs, que devez-vous faire selon les règles psychologiques ?",
+        "options": [
+          "Doubler la taille du prochain trade pour récupérer",
+          "Continuer normalement",
+          "Faire une pause de 24h minimum",
+          "Changer complètement de stratégie"
+        ],
+        "bonne_reponse": 2,
+        "explication": "RÈGLE PSYCHOLOGIQUE : Après 2 pertes consécutives, pause OBLIGATOIRE de 24h. Cela évite le revenge trading (trading de revanche) qui détruit les comptes."
+      },
+      {
+        "question": "Quelle est la caractéristique du Day Trading qui le rend difficile pour les débutants ?",
+        "options": [
+          "Nécessite un capital minimum de 100 000$",
+          "Nécessite 2-3h/jour minimum + clôture obligatoire avant 16h",
+          "Interdit aux personnes de moins de 25 ans",
+          "Impossible sans formation universitaire"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Le Day Trading nécessite 2-3h/jour MINIMUM (notamment ouverture + clôture), toutes les positions doivent être fermées avant 16h (pas d'overnight), et capital > 5 000$. Incompatible avec un job temps plein."
+      }
+    ],
+    "exercices": [
+      {
+        "type": "auto-evaluation",
+        "titre": "Déterminez votre style de trading idéal",
+        "description": "Remplissez le questionnaire de profil (temps disponible, capital, tolérance risque, personnalité). Basé sur vos réponses, identifiez le style de trading le plus adapté à VOTRE situation. Justifiez votre choix en 3-5 phrases."
+      },
+      {
+        "type": "simulation",
+        "titre": "Trader la stratégie Breakout Momentum",
+        "description": "Dans le simulateur HelixOne, identifiez une résistance testée 2-3 fois. Attendez le breakout avec volume élevé. Entrez soit au breakout (agressif) soit au pullback (conservateur). Documentez : critères validés, entrée, stop, objectif, résultat. Ratio R/R réalisé ?"
+      },
+      {
+        "type": "backtest",
+        "titre": "Backtester Mean Reversion sur 3 actions",
+        "description": "Prenez AAPL, MSFT, NVDA sur 6 mois (daily). Pour chaque action, trouvez tous les moments où : prix > MM200 (tendance haussière) ET RSI < 35 (survente) ET retournement (chandelier vert + RSI remonte). Calculez le taux de réussite si vous étiez entré avec objectif = retour à MM50."
+      },
+      {
+        "type": "creation",
+        "titre": "Créez votre plan de trading personnalisé",
+        "description": "Utilisez le template fourni et créez VOTRE plan complet : profil, style choisi, timeframe, indicateurs (3-5 max), critères d'entrée (checklist), critères de sortie, gestion du risque, règles psychologiques. Soyez spécifique et mesurable. Format 2-3 pages maximum."
+      }
+    ]
+  }
+]

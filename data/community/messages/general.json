@@ -1,0 +1,41 @@
+[
+  {
+    "id": "746abd8e2b3576db914865b138c5325b",
+    "author": "Vous",
+    "content": "Bonjour",
+    "timestamp": "2025-09-14T23:31:45.182691",
+    "attachments": [],
+    "reactions": {}
+  },
+  {
+    "id": "81df6353b6b9c9b9597970a4b5ee4f12",
+    "author": "Vous",
+    "content": "",
+    "timestamp": "2025-09-14T23:31:57.234014",
+    "attachments": [
+      {
+        "type": "file",
+        "filename": "1757885517_Cas Biocoop.pdf",
+        "original_name": "Cas Biocoop.pdf",
+        "size": 4430722,
+        "mime_type": "application/pdf"
+      }
+    ],
+    "reactions": {}
+  },
+  {
+    "id": "3f943f9dd97308dc95d6d4b09c6de10b",
+    "author": "Vous",
+    "content": "",
+    "timestamp": "2025-09-14T23:32:09.512587",
+    "attachments": [
+      {
+        "type": "image",
+        "filename": "1757885529_Capture_d_e_cran_2025-09-12_a__17_51_39.png",
+        "original_name": "Capture d’écran 2025-09-12 à 17.51.39.png",
+        "size": 161510
+      }
+    ],
+    "reactions": {}
+  }
+]

@@ -1,0 +1,31 @@
+[
+    {
+      "id": "niveau_1",
+      "titre": "1 - Niveau Débutant",
+      "description": "Introduction",
+      "niveau": "Débutant",
+      "progres": 0
+    },
+    {
+      "id": "niveau_2",
+      "titre": "2 - Niveau Intermédiaire",
+      "description": "Analyse des marchés",
+      "niveau": "Intermédiaire",
+      "progres": 0
+    },
+    {
+      "id": "niveau_3",
+      "titre": "3 - Niveau Avancé",
+      "description": "Stratégies d’investissement",
+      "niveau": "Avancé",
+      "progres": 0
+    },
+    {
+      "id": "niveau_4",
+      "titre": "4 - Niveau Expert",
+      "description": "Trading professionnel & finance comportementale",
+      "niveau": "Expert",
+      "progres": 0
+    }
+  ]
+  

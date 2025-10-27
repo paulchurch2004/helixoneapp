@@ -1,0 +1,405 @@
+[
+  {
+    "id": "algorithmic_trading_bots",
+    "parcours": "expert",
+    "titre": "🤖 Trading Algorithmique & Bots de Trading",
+    "description": "Créez des algorithmes de trading automatisés et maîtrisez le trading quantitatif",
+    "durée": "3 heures",
+    "difficulté": "Expert",
+    "points_xp": 500,
+    "prérequis": ["trading_strategies_advanced", "technical_indicators_intro"],
+    "contenu": {
+      "introduction": "Le trading algorithmique représente aujourd'hui plus de 70% des volumes échangés sur les marchés financiers. Il s'agit de l'utilisation de programmes informatiques pour exécuter automatiquement des ordres selon des règles prédéfinies, sans intervention humaine. Cette approche offre des avantages considérables : élimination des émotions, exécution ultra-rapide, capacité à surveiller plusieurs marchés simultanément, et surtout, la possibilité de backtester rigoureusement vos stratégies sur des années de données historiques. Dans ce module, vous apprendrez à concevoir, développer, tester et déployer vos propres algorithmes de trading, en maîtrisant les concepts de base de la programmation financière, l'architecture des systèmes de trading automatisés, et les pièges à éviter.",
+      "sections": [
+        {
+          "titre": "🏗️ Architecture d'un Système de Trading Algorithmique",
+          "contenu": "Un système de trading algorithmique professionnel se compose de plusieurs modules interconnectés :\n\n1. MODULE DE DONNÉES (Data Feed):\n- Connexion API aux courtiers/exchanges (Interactive Brokers, Alpaca, Binance)\n- Récupération des données en temps réel (prix, volume, order book)\n- Stockage des données historiques pour backtesting\n- Nettoyage et normalisation des données\n\n2. MODULE DE STRATÉGIE (Strategy Engine):\n- Logique de trading (conditions d'entrée/sortie)\n- Calcul des indicateurs techniques\n- Génération des signaux (BUY/SELL/HOLD)\n- Gestion de l'état du marché\n\n3. MODULE DE GESTION DES RISQUES (Risk Management):\n- Calcul de la taille des positions (position sizing)\n- Vérification des limites d'exposition\n- Stop-loss et take-profit automatiques\n- Drawdown maximum autorisé\n\n4. MODULE D'EXÉCUTION (Order Execution):\n- Envoi des ordres au broker\n- Gestion des ordres partiellement exécutés\n- Slippage et frais de transaction\n- Reconnexion automatique en cas de perte de connexion\n\n5. MODULE DE MONITORING (Monitoring & Logging):\n- Enregistrement de tous les trades\n- Métriques de performance en temps réel\n- Alertes en cas d'anomalie\n- Dashboard de visualisation\n\nEXEMPLE D'ARCHITECTURE SIMPLE (Python) :\n```python\nclass TradingBot:\n    def __init__(self):\n        self.data_feed = DataFeed()\n        self.strategy = MeanReversionStrategy()\n        self.risk_manager = RiskManager(max_position=5000)\n        self.executor = OrderExecutor()\n    \n    def run(self):\n        while market_is_open():\n            prices = self.data_feed.get_latest()\n            signal = self.strategy.generate_signal(prices)\n            if signal and self.risk_manager.validate(signal):\n                self.executor.place_order(signal)\n```",
+          "points_cles": [
+            "Un bot de trading = 5 modules principaux interconnectés",
+            "Data Feed + Strategy Engine + Risk Management + Execution + Monitoring",
+            "Chaque module doit être testé indépendamment",
+            "Architecture modulaire = facilité de maintenance et debugging"
+          ]
+        },
+        {
+          "titre": "💻 Langages et Outils pour le Trading Algo",
+          "contenu": "PYTHON - LE ROI DU TRADING ALGO :\n\nPython est le langage dominant en trading algorithmique grâce à son écosystème riche :\n\nBibliothèques essentielles :\n• pandas : Manipulation de données financières (DataFrames, séries temporelles)\n• numpy : Calculs numériques rapides\n• ta-lib / pandas-ta : Indicateurs techniques (RSI, MACD, Bollinger)\n• backtrader / zipline : Frameworks de backtesting\n• ccxt : Connexion à 100+ exchanges crypto\n• alpaca-trade-api : Trading actions US\n• vectorbt : Backtesting vectorisé ultra-rapide\n\nEXEMPLE - CALCULER LE RSI :\n```python\nimport pandas as pd\nimport pandas_ta as ta\n\n# Récupérer les données\ndf = get_historical_data('AAPL', '1d', 100)\n\n# Calculer RSI\ndf['rsi'] = ta.rsi(df['close'], length=14)\n\n# Signal: acheter si RSI < 30\ndf['signal'] = df['rsi'] < 30\n```\n\nAUTRES LANGAGES :\n\n• C++ : Ultra-rapide pour HFT (High Frequency Trading)\n- Latence < 1 microseconde\n- Utilisé par les hedge funds et market makers\n- Complexe à développer\n\n• Java : Robustesse pour systèmes institutionnels\n- Utilisé par les banques\n- JVM garantit la stabilité\n\n• JavaScript/Node.js : Idéal pour crypto trading\n- Connexions WebSocket temps réel\n- Nombreuses librairies pour exchanges\n\nPLATEFORMES NO-CODE :\n\n• TradingView Pine Script : Stratégies simples sans coder\n• MetaTrader 4/5 (MQL) : Forex et CFDs\n• QuantConnect / Quantopian : IDE cloud pour algo trading\n\nCHOISIR VOTRE STACK :\n- Débutant : Python + pandas + backtrader\n- Intermédiaire : Python + vectorbt + ccxt\n- Expert : Python (stratégie) + C++ (exécution) + Redis (cache)",
+          "points_cles": [
+            "Python = langage #1 pour débuter en algo trading",
+            "pandas + ta-lib + backtrader = stack minimaliste efficace",
+            "C++ seulement si vous faites du HFT (< 1ms de latence)",
+            "Commencez simple, optimisez plus tard"
+          ]
+        },
+        {
+          "titre": "🧪 Backtesting: Tester vos Algorithmes",
+          "contenu": "Le backtesting est l'étape CRUCIALE avant de mettre de l'argent réel. Il consiste à tester votre algorithme sur des données historiques pour évaluer sa performance.\n\nMÉTHODOLOGIE DE BACKTESTING RIGOUREUX :\n\n1. DONNÉES HISTORIQUES :\n- Minimum 2-3 ans de données (plus = mieux)\n- Incluez les périodes de crise (2008, 2020)\n- Données tick-by-tick pour day trading, daily pour swing\n- Attention aux données survivorship bias (actions disparues)\n\n2. COÛTS RÉALISTES :\n- Frais de courtage : 0.1% à 0.5% par trade\n- Slippage : 0.05% à 0.2% (différence entre prix théorique et réel)\n- Spread bid/ask : 0.01% à 0.05%\n- Impact de marché si gros volumes\n\n3. MÉTRIQUES IMPORTANTES :\n\n• Sharpe Ratio : Rendement/Risque (> 1.5 = bon, > 2 = excellent)\n```python\nsharpe = (returns.mean() / returns.std()) * sqrt(252)\n```\n\n• Max Drawdown : Pire chute depuis un pic (< 20% acceptable)\n```python\nmax_dd = (cumulative_returns / cumulative_returns.cummax() - 1).min()\n```\n\n• Win Rate : % de trades gagnants (> 55% = bien)\n• Profit Factor : Gains totaux / Pertes totales (> 1.5 = viable)\n• Nombre de trades : Minimum 100 pour significativité statistique\n\n4. PIÈGES DU BACKTESTING (OVERFITTING) :\n\n⚠️ OVERFITTING = Algorithme qui marche parfaitement sur données historiques mais échoue en réel.\n\nCauses communes :\n- Trop de paramètres ajustables (> 5 = danger)\n- Optimisation excessive sur une période courte\n- Ignorer les coûts de transaction\n- Look-ahead bias (utiliser des infos futures)\n\nSOLUTION - WALK-FORWARD ANALYSIS :\n- Divisez données en 70% training / 30% testing\n- Optimisez sur training UNIQUEMENT\n- Validez sur testing (données jamais vues)\n- Si ça marche sur testing → robuste\n\nEXEMPLE BACKTRADER :\n```python\nimport backtrader as bt\n\nclass MaStrategy(bt.Strategy):\n    def __init__(self):\n        self.sma = bt.indicators.SMA(period=50)\n    \n    def next(self):\n        if self.data.close > self.sma:\n            self.buy()\n        elif self.data.close < self.sma:\n            self.sell()\n\ncerebro = bt.Cerebro()\ncerebro.addstrategy(MaStrategy)\ncerebro.adddata(data)\ncerebro.run()\nprint(f'Sharpe: {cerebro.analyzers.sharpe.get_analysis()}')\n```",
+          "points_cles": [
+            "Backtesting = tester sur données historiques AVANT argent réel",
+            "Incluez TOUS les coûts : frais, slippage, spread",
+            "Métriques clés : Sharpe Ratio, Max Drawdown, Win Rate, Profit Factor",
+            "Overfitting = ennemi #1, utilisez walk-forward analysis",
+            "Minimum 100 trades pour validité statistique"
+          ]
+        },
+        {
+          "titre": "⚡ Stratégies Algorithmiques Classiques",
+          "contenu": "STRATÉGIE 1: MEAN REVERSION (RETOUR À LA MOYENNE)\n\nPrincipe : Les prix qui s'écartent trop de leur moyenne ont tendance à y revenir.\n\nImplémentation :\n```python\n# Paramètres\nbb_period = 20\nbb_std = 2\n\n# Signaux\nif price < bollinger_lower:  # Prix 2σ sous moyenne\n    signal = 'BUY'  # Paris sur retour à la moyenne\nelif price > bollinger_upper:  # Prix 2σ au-dessus\n    signal = 'SELL'\n```\n\nMarchés adaptés : Actions de grandes caps (AAPL, MSFT), indices\nTimeframe : 1H à Daily\nSharpe typique : 1.2 à 1.8\n\n---\n\nSTRATÉGIE 2: MOMENTUM / TREND FOLLOWING\n\nPrincipe : Les tendances ont tendance à persister.\n\nImplémentation :\n```python\n# Signaux\nif price > ma_200 and macd > signal_line:\n    signal = 'BUY'  # Tendance haussière confirmée\nelif price < ma_200 and macd < signal_line:\n    signal = 'SELL'\n```\n\nMarchés : Cryptos, matières premières, forex\nTimeframe : 4H à Weekly\nSharpe typique : 0.8 à 1.5\n\n---\n\nSTRATÉGIE 3: STATISTICAL ARBITRAGE (PAIRS TRADING)\n\nPrincipe : Exploiter la corrélation entre deux actifs.\n\nEXEMPLE - Coca vs Pepsi :\n```python\n# Calculer le spread\nspread = price_KO / price_PEP\nspread_ma = spread.rolling(30).mean()\nspread_std = spread.rolling(30).std()\n\n# Z-score\nz_score = (spread - spread_ma) / spread_std\n\nif z_score > 2:  # Spread trop élevé\n    # SHORT KO, LONG PEP\n    sell('KO')\n    buy('PEP')\nelif z_score < -2:  # Spread trop bas\n    # LONG KO, SHORT PEP\n    buy('KO')\n    sell('PEP')\n```\n\nMarchés : Actions corrélées du même secteur\nSharpe typique : 1.5 à 2.5 (market neutral)\n\n---\n\nSTRATÉGIE 4: MARKET MAKING\n\nPrincipe : Profiter du spread bid/ask en fournissant de la liquidité.\n\n```python\n# Placer ordres de chaque côté\nmid_price = (bid + ask) / 2\nspread = 0.002  # 0.2%\n\nbuy_order = mid_price * (1 - spread)  # Bid\nsell_order = mid_price * (1 + spread)  # Ask\n\n# Profit = spread si les deux exécutés\n```\n\nMarchés : Cryptos (liquidité fragmentée)\nRisque : Être pris dans un mouvement fort",
+          "points_cles": [
+            "Mean Reversion = acheter survente, vendre surachat (Bollinger)",
+            "Momentum = suivre les tendances fortes (MACD + MA200)",
+            "Pairs Trading = exploiter corrélations (market neutral)",
+            "Market Making = profiter du spread (nécessite capital important)"
+          ]
+        },
+        {
+          "titre": "🚀 Mise en Production et Gestion en Direct",
+          "contenu": "PHASE 1: PAPER TRADING (SIMULATION)\n\nAvant de risquer de l'argent, testez en conditions réelles mais sans risque :\n\nPlateformes :\n• Alpaca Paper Trading (actions US)\n• Binance Testnet (crypto)\n• Interactive Brokers Paper Account\n\nDurée recommandée : 20-30 trades minimum (1-3 mois)\n\nCritères de validation :\n✓ Sharpe > 1.0 en paper\n✓ Max Drawdown < 20%\n✓ Win Rate > 50%\n✓ Zéro erreur technique (crashes, bugs)\n\n---\n\nPHASE 2: MISE EN PRODUCTION (ARGENT RÉEL)\n\nCommencez PETIT :\n- Capital initial : 500-2000€ (même si vous avez plus)\n- Taille de position : 1-2% du capital max par trade\n- Augmentez PROGRESSIVEMENT si ça marche\n\nINFRASTRUCTURE :\n\n1. SERVEUR DÉDIÉ (VPS) :\n- Hébergement cloud : AWS, DigitalOcean, Scaleway\n- Uptime 99.9% minimum\n- Localisation proche de l'exchange (latence < 50ms)\n- Coût : 5-20€/mois\n\n2. REDONDANCE :\n- Bot primaire + bot de backup\n- Système de heartbeat (vérification toutes les 30s)\n- Alertes SMS/Email si crash\n\n3. SÉCURITÉ :\n- API keys avec droits LIMITÉS (trading only, pas withdraw)\n- Authentification 2FA activée\n- Whitelist IP du serveur\n- Logs encryptés\n\n---\n\nMONITORING CONTINU :\n\nMÉTRIQUES À SURVEILLER QUOTIDIENNEMENT :\n• P&L (Profit & Loss) intraday\n• Sharpe Ratio rolling 30 jours\n• Drawdown actuel vs max autorisé\n• Nombre d'erreurs techniques\n• Latence d'exécution (< 100ms)\n\nALERTES AUTOMATIQUES :\n```python\n# Exemple d'alerte\nif current_drawdown > 0.15:  # -15%\n    send_sms(\"⚠️ Drawdown 15%, STOP BOT\")\n    bot.pause()\n\nif daily_loss > 0.05:  # -5% en une journée\n    send_email(\"Perte journalière 5%\")\n```\n\nRÈGLES DE SÉCURITÉ :\n• KILL SWITCH : Bouton d'arrêt d'urgence\n• MAX DAILY LOSS : -5% → bot s'arrête automatiquement\n• MAX DRAWDOWN : -20% → arrêt et révision de la stratégie\n• Review hebdomadaire : Analyser tous les trades\n\n---\n\nOPTIMISATION EN CONTINU :\n\n• Backtester sur données récentes tous les mois\n• Ajuster paramètres si conditions de marché changent\n• A/B testing : Tester variantes de la stratégie\n• Machine Learning : Améliorer prédictions avec ML (avancé)",
+          "points_cles": [
+            "Paper Trading OBLIGATOIRE avant argent réel (20-30 trades)",
+            "Commencez avec capital MINIMAL (500-2000€) même si vous avez plus",
+            "VPS dédié + redondance + alertes automatiques = infra pro",
+            "Kill switch + max daily loss (-5%) + max drawdown (-20%)",
+            "Monitoring quotidien + review hebdomadaire indispensables"
+          ]
+        },
+        {
+          "titre": "⚠️ Pièges et Erreurs à Éviter",
+          "contenu": "ERREUR #1: OVERFITTING (Surapprentissage)\n\nSymptômes :\n• Backtest = +50%, Live trading = -10%\n• Stratégie avec 10+ paramètres ajustables\n• Optimisé sur période courte (< 1 an)\n\nSolution :\n• Maximum 3-5 paramètres\n• Walk-forward analysis\n• Tester sur différents actifs\n\n---\n\nERREUR #2: IGNORER LES COÛTS DE TRANSACTION\n\nExemple catastrophique :\n```python\n# Stratégie qui fait 50 trades/jour\ntrades_per_day = 50\ncommission = 0.001  # 0.1% par trade\n\n# Coût quotidien\ndaily_cost = trades_per_day * commission * 2  # Buy + Sell\n# = 10% de coût par jour !\n# → Impossible d'être profitable\n```\n\nSolution : Backtesting avec coûts RÉELS inclus\n\n---\n\nERREUR #3: MANQUE DE DIVERSIFICATION\n\nNE JAMAIS mettre tous vos œufs dans le même panier :\n\n❌ MAL : 100% du capital sur 1 stratégie, 1 actif\n✅ BIEN : Portfolio de 3-5 stratégies décorrélées\n\nExemple :\n• 30% Mean Reversion sur AAPL\n• 30% Momentum sur BTC\n• 40% Pairs Trading KO/PEP\n\n---\n\nERREUR #4: BOT MAL GÉRÉ EN PRODUCTION\n\nHISTOIRE VRAIE :\nUn trader lance son bot vendredi soir, part en weekend. Lundi matin : compte à -60% à cause d'un bug.\n\nSOLUTION :\n• Alertes en temps réel\n• Maximum daily loss automatique\n• Toujours surveiller les premières heures\n• Ne JAMAIS laisser tourner non surveillé les premiers jours\n\n---\n\nERREUR #5: IMPATIENCE ET OVERTRADING\n\n\"Mon bot ne fait que 2 trades/jour, c'est trop peu !\"\n\n→ FAUX. Qualité > Quantité\n\n• 2 trades/jour à +0.5% = +252% par an (composé)\n• 50 trades/jour à +0.01% après fees = -5% par an\n\n---\n\nERREUR #6: NE PAS TESTER EN CONDITIONS EXTRÊMES\n\nVotre bot doit survivre à :\n• Flash crash (-10% en 5 min)\n• Perte de connexion\n• API qui rate (timeout)\n• Liquidité faible\n\nTest : Débranchez internet pendant que le bot tourne. Que se passe-t-il ?",
+          "points_cles": [
+            "Overfitting = #1 ennemi (backtest ≠ réalité)",
+            "Inclure TOUS les coûts dans backtesting",
+            "Diversifier : 3-5 stratégies décorrélées minimum",
+            "Alertes temps réel + kill switch obligatoires",
+            "Qualité > Quantité : 2 bons trades/jour suffisent",
+            "Tester bot en conditions extrêmes (crash, déconnexion)"
+          ]
+        }
+      ],
+      "resume": "Le trading algorithmique offre des avantages considérables mais nécessite une approche rigoureuse : architecture modulaire solide, backtesting exhaustif avec walk-forward analysis, paper trading avant production, infrastructure fiable avec monitoring continu, et gestion stricte des risques. Les stratégies classiques (Mean Reversion, Momentum, Pairs Trading) ont fait leurs preuves, mais le succès réside dans l'exécution disciplinée et l'évitement des pièges (overfitting, coûts ignorés, manque de diversification). Commencez petit, testez abondamment, et scalez progressivement. Le trading algo n'est pas un 'get rich quick', mais une approche systématique pour trader sans émotions.",
+      "ressources_complementaires": [
+        "📖 Livre : 'Algorithmic Trading' par Ernest P. Chan",
+        "📖 Livre : 'Quantitative Trading' par Ernest P. Chan",
+        "🎥 Cours : 'Python for Finance' sur Udemy",
+        "🔗 Framework : Backtrader (open-source Python)",
+        "🔗 Framework : VectorBT (backtesting rapide)",
+        "🔗 API : CCXT (connexion 100+ exchanges)",
+        "📄 Documentation : Alpaca API (actions US)",
+        "💻 GitHub : awesome-quant (liste de ressources)",
+        "🎓 Plateforme : QuantConnect (IDE cloud algo trading)"
+      ]
+    },
+    "quiz": [
+      {
+        "question": "Quels sont les 5 modules essentiels d'un système de trading algorithmique ?",
+        "options": [
+          "Frontend, Backend, Database, API, UI",
+          "Data Feed, Strategy Engine, Risk Management, Order Execution, Monitoring",
+          "Buy Module, Sell Module, Stop-Loss, Take-Profit, Logger",
+          "Python, C++, JavaScript, SQL, HTML"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Les 5 modules sont : Data Feed (données), Strategy Engine (logique), Risk Management (gestion risque), Order Execution (exécution ordres), et Monitoring (surveillance). Cette architecture modulaire garantit maintenabilité et robustesse."
+      },
+      {
+        "question": "Quel langage est le PLUS utilisé pour débuter en trading algorithmique ?",
+        "options": [
+          "C++ car c'est le plus rapide",
+          "Java car utilisé par les banques",
+          "Python car écosystème riche et facile à apprendre",
+          "JavaScript car moderne"
+        ],
+        "bonne_reponse": 2,
+        "explication": "Python est le roi du trading algo grâce à pandas, numpy, ta-lib, backtrader, etc. C++ est réservé au HFT (< 1ms), trop complexe pour débuter. Python = 90% des algo traders retail."
+      },
+      {
+        "question": "Qu'est-ce que l'OVERFITTING en backtesting ?",
+        "options": [
+          "Utiliser trop de données historiques",
+          "Stratégie qui marche parfaitement en backtest mais échoue en live",
+          "Trop de trades executés par le bot",
+          "Bot qui consomme trop de mémoire"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Overfitting = algorithme sur-optimisé sur données historiques (backtest +50%) mais qui échoue en trading réel (-10%). C'est l'ennemi #1. Solution : walk-forward analysis, peu de paramètres (< 5), tester sur différentes périodes."
+      },
+      {
+        "question": "Quelle métrique indique le ratio Rendement/Risque d'une stratégie ?",
+        "options": [
+          "Win Rate",
+          "Max Drawdown",
+          "Sharpe Ratio",
+          "Profit Factor"
+        ],
+        "bonne_reponse": 2,
+        "explication": "Sharpe Ratio = (Rendement moyen) / (Volatilité). > 1.5 = bon, > 2 = excellent. C'est LA métrique clé pour comparer des stratégies. Un Sharpe de 0.5 = mauvais même si Win Rate élevé."
+      },
+      {
+        "question": "Combien de trades MINIMUM devez-vous faire en paper trading avant de passer en réel ?",
+        "options": [
+          "5 trades suffisent",
+          "10-15 trades",
+          "20-30 trades minimum",
+          "100 trades minimum"
+        ],
+        "bonne_reponse": 2,
+        "explication": "20-30 trades MINIMUM en paper trading (simulation) avant argent réel. Cela prend 1-3 mois. Vous devez valider : Sharpe > 1.0, Max DD < 20%, aucun bug technique. Ne skippez pas cette étape !"
+      },
+      {
+        "question": "Quelle est la stratégie où vous ACHETEZ quand un actif est survendu (Bollinger basse) ?",
+        "options": [
+          "Momentum Trading",
+          "Mean Reversion",
+          "Pairs Trading",
+          "Market Making"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Mean Reversion = retour à la moyenne. Quand prix trop bas (< Bollinger lower), vous pariez qu'il va remonter. Marche bien sur grandes caps (AAPL, MSFT). Sharpe typique : 1.2-1.8."
+      },
+      {
+        "question": "Avec un capital de 10,000€, quelle devrait être votre taille de position MAXIMUM par trade ?",
+        "options": [
+          "10,000€ (tout)",
+          "5,000€ (50%)",
+          "200-400€ (2-4%)",
+          "1,000€ (10%)"
+        ],
+        "bonne_reponse": 2,
+        "explication": "Règle en algo trading : 1-2% max du capital par trade pour éviter ruine. Sur 10,000€ → max 200€. Vous pouvez avoir 5 positions simultanées (5×200 = 1,000€ exposé). JAMAIS tout le capital sur 1 trade."
+      }
+    ],
+    "exercices": [
+      {
+        "type": "developpement",
+        "titre": "Créez votre premier bot Mean Reversion",
+        "description": "En Python, développez un bot simple qui : 1) Récupère les données AAPL sur 100 derniers jours, 2) Calcule Bollinger Bands (20 périodes, 2σ), 3) Génère signal BUY si prix < lower band, SELL si prix > upper band, 4) Backteste sur les données. Utilisez pandas + ta-lib ou pandas-ta. Objectif : Comprendre structure basique d'un algo."
+      },
+      {
+        "type": "backtest",
+        "titre": "Backtester et optimiser une stratégie Momentum",
+        "description": "Implémentez stratégie : LONG si (prix > MA200 ET MACD > signal). Backtestez sur AAPL + MSFT + TSLA sur 3 ans. Calculez : Sharpe Ratio, Max Drawdown, Win Rate, Profit Factor. Incluez 0.1% de frais par trade. Testez différentes périodes de MA (100, 150, 200). Documentez : quelle période donne le meilleur Sharpe ?"
+      },
+      {
+        "type": "analyse",
+        "titre": "Walk-Forward Analysis pour éviter l'overfitting",
+        "description": "Prenez une stratégie simple (RSI < 30 = BUY). Divisez données en 70% training (2020-2021) / 30% testing (2022). Optimisez période RSI sur training pour maximiser Sharpe. Puis testez SANS changer paramètres sur testing. Comparez Sharpe training vs testing. Si testing < 50% du training → overfitting. Documentez vos findings."
+      },
+      {
+        "type": "infrastructure",
+        "titre": "Déployez un bot sur VPS avec alertes",
+        "description": "Louez un VPS (DigitalOcean/AWS, 5$/mois). Installez Python + dépendances. Configurez bot simple qui envoie alerte email/SMS : 1) Toutes les heures (heartbeat), 2) Si erreur API, 3) Si drawdown > 10%. Lancez bot, débranchez votre PC, vérifiez que bot continue de tourner sur VPS. Objectif : Infrastructure de production basique."
+      },
+      {
+        "type": "analyse-risque",
+        "titre": "Calculez l'impact des frais sur performance",
+        "description": "Prenez une stratégie qui génère 10 trades/jour avec gain moyen +0.3% par trade. Calculez profit annuel SANS frais. Puis recalculez AVEC 0.1% de frais par trade (buy + sell = 0.2%). Combien de % de profit les frais consomment-ils ? À partir de combien de trades/jour une stratégie devient non-profitable à cause des frais ? Créez graphique : trades/jour vs profit net."
+      }
+    ]
+  },
+  {
+    "id": "options_derivatives_mastery",
+    "parcours": "expert",
+    "titre": "💎 Options & Produits Dérivés - Maîtriser les instruments complexes",
+    "description": "Maîtrisez les options, futures, swaps et dérivés exotiques pour diversifier vos stratégies",
+    "durée": "4 heures",
+    "difficulté": "Expert",
+    "points_xp": 600,
+    "prérequis": ["risk_management", "trading_strategies_advanced"],
+    "contenu": {
+      "introduction": "Les produits dérivés représentent plus de 600 trillions de dollars de notionnel échangés mondialement, soit 10 fois le PIB mondial. Ces instruments financiers, dont la valeur 'dérive' d'un actif sous-jacent (action, indice, matière première, taux d'intérêt), offrent des possibilités de trading sophistiquées : effet de levier, couverture de risques, génération de revenus, stratégies market neutral. Contrairement aux idées reçues, les dérivés ne sont pas uniquement pour la spéculation agressive - ils sont utilisés par les institutions pour RÉDUIRE les risques. Dans ce module, vous apprendrez à maîtriser les options (calls/puts), comprendre le pricing Black-Scholes et les Greeks, construire des stratégies complexes (spreads, straddles, iron condors), trader les futures, et découvrir les dérivés exotiques. Vous serez capable d'utiliser ces instruments pour toutes les conditions de marché : haussier, baissier, range ou volatile.",
+      "sections": [
+        {
+          "titre": "📊 Comprendre les Options: Calls, Puts et Terminologie",
+          "contenu": "Une OPTION est un contrat qui donne le DROIT (mais pas l'obligation) d'acheter ou vendre un actif à un prix fixé (strike) avant une date d'expiration.\n\nDEUX TYPES D'OPTIONS :\n\n1. CALL OPTION (Option d'Achat) :\n- Donne le droit D'ACHETER l'actif au prix strike\n- Vous achetez un call si vous pensez que le prix va MONTER\n\nEXEMPLE :\n• Action AAPL = 150$\n• Vous achetez 1 CALL strike 160$ expirant dans 30 jours\n• Prime payée : 3$ (coût de l'option)\n• Si AAPL monte à 170$ :\n  → Vous exercez : Achetez à 160$, revendez à 170$ = +10$\n  → Profit net : 10$ - 3$ (prime) = +7$ soit +233%\n• Si AAPL reste à 150$ :\n  → Option expire sans valeur\n  → Perte : -3$ (100% de la prime)\n\n2. PUT OPTION (Option de Vente) :\n- Donne le droit DE VENDRE l'actif au prix strike\n- Vous achetez un put si vous pensez que le prix va BAISSER\n\nEXEMPLE :\n• Action TSLA = 200$\n• Vous achetez 1 PUT strike 190$ expirant dans 30 jours\n• Prime payée : 4$\n• Si TSLA baisse à 170$ :\n  → Vous exercez : Vendez à 190$ (au lieu de 170$) = +20$\n  → Profit net : 20$ - 4$ = +16$ soit +400%\n• Si TSLA monte à 220$ :\n  → Option expire sans valeur\n  → Perte : -4$ (100% de la prime)\n\n---\n\nTERMINOLOGIE ESSENTIELLE :\n\n• STRIKE PRICE (Prix d'exercice) : Prix auquel vous pouvez acheter/vendre\n• EXPIRATION : Date limite d'exercice (hebdo, mensuelle, trimestrielle)\n• PREMIUM (Prime) : Prix que vous PAYEZ pour acheter l'option\n• IN THE MONEY (ITM) : Option profitable si exercée maintenant\n  - Call ITM : Prix actuel > Strike\n  - Put ITM : Prix actuel < Strike\n• AT THE MONEY (ATM) : Prix actuel = Strike\n• OUT OF THE MONEY (OTM) : Option non profitable si exercée\n  - Call OTM : Prix actuel < Strike\n  - Put OTM : Prix actuel > Strike\n\n• VALEUR INTRINSÈQUE : Profit si exercé immédiatement\n  - Call : Max(Prix actuel - Strike, 0)\n  - Put : Max(Strike - Prix actuel, 0)\n\n• VALEUR TEMPORELLE : Prime - Valeur intrinsèque\n  - Diminue avec le temps (theta decay)\n  - Vaut 0 à l'expiration\n\nEXEMPLE COMPLET :\n• AAPL = 150$\n• Call Strike 140$ (ITM), Prime 12$\n  - Valeur intrinsèque : 150 - 140 = 10$\n  - Valeur temporelle : 12 - 10 = 2$\n\n• Call Strike 160$ (OTM), Prime 3$\n  - Valeur intrinsèque : 0$ (pas profitable)\n  - Valeur temporelle : 3$ (100% de la prime)\n\n---\n\nACHETEUR vs VENDEUR (Writer) :\n\nACHETEUR D'OPTION :\n• Paye la prime\n• Risque LIMITÉ (max = prime payée)\n• Profit ILLIMITÉ (call) ou très élevé (put)\n• Contrôle : Décide d'exercer ou non\n\nVENDEUR D'OPTION (WRITER) :\n• Reçoit la prime (revenus)\n• Risque ILLIMITÉ (call) ou très élevé (put)\n• Profit LIMITÉ (max = prime reçue)\n• Obligation : Doit vendre/acheter si acheteur exerce\n\nSTRATÉGIE : Vendre options = générer revenus (80% options expirent OTM)",
+          "points_cles": [
+            "Call = droit d'ACHETER, achetez si bullish (prix monte)",
+            "Put = droit de VENDRE, achetez si bearish (prix baisse)",
+            "Acheteur : Risque limité (prime), profit illimité",
+            "Vendeur : Reçoit prime, risque élevé, stratégie de revenus",
+            "ITM = profitable, OTM = pas profitable, ATM = prix = strike",
+            "Valeur option = Intrinsèque + Temporelle (fond vers 0 à expiration)"
+          ]
+        },
+        {
+          "titre": "🧮 Le Modèle Black-Scholes et les Greeks",
+          "contenu": "Le modèle BLACK-SCHOLES (Nobel 1997) permet de calculer le prix THÉORIQUE d'une option européenne.\n\nFORMULE BLACK-SCHOLES (Call) :\n```\nC = S₀N(d₁) - Ke^(-rT)N(d₂)\n\noù :\nd₁ = [ln(S₀/K) + (r + σ²/2)T] / (σ√T)\nd₂ = d₁ - σ√T\n\nS₀ = Prix actuel de l'actif\nK = Strike price\nr = Taux sans risque\nT = Temps jusqu'à expiration (en années)\nσ = Volatilité implicite (annualisée)\nN(x) = Fonction de distribution normale cumulative\n```\n\nEXEMPLE PRATIQUE (Python) :\n```python\nimport scipy.stats as stats\nimport numpy as np\n\ndef black_scholes_call(S, K, T, r, sigma):\n    d1 = (np.log(S/K) + (r + 0.5*sigma**2)*T) / (sigma*np.sqrt(T))\n    d2 = d1 - sigma*np.sqrt(T)\n    call = S * stats.norm.cdf(d1) - K * np.exp(-r*T) * stats.norm.cdf(d2)\n    return call\n\n# AAPL = 150$, Strike 155$, 30 jours, r=5%, volatilité 25%\nprice = black_scholes_call(150, 155, 30/365, 0.05, 0.25)\nprint(f\"Prix théorique Call: {price:.2f}$\")  # ~3.20$\n```\n\n---\n\nLES GREEKS : Sensibilités de l'option aux variables\n\n1. DELTA (Δ) : Sensibilité au prix de l'actif\n• Mesure : Variation du prix de l'option si actif bouge de 1$\n• Valeurs :\n  - Call : 0 à +1 (0.5 = ATM)\n  - Put : -1 à 0 (-0.5 = ATM)\n\nEXEMPLE :\n• Call Delta = 0.6\n• Si AAPL monte de 1$ → Call monte de 0.60$\n• Si AAPL monte de 10$ → Call monte de ~6$\n\nUTILISATION : Delta hedging (couvrir position)\n\n---\n\n2. GAMMA (Γ) : Vitesse de changement du Delta\n• Mesure : Comment Delta change si prix bouge de 1$\n• Max pour options ATM\n• Important pour gestionnaires de risques\n\nEXEMPLE :\n• Delta = 0.5, Gamma = 0.05\n• Si actif +1$ → Delta devient 0.55\n\n---\n\n3. THETA (Θ) : Décroissance temporelle (Time Decay)\n• Mesure : Perte de valeur de l'option chaque jour\n• Toujours négatif pour acheteurs (temps = ennemi)\n• Positif pour vendeurs (temps = allié)\n\nEXEMPLE :\n• Call Prime = 5$, Theta = -0.10\n• Demain (si rien ne bouge) : Prime = 4.90$\n• Dans 10 jours : Prime ≈ 4.00$\n\n⚠️ THETA DECAY s'accélère dans les 30 derniers jours !\n\nSTRATÉGIE : Vendez options proches expiration pour profiter du theta.\n\n---\n\n4. VEGA (ν) : Sensibilité à la volatilité\n• Mesure : Variation du prix si volatilité implicite +1%\n• Toujours positif pour acheteurs\n\nEXEMPLE :\n• Call Prime = 5$, Vega = 0.15\n• Si volatilité passe de 25% à 26% → Prime = 5.15$\n• Si volatilité passe de 25% à 30% → Prime ≈ 5.75$\n\n💡 Achetez options AVANT événements volatils (earnings, élections)\n💡 Vendez options APRÈS (IV crush = volatilité s'effondre)\n\n---\n\n5. RHO (ρ) : Sensibilité aux taux d'intérêt\n• Impact faible pour options court terme\n• Important pour LEAPS (options long terme, 1-2 ans)\n\n---\n\nEXEMPLE COMPLET - TABLEAU DES GREEKS :\n\n| Option        | Delta | Gamma | Theta  | Vega  |\n|---------------|-------|-------|--------|-------|\n| Call ITM      | 0.80  | 0.02  | -0.08  | 0.10  |\n| Call ATM      | 0.50  | 0.08  | -0.15  | 0.20  |\n| Call OTM      | 0.20  | 0.03  | -0.05  | 0.08  |\n| Put ITM       | -0.80 | 0.02  | -0.08  | 0.10  |\n\nINTERPRÉTATION :\n• Call ATM a le Gamma et Vega max (sensibilité maximale)\n• Theta max pour ATM (perd valeur plus vite)\n• Call OTM a faible sensibilité (peu cher, peu bouge)\n\n---\n\nCALCULER LES GREEKS (Python) :\n```python\ndef calculate_greeks(S, K, T, r, sigma):\n    d1 = (np.log(S/K) + (r + 0.5*sigma**2)*T) / (sigma*np.sqrt(T))\n    d2 = d1 - sigma*np.sqrt(T)\n    \n    delta = stats.norm.cdf(d1)  # Call delta\n    gamma = stats.norm.pdf(d1) / (S * sigma * np.sqrt(T))\n    theta = -(S * stats.norm.pdf(d1) * sigma / (2*np.sqrt(T))) - \\\n            r * K * np.exp(-r*T) * stats.norm.cdf(d2)\n    vega = S * stats.norm.pdf(d1) * np.sqrt(T) / 100  # Par 1% de volatilité\n    \n    return {'Delta': delta, 'Gamma': gamma, 'Theta': theta/365, 'Vega': vega}\n```",
+          "points_cles": [
+            "Black-Scholes calcule prix théorique avec 5 inputs : S, K, T, r, σ",
+            "Delta (Δ) : Sensibilité au prix (+1$ actif = +Δ$ option)",
+            "Theta (Θ) : Decay temporel (ennemi acheteur, allié vendeur)",
+            "Vega (ν) : Sensibilité volatilité (achetez avant events, vendez après)",
+            "Gamma (Γ) : Vitesse de changement du Delta (max pour ATM)",
+            "Options ATM = Greeks max (sensibilité et decay maximaux)"
+          ]
+        },
+        {
+          "titre": "🎯 Stratégies d'Options Courantes",
+          "contenu": "STRATÉGIE 1: COVERED CALL (Appel Couvert)\n\nProfil : MODÉRÉMENT BULLISH + Génération de revenus\n\nConstruction :\n• Posséder 100 actions de l'actif\n• VENDRE 1 call OTM\n\nEXEMPLE :\n• Vous possédez 100 AAPL à 150$\n• Vendez 1 Call Strike 160$ exp 30j, Prime 3$\n• Revenus : 3$ × 100 = 300$\n\nSCÉNARIOS :\n1. AAPL reste < 160$ :\n   → Call expire sans valeur\n   → Vous gardez 300$ + actions\n   → Répétez chaque mois (revenus passifs)\n\n2. AAPL monte > 160$ :\n   → Actions vendues à 160$ (called away)\n   → Profit actions : (160-150) × 100 = 1,000$\n   → Profit total : 1,000$ + 300$ = 1,300$\n\n3. AAPL baisse à 140$ :\n   → Call expire sans valeur (gardez 300$)\n   → Perte sur actions : -1,000$\n   → Perte nette : -700$ (atténuée par prime)\n\nAVANTAGES : Revenus réguliers, réduit risque baissier\nINCONVÉNIENTS : Profit limité si forte hausse\n\n---\n\nSTRATÉGIE 2: PROTECTIVE PUT (Put Protecteur)\n\nProfil : BULLISH avec protection baissière (Assurance)\n\nConstruction :\n• Posséder 100 actions\n• ACHETER 1 put OTM\n\nEXEMPLE :\n• Vous possédez 100 TSLA à 200$\n• Achetez 1 Put Strike 190$ exp 60j, Prime 6$\n• Coût assurance : 6$ × 100 = 600$\n\nSCÉNARIOS :\n1. TSLA monte à 250$ :\n   → Profit actions : +5,000$\n   → Put expire sans valeur : -600$\n   → Net : +4,400$\n\n2. TSLA CRASH à 150$ :\n   → Perte actions théorique : -5,000$\n   → Exercez Put : Vendez à 190$ au lieu de 150$\n   → Perte limitée : (190-200) × 100 = -1,000$\n   → Net avec prime : -1,000$ - 600$ = -1,600$\n   → SANS put, perte aurait été -5,000$ !\n\nUTILISATION : Avant earnings, périodes incertaines\n\n---\n\nSTRATÉGIE 3: BULL CALL SPREAD\n\nProfil : BULLISH modéré, coût réduit\n\nConstruction :\n• ACHETER 1 call ATM ou ITM\n• VENDRE 1 call OTM (strike plus élevé)\n\nEXEMPLE :\n• AAPL = 150$\n• Acheter Call 150$ à 8$ (coût)\n• Vendre Call 160$ à 3$ (crédit)\n• Coût net : 8 - 3 = 5$ × 100 = 500$\n\nSCÉNARIOS :\n1. AAPL monte à 165$ :\n   → Long call 150$ : 165 - 150 = 15$\n   → Short call 160$ : -(165 - 160) = -5$\n   → Profit net : 15 - 5 - 5 (coût) = 5$ × 100 = 500$\n   → ROI : +100%\n\n2. AAPL reste à 150$ :\n   → Les deux expirent sans valeur\n   → Perte : -500$ (max loss)\n\nMAX PROFIT : (Spread - Coût net) = (160-150) - 5 = 5$ × 100\nMAX LOSS : Coût net = 500$\n\nAVANTAGE : Coût réduit vs acheter call seul\n\n---\n\nSTRATÉGIE 4: LONG STRADDLE\n\nProfil : NEUTRE, attend FORTE VOLATILITÉ\n\nConstruction :\n• ACHETER 1 call ATM\n• ACHETER 1 put ATM (même strike, même expiration)\n\nEXEMPLE (Avant earnings) :\n• TSLA = 200$ (earnings demain)\n• Acheter Call 200$ à 12$\n• Acheter Put 200$ à 11$\n• Coût total : 23$ × 100 = 2,300$\n\nSCÉNARIOS :\n1. TSLA EXPLOSE à 240$ :\n   → Call : 240 - 200 = 40$\n   → Put : 0$ (expire)\n   → Profit : (40 - 23) × 100 = 1,700$\n\n2. TSLA CRASH à 160$ :\n   → Put : 200 - 160 = 40$\n   → Call : 0$\n   → Profit : (40 - 23) × 100 = 1,700$\n\n3. TSLA reste à 200$ (IV CRUSH) :\n   → Les deux expirent ATM/OTM\n   → Perte : -2,300$ (perte max)\n\nBREAKEVEN : 200 ± 23 = 177$ ou 223$\n\nUTILISATION : Earnings, FDA approval, élections\n⚠️ DANGER : IV Crush post-event (volatilité s'effondre)\n\n---\n\nSTRATÉGIE 5: IRON CONDOR\n\nProfil : NEUTRE, marché en RANGE (pas de mouvement)\n\nConstruction :\n• VENDRE 1 call OTM\n• ACHETER 1 call OTM plus loin (protection)\n• VENDRE 1 put OTM\n• ACHETER 1 put OTM plus loin (protection)\n\nEXEMPLE :\n• AAPL = 150$\n• Vendre Call 160$ : +4$\n• Acheter Call 165$ : -1$\n• Vendre Put 140$ : +3$\n• Acheter Put 135$ : -0.5$\n• CRÉDIT NET : 4 + 3 - 1 - 0.5 = 5.5$ × 100 = 550$\n\nSCÉNARIO GAGNANT :\n• AAPL reste entre 140$ et 160$\n• Toutes options expirent sans valeur\n• Profit : 550$ (crédit gardé)\n\nSCÉNARIO PERDANT :\n• AAPL sort de la range (< 140 ou > 160)\n• Max Loss : (5 - 5.5) × 100 = -450$\n\nPROBABILITÉ DE SUCCÈS : ~70-80% (large range)\nMAX PROFIT : 550$, MAX LOSS : 450$\n\nUTILISATION : Marchés peu volatils, revenus mensuels",
+          "points_cles": [
+            "Covered Call : Revenus passifs sur actions possédées (bullish léger)",
+            "Protective Put : Assurance contre crash (coûte prime)",
+            "Bull Call Spread : Bullish modéré, coût réduit, profit limité",
+            "Straddle : Pari sur volatilité (earnings), profit si mouvement fort",
+            "Iron Condor : Pari sur range (pas de mouvement), revenus réguliers",
+            "Stratégies multi-legs = réduire coût ET limiter risque"
+          ]
+        },
+        {
+          "titre": "📈 Futures et Forwards : Trading à Effet de Levier",
+          "contenu": "Un FUTURE est un contrat standardisé pour acheter/vendre un actif à une date future à un prix fixé aujourd'hui. Contrairement aux options, c'est une OBLIGATION (pas un droit).\n\nCARACTÉRISTIQUES DES FUTURES :\n\n• STANDARDISÉS : Taille, échéance, spécifications fixées par l'exchange\n• EFFET DE LEVIER : Marge initiale = 5-15% de la valeur du contrat\n• MARK-TO-MARKET : P&L calculé quotidiennement\n• LIQUIDITÉ : Très liquides (millions de contrats/jour)\n\nEXEMPLE - S&P 500 E-MINI FUTURE (ES) :\n\nCONTRAT ES :\n• Taille : 50 × indice S&P 500\n• Si S&P = 4,000 → Valeur notionnelle = 200,000$\n• Marge requise : ~12,000$ (6% seulement !)\n• Tick minimum : 0.25 points = 12.50$\n\nTRADE EXEMPLE :\n• Vous achetez 1 contrat ES à 4,000\n• Exposition : 200,000$\n• Capital immobilisé : 12,000$ (marge)\n• Levier : 200,000 / 12,000 = 16.7x\n\nSCÉNARIOS :\n1. S&P monte à 4,050 (+50 points) :\n   → P&L : 50 × 50$ = +2,500$\n   → ROI sur marge : 2,500 / 12,000 = +20.8%\n\n2. S&P baisse à 3,950 (-50 points) :\n   → P&L : -50 × 50$ = -2,500$\n   → ROI : -20.8%\n   → Si continue à baisser : MARGIN CALL\n\n⚠️ DANGER : Levier = gains ET pertes amplifiés !\n\n---\n\nPRINCIPAUX FUTURES TRADÉS :\n\n1. INDICES :\n• ES (S&P 500 E-mini) : Indice US le plus populaire\n• NQ (Nasdaq E-mini) : Tech US\n• YM (Dow Jones E-mini) : Industriels US\n• VX (VIX Futures) : Volatilité\n\n2. MATIÈRES PREMIÈRES :\n• CL (Crude Oil) : Pétrole WTI, 1,000 barils/contrat\n• GC (Gold) : Or, 100 onces troy/contrat\n• ZW (Wheat) : Blé, 5,000 boisseaux\n\n3. DEVISES (FOREX) :\n• 6E (Euro FX) : EUR/USD\n• 6J (Japanese Yen) : USD/JPY\n\n4. TAUX D'INTÉRÊT :\n• ZN (10-Year T-Note) : Obligations US 10 ans\n• ZB (30-Year T-Bond) : Obligations US 30 ans\n\n---\n\nFORWARDS vs FUTURES :\n\n| Caractéristique | FUTURES | FORWARDS |\n|----------------|---------|----------|\n| Standardisé    | Oui (exchange) | Non (OTC) |\n| Liquidité      | Élevée | Faible |\n| Risque contrepartie | Aucun (clearinghouse) | Élevé |\n| Personnalisation | Non | Oui |\n| Utilisateurs   | Traders retail/instit | Entreprises, banques |\n\nFORWARD EXEMPLE (Entreprise) :\n• Airbus doit payer 100M$ dans 6 mois\n• EUR/USD = 1.10 aujourd'hui\n• Airbus achète forward EUR/USD à 1.10 pour dans 6 mois\n• Même si EUR/USD monte à 1.20 → Airbus paye 1.10 (couverture)\n\n---\n\nSTRATÉGIES AVEC FUTURES :\n\nSTRATÉGIE 1: HEDGING (Couverture) :\n• Vous possédez 500,000$ d'actions US\n• Crainte de correction\n• VENDEZ 2 contrats ES (short) à 4,000\n• Si marché baisse -10% :\n  - Actions : -50,000$\n  - Futures : +50,000$ (short profitable)\n  - Net : 0$ (couverture parfaite)\n\nSTRATÉGIE 2: SPREAD TRADING (Calendar Spread) :\n• ACHETER Mars Future\n• VENDRE Juin Future\n• Profiter de différence de prix entre échéances\n• Risque réduit (market neutral)\n\nSTRATÉGIE 3: CARRY TRADE :\n• Exploiter différence de taux d'intérêt entre devises\n• Ex: Short JPY (taux 0%), Long USD (taux 5%)\n• Profit : Différentiel de taux (carry)",
+          "points_cles": [
+            "Future = obligation d'acheter/vendre (vs option = droit)",
+            "Levier élevé : Marge 5-15% seulement du notionnel",
+            "ES (S&P E-mini) = future le plus tradé (50$ par point)",
+            "Futures = hedging portefeuille ou spéculation pure",
+            "Forward = OTC personnalisé pour entreprises (pas retail)",
+            "⚠️ Levier = pertes amplifiées, risque margin call"
+          ]
+        },
+        {
+          "titre": "🌟 Produits Dérivés Avancés : Swaps et Exotiques",
+          "contenu": "SWAPS : Échange de flux de trésorerie\n\n1. INTEREST RATE SWAP (Swap de Taux) :\n\nPrincipe : Échanger taux fixe contre taux variable\n\nEXEMPLE :\n• Entreprise A : Prêt 10M€ à taux VARIABLE (Euribor + 1%)\n• Entreprise B : Prêt 10M€ à taux FIXE (4%)\n• A craint hausse taux, B veut profiter de baisse\n\nSWAP :\n• A paye à B : 4% fixe\n• B paye à A : Euribor + 1% variable\n• Résultat :\n  - A paye désormais taux fixe 4% (protection)\n  - B paye taux variable (pari sur baisse)\n\nUTILISATION : Banques, grandes entreprises\nMARCHÉ : 400 trillions $ notionnel (le plus gros au monde)\n\n---\n\n2. CURRENCY SWAP (Swap de Devises) :\n\nPrincipe : Échanger devise A contre devise B, avec réversement futur\n\nEXEMPLE :\n• Entreprise US a besoin d'EUR\n• Entreprise EU a besoin d'USD\n• Swap : Échangent capitaux + intérêts\n• À l'échéance : Réchangent aux taux initiaux\n\nAVANTAGE : Évite risque de change\n\n---\n\n3. TOTAL RETURN SWAP (TRS) :\n\nPrincipe : Échanger rendement total d'un actif contre taux fixe\n\nEXEMPLE :\n• Hedge Fund veut exposition S&P 500 sans acheter actions\n• Banque possède les actions\n• TRS : \n  - HF paye LIBOR + 0.5% à la banque\n  - Banque paye rendement S&P 500 au HF\n\nAVANTAGE : Levier implicite, pas de transfert d'actifs\n\n---\n\nOPTIONS EXOTIQUES :\n\n1. BARRIER OPTIONS (Options à Barrière) :\n\nPrincipe : Option activée/désactivée si prix touche barrière\n\nTYPES :\n• KNOCK-OUT : Meurt si prix touche barrière\n• KNOCK-IN : S'active si prix touche barrière\n\nEXEMPLE - UP-AND-OUT CALL :\n• AAPL = 150$\n• Call Strike 155$, Barrière 170$\n• Si AAPL touche 170$ → Option disparaît (knock-out)\n• AVANTAGE : Prime moins chère qu'option standard\n• UTILISATION : Pari directionnel avec conviction\n\n---\n\n2. ASIAN OPTIONS :\n\nPrincipe : Payoff basé sur MOYENNE du prix sur période\n\nEXEMPLE :\n• Call Strike 150$\n• Moyenne prix sur 30 jours = 155$\n• Payoff : Max(155 - 150, 0) = 5$\n\nAVANTAGE : Moins volatile, prime moins chère\nUTILISATION : Entreprises importatrices (couverture taux de change moyen)\n\n---\n\n3. LOOKBACK OPTIONS :\n\nPrincipe : Strike = meilleur prix de la période\n\nEXEMPLE - LOOKBACK CALL :\n• Prix min sur 30 jours = 140$\n• Prix final = 160$\n• Payoff : 160 - 140 = 20$ (optimal !)\n\nAVANTAGE : Capture optimal (rêve de trader)\nINCONVÉNIENT : Prime TRÈS chère\n\n---\n\n4. BINARY OPTIONS (Tout ou Rien) :\n\nPrincipe : Paye montant fixe si condition remplie, sinon 0$\n\nEXEMPLE :\n• AAPL = 150$\n• Binary Call Strike 155$, Payout 100$\n• Prime : 40$\n\nRÉSULTAT :\n• Si AAPL ≥ 155$ à expiration → Vous recevez 100$ (profit +60$)\n• Si AAPL < 155$ → Vous recevez 0$ (perte -40$)\n\n⚠️ ATTENTION : Souvent utilisé par plateformes NON RÉGULÉES (arnaques)\n\n---\n\n5. VARIANCE SWAPS :\n\nPrincipe : Paris sur VOLATILITÉ réalisée future\n\nEXEMPLE :\n• Vous achetez variance swap sur SPX\n• Strike volatilité : 20%\n• Volatilité réalisée sur 30j : 28%\n• Payoff : (28² - 20²) × Notionnel\n\nUTILISATION : Hedge funds, traders de volatilité\nCOMPLEXITÉ : Élevée, réservé pros\n\n---\n\nCONSTRUIRE UN PRODUIT STRUCTURÉ :\n\nEXEMPLE - REVERSE CONVERTIBLE (Coupon élevé) :\n\nConstruction :\n• Vendre put OTM sur AAPL\n• Investir premium dans obligation\n\nProduit final :\n• Capital : 10,000€\n• Coupon : 8% annuel (vs 3% obligation normale)\n• Risque : Si AAPL baisse > 20%, recevez actions au lieu de cash\n\nQUI ACHÈTE : Investisseurs retail cherchant rendement\nQUI VEND : Banques (profit sur marge)",
+          "points_cles": [
+            "Swaps = échange flux (taux, devises, rendements totaux)",
+            "Barrier Options = moins chères, disparaissent si touche seuil",
+            "Asian Options = basées sur moyenne (moins volatiles)",
+            "Lookback = capture optimal (très cher)",
+            "Binary Options = tout ou rien (attention arnaques)",
+            "Produits structurés = combinaison dérivés (coupon élevé + risque caché)"
+          ]
+        },
+        {
+          "titre": "🛡️ Gestion des Risques avec les Dérivés",
+          "contenu": "PRINCIPE FONDAMENTAL : Les dérivés AMPLIFIENT risques ET opportunités\n\nRÈGLE #1: COMPRENDRE VOS GREEKS\n\nEXEMPLE - PORTEFEUILLE D'OPTIONS :\n\nVotre position :\n• 10 Calls AAPL Strike 150$ (Delta +0.6 chacun)\n• 5 Puts TSLA Strike 200$ (Delta -0.4 chacun)\n\nGREEKS PORTFOLIO :\n• Delta net : (10 × 0.6) + (5 × -0.4) = 6 - 2 = +4\n• Interprétation : Si marché +1$, portfolio +4$\n\nACTION :\n• Delta +4 = position BULLISH\n• Pour neutraliser : Vendre 4 calls ou acheter 4 puts ou short 400 actions\n\n---\n\nRÈGLE #2: POSITION SIZING AVEC LEVIER\n\nFORMULE KELLY CRITERION (adaptée) :\n```\nPosition % = (Win Rate × Avg Win - (1 - Win Rate) × Avg Loss) / Avg Win\n\nMais divisez par 4 pour dérivés (conservateur)\n```\n\nEXEMPLE :\n• Win Rate = 60%\n• Avg Win = 500$\n• Avg Loss = 300$\n• Kelly = (0.6×500 - 0.4×300) / 500 = 0.36 (36%)\n• Position réelle : 36% / 4 = 9% du capital MAX par trade\n\n⚠️ Avec futures levier 20x :\n• 9% capital = 9% × 20 = 180% exposition notionnelle\n• Très agressif, réduire à 3-5% si débutant\n\n---\n\nRÈGLE #3: HEDGING MULTI-STRATÉGIES\n\nTECHNIQUE 1: DELTA HEDGING\n\nPROBLÈME :\n• Vous vendez 10 calls AAPL (revenu premium)\n• Delta net : -6 (exposition short)\n• Risque : Si AAPL explose, perte illimitée\n\nSOLUTION - DELTA NEUTRAL :\n• Acheter 600 actions AAPL (Delta +0.01 par action × 600 = +6)\n• Delta portfolio : -6 + 6 = 0 (neutre)\n• Résultat : Vous gardez premium sans risque directionnel\n\n---\n\nTECHNIQUE 2: VEGA HEDGING (Volatilité)\n\nPROBLÈME :\n• Vous avez long straddle (long volatilité)\n• Vega portfolio : +50\n• Risque : IV crush post-earnings (-10 points IV)\n• Perte : 50 × -10 = -500$\n\nSOLUTION :\n• Vendre options sur autre actif corrélé (Vega -20)\n• Ou acheter VIX puts (pari contre volatilité)\n• Résultat : Vega net réduit à +30 (risque atténué)\n\n---\n\nTECHNIQUE 3: CALENDAR SPREAD POUR THETA\n\nSTRATÉGIE :\n• VENDRE options expiration proche (Theta élevé = decay rapide)\n• ACHETER options expiration lointaine (protection)\n\nEXEMPLE :\n• Vendre Call AAPL 155$ exp 15j, Theta -0.20\n• Acheter Call AAPL 155$ exp 45j, Theta -0.05\n• Theta net : -0.20 - (-0.05) = -0.15 × 100 = -15$/jour\n• Profit : 15$/jour si AAPL stable (450$ sur 30 jours)\n\n---\n\nRÈGLE #4: LIMITES ET STOPS STRICTS\n\nPOUR OPTIONS :\n• MAX LOSS par position : 2% du capital\n• MAX LOSS journalier : 5% (puis arrêt)\n• MAX LOSS mensuel : 15% (révision stratégie)\n\nEXEMPLE :\n• Capital : 50,000$\n• Position max : 50,000 × 2% = 1,000$\n• Si achetez call à 5$ → Max 200 contrats (1,000$ / 5$)\n• Si achetez call à 10$ → Max 100 contrats\n\nPOUR FUTURES :\n• STOP LOSS AUTOMATIQUE : 50 points max sur ES (2,500$)\n• MARGIN CALL = signal d'alerte CRITIQUE\n• Si 2 margin calls en 1 mois → Arrêtez trading futures\n\n---\n\nRÈGLE #5: SCÉNARIOS EXTRÊMES (STRESS TESTING)\n\nTESTEZ votre portfolio sur :\n\n1. FLASH CRASH -10% en 1 heure :\n• Quelle est votre perte max ?\n• Avez-vous assez de marge ?\n• Vos stops sont-ils exécutables ?\n\n2. IV SPIKE +100% (VIX passe de 15 à 30) :\n• Positions short options : Perte énorme\n• Positions long options : Gain\n• Êtes-vous hedgé ?\n\n3. GAP UP/DOWN (marché ouvre ±5%) :\n• Vos stops ne fonctionnent PAS (gap over stop)\n• Avez-vous protection (options) ?\n\nEXEMPLE DE CALCUL :\n```python\n# Stress test portfolio\nportfolio_delta = 120\ncrash_scenario = -0.10  # -10%\nSPX_value = 4000\n\nloss = portfolio_delta * (SPX_value * crash_scenario)\nprint(f\"Perte en flash crash: {loss}$\")  # -48,000$\n\nif abs(loss) > capital * 0.20:  # > 20% capital\n    print(\"⚠️ RISQUE EXCESSIF, réduire delta\")\n```\n\n---\n\nRÈGLE #6: DIVERSIFICATION PAR STRATÉGIES\n\n❌ MAL : 100% capital en long calls (pari unique)\n✅ BIEN : Portfolio mixte décorrélé\n\nEXEMPLE PORTFOLIO ÉQUILIBRÉ :\n• 30% Covered calls (revenus stables, bullish léger)\n• 20% Iron condors (revenus range, volatilité basse)\n• 15% Long straddles (paris événements, volatilité haute)\n• 20% Futures hedging (protection portefeuille actions)\n• 15% Cash (opportunités)\n\nCORRÉLATION :\n• Covered calls et iron condors profitent de stabilité\n• Straddles profitent de volatilité\n• Si marché stable : revenus des premières\n• Si marché volatile : profit des straddles\n• Résultat : Lissage des performances",
+          "points_cles": [
+            "Calculez Greeks du portfolio (Delta, Vega, Theta net)",
+            "Position sizing : 2% max par trade, divisez Kelly par 4 pour levier",
+            "Delta Hedging : Neutralisez exposition directionnelle",
+            "Stops stricts : 2% par trade, 5% daily, 15% monthly",
+            "Stress testing : Testez portfolio sur crash -10%, IV spike, gaps",
+            "Diversification : Mix stratégies décorrélées (revenus + volatilité)"
+          ]
+        }
+      ],
+      "resume": "Les produits dérivés (options, futures, swaps) offrent des possibilités infinies : effet de levier, génération de revenus, couverture de risques, stratégies pour tous marchés. Les options donnent droits (call = acheter, put = vendre) avec risque limité pour acheteur. Black-Scholes et Greeks (Delta, Theta, Vega) permettent de pricer et gérer ces positions. Stratégies multi-legs (spreads, straddles, iron condors) réduisent coûts et risques. Futures offrent levier élevé (5-15% marge) mais risque amplifié. Produits exotiques (barriers, asians, swaps) pour besoins spécifiques. CLÉS DU SUCCÈS : Maîtriser Greeks, position sizing strict (2% max), hedging actif, stress testing, diversification stratégies. Les dérivés amplifient résultats - utilisez-les avec discipline et connaissance approfondie.",
+      "ressources_complementaires": [
+        "📖 Livre : 'Options, Futures, and Other Derivatives' par John Hull (Bible des dérivés)",
+        "📖 Livre : 'Option Volatility & Pricing' par Sheldon Natenberg",
+        "🎥 Cours : 'Options Trading' sur Coursera (Université Penn State)",
+        "🔗 Outil : OptionStrat.com (visualiser P&L stratégies options)",
+        "🔗 Outil : ThinkorSwim (plateforme options avancée)",
+        "🔗 Calculateur : Black-Scholes Calculator (option-price.com)",
+        "📄 Data : CBOE (Chicago Board Options Exchange) pour éducation options",
+        "💻 Python : QuantLib (librairie pricing dérivés)",
+        "🎓 Certification : CFA Level 2-3 (dérivés avancés)",
+        "📊 Data : Barchart.com (futures quotes et charts)"
+      ]
+    },
+    "quiz": [
+      {
+        "question": "Quelle est la différence principale entre un CALL et un PUT ?",
+        "options": [
+          "Call = obligation d'acheter, Put = obligation de vendre",
+          "Call = droit d'acheter, Put = droit de vendre",
+          "Call pour actions, Put pour indices seulement",
+          "Aucune différence, juste des noms différents"
+        ],
+        "bonne_reponse": 1,
+        "explication": "Call = DROIT (pas obligation) d'ACHETER à strike, achetez si bullish. Put = DROIT de VENDRE à strike, achetez si bearish. Acheteur paye prime, risque limité. C'est fondamental."
+      },
+      {
+        "question": "Une option est IN THE MONEY (ITM) quand :",
+        "options": [
+          "Elle génère un profit si exercée immédiatement",
+          "Le prix actuel est exactement au strike",
+          "Elle n'a plus de valeur temporelle",
+          "L'expiration est dans moins de 7 jours"
+        ],
+        "bonne_reponse": 0,
+        "explication": "ITM = profitable si exercée maintenant. Call ITM : Prix > Strike. Put ITM : Prix < Strike. Ex: AAPL=150$, Call Strike 140$ = ITM (+10$ valeur intrinsèque)."
+      },
+      {
+        "question": "Quel GREEK mesure la décroissance temporelle (time decay) d'une option ?",
+        "options": [
+          "Delta",
+          "Gamma",
+          "Theta",
+          "Vega"
+        ],
+        "bonne_reponse": 2,
+        "explication": "THETA = perte de valeur quotidienne. Toujours négatif pour acheteurs (temps = ennemi), positif pour vendeurs. S'accélère dans les 30 derniers jours. Ex: Theta -0.10 = option perd 0.10$/jour."
+      },
+      {
+        "question": "Vous achetez un Call AAPL Strike 150$ à 5$, puis VENDEZ un Call Strike 160$ à 2$. Quelle stratégie ?",
+        "options": [
+          "Covered Call",
+          "Protective Put",
+          "Bull Call Spread",
+          "Iron Condor"
+        ],
+        "bonne_reponse": 2,
+        "explication": "Bull Call Spread = LONG call + SHORT call strike plus élevé. Coût net: 5-2=3$. Max profit: (160-150)-3=7$. Stratégie bullish modérée, coût réduit, profit limité. ROI potentiel +233%."
+      },
+      {
+        "question": "Quelle est la PRINCIPALE différence entre Future et Forward ?",
+        "options": [
+          "Future = court terme, Forward = long terme",
+          "Future = standardisé exchange, Forward = OTC personnalisé",
+          "Future = sans levier, Forward = avec levier",
+          "Aucune différence pratique"
+        ],
+        "bonne_reponse": 1,
+        "explication": "FUTURE : Standardisé exchange, liquide, clearinghouse élimine risque contrepartie, retail. FORWARD : OTC personnalisé, illiquide, risque contrepartie élevé, entreprises/banques. Ex: Airbus utilise forwards EUR/USD."
+      },
+      {
+        "question": "Un contrat ES (S&P 500 E-mini) à 4,000 avec marge 12,000$. Quel est le levier ?",
+        "options": [
+          "2x",
+          "5x",
+          "16.7x",
+          "Pas de levier"
+        ],
+        "bonne_reponse": 2,
+        "explication": "Notionnel: 4,000 × 50 = 200,000$. Marge: 12,000$. Levier: 200,000/12,000 = 16.7x. Si S&P +1% → P&L +16.7% sur marge. ⚠️ Pertes aussi amplifiées x16.7 !"
+      },
+      {
+        "question": "Quelle est la taille de position MAXIMUM recommandée par trade avec produits dérivés à levier ?",
+        "options": [
+          "10-20% du capital",
+          "2-5% du capital",
+          "50% du capital",
+          "Pas de limite si vous avez confiance"
+        ],
+        "bonne_reponse": 1,
+        "explication": "MAX 2% par trade (conservateur), 5% si expérimenté. Jamais plus avec levier. Sur 50,000$: max 1,000-2,500$ de risque par trade. Protection contre séries de pertes. Kelly divisé par 4 pour dérivés."
+      }
+    ],
+    "exercices": [
+      {
+        "type": "calcul",
+        "titre": "Calculer prix théorique d'un Call avec Black-Scholes",
+        "description": "En Python, implémentez le modèle Black-Scholes pour calculer prix d'un Call. Paramètres : AAPL S=150$, Strike K=155$, Temps T=30 jours (30/365), Taux r=5% (0.05), Volatilité σ=25% (0.25). Utilisez scipy.stats pour fonction normale cumulative N(x). Comparez votre résultat au prix de marché réel de l'option sur ThinkorSwim/IBKR. Documentez : pourquoi y a-t-il une différence (indice: volatilité implicite vs réalisée) ?"
+      },
+      {
+        "type": "strategie",
+        "titre": "Construire et analyser un Iron Condor",
+        "description": "Sur AAPL trading à 150$, créez Iron Condor : Vendez Call 160$ (+4$), Achetez Call 165$ (-1$), Vendez Put 140$ (+3$), Achetez Put 135$ (-0.5$). 1) Calculez crédit net reçu. 2) Calculez max profit et max loss. 3) Déterminez breakeven points. 4) Créez graphique P&L en fonction du prix à expiration (120$ à 180$). 5) Quelle est probabilité de succès (restez dans range 140-160) ? 6) Quel ROI sur marge requise ?"
+      },
+      {
+        "type": "hedging",
+        "titre": "Hedger un portefeuille avec Futures ES",
+        "description": "Vous possédez portefeuille actions US valeur 250,000$ (Beta 1.1 vs S&P 500). S&P à 4,000. Crainte de correction -15%. 1) Calculez combien de contrats ES shorter pour hedge parfait (ES = 50×S&P). 2) Si S&P baisse à 3,400 (-15%) : Quelle est P&L sur actions ? Sur futures ? Net ? 3) Si S&P monte à 4,400 (+10%) : P&L actions ? Futures ? Net ? 4) Quel est le coût du hedge (marge immobilisée) ? 5) Est-ce plus efficient qu'acheter Puts SPY ?"
+      },
+      {
+        "type": "greeks",
+        "titre": "Calculer et neutraliser le Delta d'un portfolio",
+        "description": "Portfolio actuel : 20 Long Calls AAPL Strike 150$ (Delta +0.55 chacun), 10 Short Puts TSLA Strike 200$ (Delta -0.35 chacun), 5 Long Puts MSFT Strike 300$ (Delta -0.45 chacun). 1) Calculez Delta net du portfolio. 2) Interprétation : Position bullish ou bearish ? 3) Pour rendre portfolio Delta neutral (Delta=0), proposez 3 solutions : via options, via actions, via futures. 4) Implémentez solution la plus capital-efficiente. 5) Recalculez Delta après ajustement (doit être ~0)."
+      },
+      {
+        "type": "stress-test",
+        "titre": "Stress Testing : Portfolio survive-t-il à un Flash Crash ?",
+        "description": "Portfolio : Long 10 Calls ATM diverses actions (Delta total +400), Short 5 Iron Condors sur indices (Delta ~0, mais Gamma élevé). Capital : 100,000$. SCÉNARIO : Flash crash -12% en 30 minutes, VIX passe de 15 à 45 (IV triple). 1) Estimez perte sur Long Calls (Delta×Move + Vega×IV change). 2) Estimez impact sur Iron Condors (breach des strikes). 3) Perte totale en % du capital ? 4) Margin call sur positions futures hedging ? 5) Proposez ajustements pour réduire risque crash à max 15% capital."
+      }
+    ]
+  }
+]

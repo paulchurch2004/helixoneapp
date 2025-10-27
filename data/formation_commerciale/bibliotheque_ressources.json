@@ -1,0 +1,755 @@
+[
+  {
+    "id": "res_001",
+    "titre": "Guide Complet de l'Analyse Technique",
+    "type": "PDF",
+    "categorie": "Analyse Technique",
+    "difficulte": "Débutant",
+    "duree": "45 min",
+    "description": "Un guide visuel pour comprendre les chandeliers japonais, supports/résistances et indicateurs techniques essentiels.",
+    "contenu_resume": "Ce guide couvre les bases de l'analyse technique : comment lire un graphique en chandeliers, identifier les tendances, tracer des supports et résistances, et utiliser les indicateurs RSI et MACD. Idéal pour débuter.",
+    "url": "https://www.investopedia.com/technical-analysis-4689657",
+    "auteur": "Investopedia Academy",
+    "date_publication": "2024",
+    "tags": [
+      "chandeliers",
+      "supports",
+      "résistances",
+      "RSI",
+      "MACD"
+    ],
+    "points_cles": [
+      "Les chandeliers japonais montrent le sentiment du marché",
+      "Les supports et résistances sont des niveaux psychologiques",
+      "Le RSI identifie les zones de surachat/survente",
+      "Le MACD détecte les changements de tendance"
+    ]
+  },
+  {
+    "id": "res_002",
+    "titre": "Trading in the Zone - Mark Douglas (Résumé)",
+    "type": "Article",
+    "categorie": "Psychologie",
+    "difficulte": "Intermédiaire",
+    "duree": "20 min",
+    "description": "Les concepts clés du livre de référence sur la psychologie du trading : pensée probabiliste, gestion des émotions, et discipline.",
+    "contenu_resume": "Mark Douglas explique pourquoi 90% des traders échouent : ils ne maîtrisent pas leurs émotions. Ce résumé couvre les 5 vérités fondamentales du trading, l'importance de penser en probabilités, et comment développer une mentalité de gagnant.",
+    "url": "https://www.tradeciety.com/trading-in-the-zone-summary/",
+    "auteur": "Rolf - Tradeciety",
+    "date_publication": "2023",
+    "tags": [
+      "psychologie",
+      "émotions",
+      "discipline",
+      "mentalité"
+    ],
+    "points_cles": [
+      "Penser en probabilités, pas en certitudes",
+      "Accepter le risque totalement avant d'entrer dans un trade",
+      "Les croyances limitantes créent des résultats limités",
+      "La discipline bat le talent sur le long terme"
+    ]
+  },
+  {
+    "id": "res_003",
+    "titre": "Comment Calculer la Taille de Position (Video)",
+    "type": "Vidéo",
+    "categorie": "Gestion du Risque",
+    "difficulte": "Débutant",
+    "duree": "15 min",
+    "description": "Tutoriel vidéo pratique pour calculer exactement combien d'actions acheter en fonction de votre capital et votre tolérance au risque.",
+    "contenu_resume": "Cette vidéo montre étape par étape comment calculer votre taille de position pour ne jamais risquer plus de 1-2% par trade. Avec des exemples concrets sur AAPL, TSLA et MSFT.",
+    "url": "https://www.youtube.com/watch?v=Xv4D9WVkqW0",
+    "auteur": "Rayner Teo - TradingwithRayner",
+    "date_publication": "2023",
+    "tags": [
+      "position sizing",
+      "risk management",
+      "capital",
+      "stop loss"
+    ],
+    "points_cles": [
+      "Formule : Taille = (Capital × Risque%) ÷ (Prix d'entrée - Stop loss)",
+      "Exemple : 10 000$ capital, risque 1% = 100$ max par trade",
+      "Si AAPL à 175$ avec stop à 170$ = 100$/5$ = 20 actions max",
+      "Cette méthode protège votre capital long terme"
+    ]
+  },
+  {
+    "id": "res_004",
+    "titre": "Les 10 Erreurs Fatales des Débutants",
+    "type": "Article",
+    "categorie": "Trading Général",
+    "difficulte": "Débutant",
+    "duree": "12 min",
+    "description": "Liste des erreurs les plus communes qui détruisent les comptes des traders débutants, et comment les éviter.",
+    "contenu_resume": "Article détaillé sur les 10 pièges classiques : overtrading, absence de stop-loss, revenge trading, FOMO, overleveraging, ne pas avoir de plan, ignorer les fondamentaux, trader avec l'argent du loyer, suivre aveuglément les 'gourous', et ne pas tenir de journal.",
+    "url": "https://www.babypips.com/learn/forex/trading-mistakes",
+    "auteur": "BabyPips.com",
+    "date_publication": "2024",
+    "tags": [
+      "erreurs",
+      "débutant",
+      "pièges",
+      "conseils"
+    ],
+    "points_cles": [
+      "Overtrading : trader par ennui détruit votre compte",
+      "Pas de stop-loss = jouer à la roulette russe",
+      "Revenge trading après une perte = perte encore plus grosse",
+      "Ne JAMAIS trader de l'argent dont vous avez besoin"
+    ]
+  },
+  {
+    "id": "res_005",
+    "titre": "Infographie : Anatomie d'un Chandelier Japonais",
+    "type": "Infographie",
+    "categorie": "Analyse Technique",
+    "difficulte": "Débutant",
+    "duree": "5 min",
+    "description": "Infographie visuelle claire montrant les différentes parties d'un chandelier et leur signification.",
+    "contenu_resume": "Schéma détaillé d'un chandelier avec annotations : le corps (range ouverture-clôture), les mèches (extrêmes de la période), signification des couleurs (vert = haussier, rouge = baissier), et les patterns de chandeliers les plus importants (doji, marteau, étoile filante, etc.)",
+    "url": "https://www.tradingview.com/education/candlesticks/",
+    "auteur": "TradingView Education",
+    "date_publication": "2024",
+    "tags": [
+      "chandeliers",
+      "infographie",
+      "visuel",
+      "patterns"
+    ],
+    "points_cles": [
+      "Le corps = différence entre ouverture et clôture",
+      "Les mèches = extrêmes (high/low) de la période",
+      "Long corps vert = forte pression acheteuse",
+      "Longues mèches = indécision et volatilité"
+    ]
+  },
+  {
+    "id": "res_006",
+    "titre": "Ratios Risk/Reward : Le Secret de la Rentabilité",
+    "type": "Article",
+    "categorie": "Gestion du Risque",
+    "difficulte": "Intermédiaire",
+    "duree": "18 min",
+    "description": "Explication approfondie du concept de ratio risk/reward et pourquoi c'est plus important que votre taux de réussite.",
+    "contenu_resume": "Article mathématique montrant comment avec un ratio 1:3 vous pouvez être profitable avec seulement 30% de trades gagnants. Inclut des tableaux comparatifs et des exemples concrets. Démontre que le R/R est la clé de la rentabilité long terme.",
+    "url": "https://www.investopedia.com/articles/active-trading/091813/how-use-riskreward-ratio-effectively.asp",
+    "auteur": "Investopedia - Cory Mitchell",
+    "date_publication": "2024",
+    "tags": [
+      "risk reward",
+      "ratio",
+      "probabilités",
+      "rentabilité"
+    ],
+    "points_cles": [
+      "Ratio 1:2 minimum = risquer 1$ pour gagner 2$",
+      "Avec ratio 1:3 et 30% winrate → profitable !",
+      "Calcul : (Wins × Avg Win) - (Losses × Avg Loss)",
+      "Un bon R/R compense un faible taux de réussite"
+    ]
+  },
+  {
+    "id": "res_007",
+    "titre": "Warren Buffett : Les Principes d'Investissement (Vidéo)",
+    "type": "Vidéo",
+    "categorie": "Investissement Long Terme",
+    "difficulte": "Tous niveaux",
+    "duree": "25 min",
+    "description": "Compilation des meilleurs conseils de Warren Buffett : investir dans ce qu'on comprend, la patience, l'avantage composé, et la discipline.",
+    "contenu_resume": "Vidéo inspirante avec extraits d'interviews de Warren Buffett. Il explique sa philosophie : 'Règle 1 : Ne jamais perdre d'argent. Règle 2 : Ne jamais oublier la règle 1'. Couvre l'importance de la valeur intrinsèque, l'avantage de l'intérêt composé, et pourquoi la patience bat la spéculation.",
+    "url": "https://www.youtube.com/watch?v=yYl8F6bDKR8",
+    "auteur": "CNBC - Warren Buffett Interview",
+    "date_publication": "2023",
+    "tags": [
+      "Warren Buffett",
+      "investissement",
+      "long terme",
+      "valeur"
+    ],
+    "points_cles": [
+      "'Soyez craintif quand les autres sont avides, et avide quand les autres sont craintifs'",
+      "Investissez dans des entreprises que vous comprenez",
+      "Le temps au marché bat le timing du marché",
+      "L'intérêt composé = 8e merveille du monde"
+    ]
+  },
+  {
+    "id": "res_008",
+    "titre": "Checklist du Trader : Plan de Trading Complet",
+    "type": "PDF",
+    "categorie": "Trading Général",
+    "difficulte": "Intermédiaire",
+    "duree": "30 min",
+    "description": "Template téléchargeable et personnalisable pour créer votre plan de trading complet avec toutes les règles essentielles.",
+    "contenu_resume": "Document PDF avec sections pré-remplies : critères d'entrée, critères de sortie, gestion du risque (% max par trade), règles émotionnelles (quand NE PAS trader), horaires de trading, journal de suivi, et review hebdomadaire. Prêt à imprimer et afficher près de votre écran.",
+    "url": "https://www.tradingwithrayner.com/trading-plan-template/",
+    "auteur": "Rayner Teo",
+    "date_publication": "2024",
+    "tags": [
+      "plan de trading",
+      "template",
+      "checklist",
+      "discipline"
+    ],
+    "points_cles": [
+      "Section 1 : Définir vos objectifs (ROI annuel, drawdown max)",
+      "Section 2 : Critères d'entrée (setup technique requis)",
+      "Section 3 : Gestion du risque (1-2% max par trade)",
+      "Section 4 : Règles émotionnelles (pause après 2 pertes)"
+    ]
+  },
+  {
+    "id": "res_009",
+    "titre": "Les Biais Cognitifs qui Ruinent les Traders",
+    "type": "Article",
+    "categorie": "Psychologie",
+    "difficulte": "Intermédiaire",
+    "duree": "22 min",
+    "description": "Analyse psychologique des 12 biais cognitifs les plus dangereux en trading : confirmation, ancrage, aversion à la perte, etc.",
+    "contenu_resume": "Article scientifique vulgarisé sur les pièges du cerveau humain. Couvre le biais de confirmation (voir uniquement ce qui confirme votre opinion), l'ancrage (se fixer sur un prix d'achat), l'aversion à la perte (douleur de perdre > plaisir de gagner), l'overconfidence, et 8 autres biais. Avec solutions concrètes pour chaque piège.",
+    "url": "https://www.investopedia.com/articles/trading/02/110502.asp",
+    "auteur": "Investopedia - James Chen",
+    "date_publication": "2024",
+    "tags": [
+      "psychologie",
+      "biais cognitifs",
+      "erreurs",
+      "cerveau"
+    ],
+    "points_cles": [
+      "Biais de confirmation : vous voyez ce que vous voulez voir",
+      "Aversion à la perte : garder les pertes trop longtemps",
+      "Ancrage : 'J'ai acheté à 180$ donc je garde jusqu'à 180$'",
+      "Solution : plan écrit AVANT le trade pour contrer les biais"
+    ]
+  },
+  {
+    "id": "res_010",
+    "titre": "TradingView : Guide Complet pour Débutants (Vidéo)",
+    "type": "Vidéo",
+    "categorie": "Outils",
+    "difficulte": "Débutant",
+    "duree": "35 min",
+    "description": "Tutoriel complet de la plateforme TradingView : comment tracer des lignes, ajouter des indicateurs, configurer des alertes, etc.",
+    "contenu_resume": "Vidéo tutoriel pas-à-pas sur TradingView, LA plateforme de graphiques la plus utilisée. Montre comment créer un graphique, changer les timeframes, dessiner des supports/résistances, ajouter RSI et MACD, configurer des alertes de prix, sauvegarder vos analyses, et utiliser le screener d'actions.",
+    "url": "https://www.youtube.com/watch?v=qDYHGLqGPPc",
+    "auteur": "The Trading Channel",
+    "date_publication": "2024",
+    "tags": [
+      "TradingView",
+      "outils",
+      "graphiques",
+      "indicateurs"
+    ],
+    "points_cles": [
+      "TradingView = meilleure plateforme de graphiques (gratuite)",
+      "Personnaliser les timeframes (1min, 5min, 1h, 1d, etc.)",
+      "Ajouter indicateurs : RSI, MACD, Bollinger Bands",
+      "Alertes de prix pour ne jamais rater un niveau clé"
+    ]
+  },
+  {
+    "id": "res_011",
+    "titre": "Le Guide Ultime des Patterns de Chandeliers",
+    "type": "PDF",
+    "categorie": "Analyse Technique",
+    "difficulte": "Intermédiaire",
+    "duree": "50 min",
+    "description": "Catalogue complet des 20 patterns de chandeliers les plus fiables avec exemples réels et taux de réussite.",
+    "contenu_resume": "Ce guide approfondi couvre tous les patterns majeurs : engulfing, doji, morning star, evening star, hammer, shooting star, three white soldiers, three black crows, et plus. Chaque pattern inclut son taux de réussite historique, les meilleures conditions de marché, et des exemples annotés.",
+    "url": "https://www.investopedia.com/articles/active-trading/062315/top-reversal-patterns-every-trader-should-know.asp",
+    "auteur": "Investopedia - Trading Academy",
+    "date_publication": "2024",
+    "tags": [
+      "patterns",
+      "chandeliers",
+      "reversal",
+      "continuation"
+    ],
+    "points_cles": [
+      "Engulfing haussier/baissier = taux réussite 63%",
+      "Doji en zone extrême = forte probabilité de reversal",
+      "Confirmation volume + pattern = signal plus fiable",
+      "Ne jamais trader un pattern isolé sans contexte"
+    ]
+  },
+  {
+    "id": "res_012",
+    "titre": "Psychologie : Gérer la Peur et l'Avidité",
+    "type": "Vidéo",
+    "categorie": "Psychologie",
+    "difficulte": "Tous niveaux",
+    "duree": "28 min",
+    "description": "Vidéo psychologique sur comment reconnaître et contrôler vos émotions de trader : FOMO, revenge trading, overconfidence.",
+    "contenu_resume": "Cette vidéo explique les deux émotions destructrices du trading : la peur (qui fait vendre trop tôt ou empêche d'entrer) et l'avidité (qui fait garder trop longtemps ou overtrader). Techniques concrètes : breathing exercises, pre-trade checklist, trading journal émotionnel, circuit breakers personnels.",
+    "url": "https://www.youtube.com/watch?v=N4vIBijzg-8",
+    "auteur": "The Trading Psychology Coach",
+    "date_publication": "2024",
+    "tags": [
+      "psychologie",
+      "emotions",
+      "FOMO",
+      "discipline"
+    ],
+    "points_cles": [
+      "FOMO = Fear Of Missing Out, cause #1 des mauvais trades",
+      "Technique 4-7-8 breathing avant chaque décision importante",
+      "Si vous êtes émotionnel → fermez la plateforme",
+      "Journal émotionnel = tracker vos émotions à chaque trade"
+    ]
+  },
+  {
+    "id": "res_013",
+    "titre": "Les Supports et Résistances Dynamiques",
+    "type": "Article",
+    "categorie": "Analyse Technique",
+    "difficulte": "Intermédiaire",
+    "duree": "18 min",
+    "description": "Comment identifier et trader les supports/résistances qui bougent : moyennes mobiles, bandes de Bollinger, lignes de tendance.",
+    "contenu_resume": "Contrairement aux S/R statiques (niveaux psychologiques), les S/R dynamiques évoluent avec le prix. Article détaillé sur l'utilisation des MM 20/50/200 comme supports mobiles, les bandes de Bollinger comme zones de surachat/survente dynamiques, et le traçage correct des trendlines.",
+    "url": "https://www.tradingview.com/support/solutions/43000502322-support-and-resistance/",
+    "auteur": "TradingView Education",
+    "date_publication": "2024",
+    "tags": [
+      "supports",
+      "résistances",
+      "moyennes mobiles",
+      "trendlines"
+    ],
+    "points_cles": [
+      "MM 200 = support/résistance majeur sur graphique daily",
+      "Prix touche bande Bollinger inférieure = zone d'achat potentielle",
+      "Trendline : connecter 3 points minimum pour validité",
+      "Casser une résistance dynamique = signal plus fort qu'une statique"
+    ]
+  },
+  {
+    "id": "res_014",
+    "titre": "Backtesting : Tester Votre Stratégie",
+    "type": "Vidéo",
+    "categorie": "Stratégie",
+    "difficulte": "Intermédiaire",
+    "duree": "32 min",
+    "description": "Tutoriel complet sur comment backtester une stratégie de trading manuellement et avec des outils automatisés.",
+    "contenu_resume": "Le backtesting permet de tester votre stratégie sur des données historiques avant de risquer de l'argent réel. Cette vidéo montre comment faire un backtest manuel sur TradingView, utiliser un spreadsheet pour tracker les résultats, et interpréter les métriques (winrate, profit factor, max drawdown). Inclut démo avec stratégie RSI + MACD.",
+    "url": "https://www.youtube.com/watch?v=1pBdT3S7QKM",
+    "auteur": "BacktestRookies",
+    "date_publication": "2023",
+    "tags": [
+      "backtesting",
+      "stratégie",
+      "données historiques",
+      "validation"
+    ],
+    "points_cles": [
+      "Minimum 100 trades pour backtest statistiquement valide",
+      "Méfiez-vous du curve-fitting (sur-optimisation)",
+      "Testez sur différentes périodes de marché (bull, bear, range)",
+      "Si backtest = +60% winrate, réel sera probablement 45-50%"
+    ]
+  },
+  {
+    "id": "res_015",
+    "titre": "Les ETFs pour Traders Débutants",
+    "type": "Article",
+    "categorie": "Investissement Long Terme",
+    "difficulte": "Débutant",
+    "duree": "15 min",
+    "description": "Introduction aux ETFs (Exchange-Traded Funds) : qu'est-ce que c'est, comment ça marche, et pourquoi c'est plus sûr que les actions individuelles.",
+    "contenu_resume": "Un ETF est un panier d'actions qui se trade comme une action normale. SPY = 500 plus grandes entreprises US, QQQ = 100 tech leaders, VOO = S&P 500. Article explique les avantages (diversification, frais bas, moins de risque), les inconvénients (moins de upside qu'une action qui explose), et comment choisir ses premiers ETFs.",
+    "url": "https://www.investopedia.com/terms/e/etf.asp",
+    "auteur": "Investopedia - ETF Guide",
+    "date_publication": "2024",
+    "tags": [
+      "ETF",
+      "diversification",
+      "long terme",
+      "débutant"
+    ],
+    "points_cles": [
+      "SPY/VOO = investir dans toute l'économie US en 1 clic",
+      "QQQ = 100% tech (Apple, Microsoft, Nvidia, Tesla)",
+      "VTI = marché US total (3500+ entreprises)",
+      "ETFs sectoriels : XLF (finance), XLE (energie), XLK (tech)"
+    ]
+  },
+  {
+    "id": "res_016",
+    "titre": "Analyse des Volumes : Le Langage Caché du Marché",
+    "type": "PDF",
+    "categorie": "Analyse Technique",
+    "difficulte": "Intermédiaire",
+    "duree": "40 min",
+    "description": "Guide approfondi sur l'analyse des volumes de trading : volume profile, OBV, volume breakout, et volume climax.",
+    "contenu_resume": "Le volume confirme ou infirme la validité d'un mouvement de prix. Ce PDF couvre les concepts clés : breakout avec volume = valide, breakout sans volume = suspect. OBV (On Balance Volume) pour détecter l'accumulation/distribution. Volume Profile pour identifier les zones de forte activité (POC = Point of Control). Volume climax = épuisement du mouvement.",
+    "url": "https://www.tradingview.com/scripts/volumeprofile/",
+    "auteur": "Trading Volume Academy",
+    "date_publication": "2024",
+    "tags": [
+      "volume",
+      "OBV",
+      "volume profile",
+      "accumulation"
+    ],
+    "points_cles": [
+      "Breakout + volume 2x moyenne = signal fort",
+      "Volume décroissant dans tendance = affaiblissement",
+      "OBV divergence = signal avancé de reversal",
+      "Volume Profile POC = niveau magnétique où prix revient souvent"
+    ]
+  },
+  {
+    "id": "res_017",
+    "titre": "Les Options : Introduction pour Traders d'Actions",
+    "type": "Vidéo",
+    "categorie": "Produits Dérivés",
+    "difficulte": "Avancé",
+    "duree": "45 min",
+    "description": "Vidéo complète sur les options : calls, puts, stratégies de base, et comment utiliser les options pour couvrir vos positions.",
+    "contenu_resume": "Les options donnent le DROIT (pas l'obligation) d'acheter (call) ou vendre (put) à un prix fixé. Cette vidéo explique les concepts : strike price, expiration, prime, time decay (theta). Stratégies : covered call (générer revenus), protective put (assurance), bull call spread. Attention : les options peuvent être très risquées pour débutants.",
+    "url": "https://www.youtube.com/watch?v=VJgHkAqohbE",
+    "auteur": "Options Trading for Beginners - ProjectOption",
+    "date_publication": "2023",
+    "tags": [
+      "options",
+      "calls",
+      "puts",
+      "hedging"
+    ],
+    "points_cles": [
+      "Call = parier sur hausse, Put = parier sur baisse",
+      "Covered call = vendre call sur actions qu'on possède",
+      "Protective put = assurance sur votre position longue",
+      "⚠️ Options = complexes, ne pas trader avant de maîtriser actions"
+    ]
+  },
+  {
+    "id": "res_018",
+    "titre": "Screener d'Actions : Trouver les Meilleures Opportunités",
+    "type": "Article",
+    "categorie": "Outils",
+    "difficulte": "Intermédiaire",
+    "duree": "20 min",
+    "description": "Comment utiliser un screener pour filtrer les milliers d'actions et trouver celles qui correspondent à votre stratégie.",
+    "contenu_resume": "Un screener permet de scanner des milliers d'actions selon vos critères. Article montre comment utiliser Finviz (gratuit) et TradingView screener. Exemples de filtres : RSI < 30 + prix > MM 200 (oversold dans uptrend), volume > 1M (liquidité), market cap > 5B (stabilité). Guide pour créer vos propres scans personnalisés.",
+    "url": "https://www.finviz.com/screener.ashx",
+    "auteur": "Finviz Tutorial",
+    "date_publication": "2024",
+    "tags": [
+      "screener",
+      "finviz",
+      "filtres",
+      "opportunités"
+    ],
+    "points_cles": [
+      "Finviz screener = gratuit et puissant",
+      "Filtres essentiels : volume, market cap, secteur, RSI",
+      "Créer 3-5 scans favoris pour vos setups récurrents",
+      "Scanner matin 9h = trouver gaps et movers du jour"
+    ]
+  },
+  {
+    "id": "res_019",
+    "titre": "La Fiscalité du Trading (France & US)",
+    "type": "PDF",
+    "categorie": "Administratif",
+    "difficulte": "Tous niveaux",
+    "duree": "25 min",
+    "description": "Guide pratique sur la fiscalité des plus-values boursières : déclaration, taux d'imposition, optimisations légales.",
+    "contenu_resume": "PDF clair sur les obligations fiscales du trader. France : flat tax 30% (12.8% impôt + 17.2% prélèvements sociaux) ou barème progressif si plus avantageux. US : short-term gains (< 1 an) = taxés comme revenu ordinaire, long-term (> 1 an) = taux réduit. Importance de tenir un registre précis de tous vos trades.",
+    "url": "https://www.service-public.fr/particuliers/vosdroits/F21618",
+    "auteur": "Service Public France",
+    "date_publication": "2024",
+    "tags": [
+      "fiscalité",
+      "impôts",
+      "déclaration",
+      "plus-values"
+    ],
+    "points_cles": [
+      "France : 30% flat tax sur plus-values (PFU)",
+      "Tenir journal de tous vos trades pour déclaration",
+      "PEA = enveloppe fiscale avantageuse (exonération après 5 ans)",
+      "US : hold > 1 an pour bénéficier taux réduit"
+    ]
+  },
+  {
+    "id": "res_020",
+    "titre": "Day Trading vs Swing Trading : Quel Style Choisir ?",
+    "type": "Article",
+    "categorie": "Stratégie",
+    "difficulte": "Débutant",
+    "duree": "12 min",
+    "description": "Comparaison détaillée des deux styles de trading principaux : day trading (intraday) et swing trading (plusieurs jours).",
+    "contenu_resume": "Day trading = ouvrir et fermer positions le même jour, nécessite temps plein et stress élevé. Swing trading = garder 2-10 jours, compatible avec job à temps plein. Article compare capital requis (day 25k$ minimum US, swing 5k$+), temps nécessaire (day 6h/jour, swing 1h/jour), stress, taux de réussite. Recommandation : débutants → commencer swing.",
+    "url": "https://www.investopedia.com/articles/trading/09/day-trading-introduction.asp",
+    "auteur": "Investopedia - Trading Styles",
+    "date_publication": "2024",
+    "tags": [
+      "day trading",
+      "swing trading",
+      "style",
+      "débutant"
+    ],
+    "points_cles": [
+      "Day trading = temps plein, très stressant, 90% échec",
+      "Swing trading = 1-2h/jour suffit, moins stressant",
+      "Day trade aux US = minimum 25 000$ (PDT rule)",
+      "Débutants : TOUJOURS commencer par swing trading"
+    ]
+  },
+  {
+    "id": "res_021",
+    "titre": "Les Gaps : Comment les Trader Efficacement",
+    "type": "Vidéo",
+    "categorie": "Stratégie",
+    "difficulte": "Intermédiaire",
+    "duree": "22 min",
+    "description": "Guide vidéo sur les gaps (écarts de prix à l'ouverture) : types, probabilités de fill, et stratégies de trading.",
+    "contenu_resume": "Un gap se produit quand le prix d'ouverture est significativement différent de la clôture précédente. Types : gap up (haussier), gap down (baissier), breakaway gap (début de tendance), exhaustion gap (fin de tendance). Statistique : 70% des gaps sont comblés dans les 3 jours. Stratégies : fade the gap, gap and go, wait for fill.",
+    "url": "https://www.youtube.com/watch?v=6eEBvhDmZWE",
+    "auteur": "Warrior Trading - Ross Cameron",
+    "date_publication": "2023",
+    "tags": [
+      "gaps",
+      "gap up",
+      "gap down",
+      "stratégie intraday"
+    ],
+    "points_cles": [
+      "Gap sur news = souvent continué, gap sans news = souvent comblé",
+      "Gap > 3% + volume 2x = signal fort de continuation",
+      "Fade the gap = parier sur retour, risqué mais profitable",
+      "Attendre 15-30min après ouverture pour voir direction"
+    ]
+  },
+  {
+    "id": "res_022",
+    "titre": "Le Ratio Rendement/Risque : Mathématiques du Trading",
+    "type": "Article",
+    "categorie": "Gestion du Risque",
+    "difficulte": "Intermédiaire",
+    "duree": "16 min",
+    "description": "Explication mathématique du R:R ratio et comment l'utiliser pour être profitable même avec 40% winrate.",
+    "contenu_resume": "Article quantitatif montrant que le winrate n'est pas tout. Avec ratio 1:3 (risquer 1$ pour gagner 3$) et 40% winrate → profit de 20%. Tableaux de simulation avec différents winrates et ratios. Calcul de l'espérance mathématique. Pourquoi viser minimum 1:2, idéalement 1:3. Comment calculer votre R:R avant chaque trade.",
+    "url": "https://www.investopedia.com/terms/r/riskrewardratio.asp",
+    "auteur": "Investopedia - Risk Management",
+    "date_publication": "2024",
+    "tags": [
+      "risk reward",
+      "mathématiques",
+      "espérance",
+      "probabilités"
+    ],
+    "points_cles": [
+      "Formule : R:R = (Take Profit - Entry) / (Entry - Stop Loss)",
+      "Avec 1:3 et 40% winrate → profitable !",
+      "Ne JAMAIS prendre trade avec R:R < 1:1",
+      "Calcul espérance : (% win × avg win) - (% loss × avg loss)"
+    ]
+  },
+  {
+    "id": "res_023",
+    "titre": "Les Niveaux de Fibonacci en Trading",
+    "type": "PDF",
+    "categorie": "Analyse Technique",
+    "difficulte": "Intermédiaire",
+    "duree": "30 min",
+    "description": "Guide complet sur l'utilisation des retracements et extensions de Fibonacci pour identifier supports/résistances et objectifs.",
+    "contenu_resume": "Les niveaux de Fibonacci (23.6%, 38.2%, 50%, 61.8%, 100%) sont utilisés mondialement par les traders. Ce PDF explique comment tracer correctement un Fib (du swing low au swing high en uptrend), interpréter les niveaux (38.2% et 61.8% = zones clés), utiliser extensions Fib pour objectifs de profit (127%, 161.8%, 261.8%).",
+    "url": "https://www.babypips.com/learn/forex/fibonacci-retracement",
+    "auteur": "BabyPips - Fibonacci Guide",
+    "date_publication": "2024",
+    "tags": [
+      "fibonacci",
+      "retracement",
+      "extension",
+      "niveaux"
+    ],
+    "points_cles": [
+      "Niveaux magiques : 38.2%, 50%, 61.8%",
+      "Retracement 61.8% = dernier support avant invalidation tendance",
+      "Extensions 127% et 161.8% = objectifs de profit classiques",
+      "Confluence Fib + autre S/R = signal très fort"
+    ]
+  },
+  {
+    "id": "res_024",
+    "titre": "News Trading : Trader les Annonces Économiques",
+    "type": "Vidéo",
+    "categorie": "Fondamental",
+    "difficulte": "Avancé",
+    "duree": "27 min",
+    "description": "Comment trader autour des annonces économiques importantes : NFP, FOMC, CPI, earnings. Stratégies et pièges.",
+    "contenu_resume": "Vidéo avancée sur le news trading. Explique les annonces majeures : NFP (emploi US, 1er vendredi du mois), FOMC (décisions Fed sur taux), CPI (inflation), earnings (résultats trimestriels). Stratégies : fade (counter-trend), breakout, straddle options. Avertissement : volatilité extrême, spreads larges, risque élevé.",
+    "url": "https://www.youtube.com/watch?v=R7LhAz7J8sg",
+    "auteur": "Real Life Trading",
+    "date_publication": "2023",
+    "tags": [
+      "news trading",
+      "NFP",
+      "FOMC",
+      "earnings",
+      "volatilité"
+    ],
+    "points_cles": [
+      "NFP = la plus grosse news mensuelle (1er vendredi)",
+      "FOMC = décisions Fed sur taux d'intérêt (impact majeur)",
+      "Earnings = éviter juste avant si vous débutez (trop volatile)",
+      "⚠️ Spreads 3-5x plus larges pendant annonces = coûteux"
+    ]
+  },
+  {
+    "id": "res_025",
+    "titre": "Le Journal de Trading : Template Excel Gratuit",
+    "type": "Excel",
+    "categorie": "Outils",
+    "difficulte": "Tous niveaux",
+    "duree": "10 min",
+    "description": "Template Excel téléchargeable pour tracker tous vos trades : entrée, sortie, P&L, émotions, screenshots, notes.",
+    "contenu_resume": "Fichier Excel pré-configuré avec formules automatiques. Colonnes : date, ticker, direction (long/short), entry, exit, stop loss, take profit, quantité, P&L $, P&L %, temps dans trade, émotion (1-5), notes, screenshot. Graphiques auto-générés : winrate, courbe equity, meilleurs setups, distribution P&L. Onglets séparés par mois.",
+    "url": "https://www.tradingjournal.app/free-trading-journal-excel-template",
+    "auteur": "TradingJournal.app",
+    "date_publication": "2024",
+    "tags": [
+      "journal",
+      "excel",
+      "tracking",
+      "template"
+    ],
+    "points_cles": [
+      "Tracker CHAQUE trade sans exception",
+      "Inclure émotions et contexte, pas juste chiffres",
+      "Review hebdomadaire : identifier patterns de succès/échec",
+      "Screenshots obligatoires pour analyse post-trade"
+    ]
+  },
+  {
+    "id": "res_026",
+    "titre": "Corrélations Inter-Marchés : Stocks, Bonds, Dollar, Gold",
+    "type": "Article",
+    "categorie": "Analyse Macro",
+    "difficulte": "Avancé",
+    "duree": "24 min",
+    "description": "Comment les différents marchés s'influencent : corrélations entre actions, obligations, dollar US, or, et pétrole.",
+    "contenu_resume": "Article avancé sur les corrélations macro. Dollar fort → actions US sous pression (exports moins compétitifs). Taux obligataires monte → actions tech baissent (moins attrayantes). Or monte → peur/incertitude (valeur refuge). VIX haut → marchés baissiers. Comprendre ces relations aide à anticiper mouvements et diversifier intelligemment.",
+    "url": "https://www.investopedia.com/articles/trading/10/correlation-between-stocks-bonds.asp",
+    "auteur": "Investopedia - Macro Analysis",
+    "date_publication": "2024",
+    "tags": [
+      "corrélations",
+      "macro",
+      "dollar",
+      "obligations",
+      "or"
+    ],
+    "points_cles": [
+      "Dollar fort = mauvais pour actions américaines (exports)",
+      "Taux haut = tech baisse (valorisations comprimées)",
+      "VIX > 30 = peur extrême, opportunités contrarian",
+      "Or monte = fuite vers sécurité, stocks risqués baissent"
+    ]
+  },
+  {
+    "id": "res_027",
+    "titre": "Ichimoku Cloud : Système Complet de Trading",
+    "type": "Vidéo",
+    "categorie": "Analyse Technique",
+    "difficulte": "Avancé",
+    "duree": "38 min",
+    "description": "Tutoriel complet sur l'indicateur Ichimoku : interprétation du nuage, lignes Tenkan/Kijun, signaux d'achat/vente.",
+    "contenu_resume": "Ichimoku Kinko Hyo = indicateur japonais tout-en-un (tendance + momentum + S/R). Vidéo explique les 5 lignes : Tenkan-sen (fast), Kijun-sen (slow), Senkou Span A/B (cloud), Chikou Span (lagging). Signaux : prix au-dessus nuage = bullish, Tenkan cross Kijun = entrée, épaisseur nuage = force tendance. Complexe mais très puissant.",
+    "url": "https://www.youtube.com/watch?v=gUfZ3pVvQ_E",
+    "auteur": "The Trading Channel - Ichimoku Guide",
+    "date_publication": "2023",
+    "tags": [
+      "ichimoku",
+      "cloud",
+      "tendance",
+      "japonais"
+    ],
+    "points_cles": [
+      "Prix au-dessus nuage vert = forte tendance haussière",
+      "Tenkan cross au-dessus Kijun = signal achat",
+      "Épaisseur du nuage = force de la tendance",
+      "Chikou au-dessus prix historique = confirmation bullish"
+    ]
+  },
+  {
+    "id": "res_028",
+    "titre": "Les Cryptomonnaies pour Traders d'Actions",
+    "type": "Article",
+    "categorie": "Crypto",
+    "difficulte": "Intermédiaire",
+    "duree": "20 min",
+    "description": "Introduction au trading de crypto pour traders venant des actions : différences, opportunités, risques majeurs.",
+    "contenu_resume": "Article comparant stocks et crypto. Similitudes : analyse technique fonctionne, même psychologie. Différences majeures : crypto trade 24/7 (pas de repos), volatilité 5-10x plus élevée, régulation floue, hacks/scams fréquents. Bitcoin = 'or numérique', Ethereum = plateforme smart contracts. Avertissement : commencer avec <5% de votre capital.",
+    "url": "https://www.coindesk.com/learn/crypto-trading-guide/",
+    "auteur": "CoinDesk - Crypto Trading Guide",
+    "date_publication": "2024",
+    "tags": [
+      "crypto",
+      "bitcoin",
+      "ethereum",
+      "volatilité"
+    ],
+    "points_cles": [
+      "Crypto = marché 24/7, jamais de pause",
+      "Volatilité 5-10x actions (Bitcoin peut -20% en 1 jour)",
+      "Analyse technique fonctionne, mais swings extrêmes",
+      "⚠️ Débutants : maximum 5% capital en crypto"
+    ]
+  },
+  {
+    "id": "res_029",
+    "titre": "Les Dividendes : Stratégie d'Investissement Passif",
+    "type": "PDF",
+    "categorie": "Investissement Long Terme",
+    "difficulte": "Débutant",
+    "duree": "18 min",
+    "description": "Guide sur l'investissement en actions à dividendes : yield, aristocrates, DRIP, fiscalité, et création de revenus passifs.",
+    "contenu_resume": "PDF pédagogique sur les dividendes = paiements trimestriels des entreprises aux actionnaires. Dividend yield = dividende annuel / prix action (ex: 4%). Dividend aristocrats = entreprises ayant augmenté dividendes 25+ ans consécutifs (JNJ, KO, PG). DRIP = réinvestissement automatique. Stratégie long terme pour générer revenus passifs.",
+    "url": "https://www.investopedia.com/terms/d/dividend.asp",
+    "auteur": "Investopedia - Dividend Investing",
+    "date_publication": "2024",
+    "tags": [
+      "dividendes",
+      "revenus passifs",
+      "aristocrates",
+      "DRIP"
+    ],
+    "points_cles": [
+      "Dividend yield 3-5% = bon rendement stable",
+      "Aristocrates = JNJ, KO, PG (dividendes 25+ ans)",
+      "DRIP = réinvestir dividendes automatiquement (composé)",
+      "Fiscalité : dividendes qualifiés taxés à taux réduit"
+    ]
+  },
+  {
+    "id": "res_030",
+    "titre": "Circuit Breakers et Halts : Comprendre les Arrêts de Trading",
+    "type": "Article",
+    "categorie": "Réglementation",
+    "difficulte": "Intermédiaire",
+    "duree": "14 min",
+    "description": "Explication des circuit breakers (arrêts de marché) et trading halts : pourquoi, quand, et comment réagir.",
+    "contenu_resume": "Article sur les mécanismes de protection. Circuit breakers US : si S&P 500 chute -7% → pause 15min, -13% → pause 15min, -20% → fermeture journée. Trading halts individuels : si action monte/baisse >10% en 5min → halt temporaire. Halts news = attente annonce importante. Comment réagir : ne PAS paniquer, utiliser ordres limites après reprise.",
+    "url": "https://www.investopedia.com/terms/c/circuitbreaker.asp",
+    "auteur": "Investopedia - Market Mechanics",
+    "date_publication": "2024",
+    "tags": [
+      "circuit breakers",
+      "halts",
+      "réglementation",
+      "volatilité"
+    ],
+    "points_cles": [
+      "Circuit breaker niveau 1 : -7% S&P → pause 15 minutes",
+      "Trading halt individuel : >10% en 5min → pause 5-10min",
+      "Halt news : attente annonce majeure (M&A, FDA approval)",
+      "Après halt : utiliser ordres LIMIT jamais MARKET (spreads énormes)"
+    ]
+  }
+]
