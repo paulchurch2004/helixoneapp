@@ -54,7 +54,14 @@
       "Bash(cat /Users/macintosh/Desktop/helixone/helixone-backend/.env.example)",
       "Bash(lsof -ti:8000)",
       "Bash(xargs kill -9)",
-      "Bash(git init)"
+      "Bash(git init)",
+      "Bash(if git diff --cached --name-only)",
+      "Bash(then echo \"❌ DANGER: .env est dans le commit!\")",
+      "Bash(exit 1)",
+      "Bash(else echo \"✅ SÉCURISÉ: .env n''''est PAS dans le commit\")",
+      "Bash(fi)",
+      "Bash(git check-ignore .env.example)",
+      "Bash(git add -f .env.example)"
     ],
     "deny": [],
     "ask": []

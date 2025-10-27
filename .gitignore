@@ -36,6 +36,9 @@ ENV/
 config/secrets.yaml
 config/credentials.json
 
+# EXCEPTION: .env.example doit être committé (template sans secrets)
+!.env.example
+
 # Databases
 *.db
 *.sqlite
