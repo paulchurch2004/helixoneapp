@@ -61,7 +61,10 @@
       "Bash(else echo \"✅ SÉCURISÉ: .env n''''est PAS dans le commit\")",
       "Bash(fi)",
       "Bash(git check-ignore .env.example)",
-      "Bash(git add -f .env.example)"
+      "Bash(git add -f .env.example)",
+      "Bash(git commit -m \"security: enhance .gitignore and add .env.example templates\n\n- Updated .gitignore to exclude .env but allow .env.example\n- Added backend .env.example template with all required variables\n- Updated Claude settings for project configuration\n\nThese changes complete the critical security fixes:\n- API keys protected from accidental commits\n- Template files provided for easy setup\n- Git properly configured to track only safe files\")",
+      "Bash(git add .claude/settings.local.json)",
+      "Bash(git commit -m \"config: update Claude settings\")"
     ],
     "deny": [],
     "ask": []
