@@ -1,45 +1,111 @@
+# ============================================
+# HELIXONE BACKEND - Docker Compose
+# ============================================
+# Orchestration des services:
+# - Backend FastAPI
+# - PostgreSQL Database
+# - Redis Cache
+#
+# Usage:
+#   docker-compose up -d          # Démarrer tous les services
+#   docker-compose down           # Arrêter tous les services
+#   docker-compose logs -f        # Voir les logs
+#   docker-compose ps             # État des services
+# ============================================
+
 version: '3.8'
 
 services:
+  # ============================================
+  # Backend FastAPI
+  # ============================================
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: helixone-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://helixone:${POSTGRES_PASSWORD:-helixone_secure_password}@postgres:5432/helixone
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=${SECRET_KEY:-change_me_in_production}
+      - ENVIRONMENT=production
+      - APP_ENV=production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - helixone-network
+    volumes:
+      - ./logs:/app/logs
+      - ./ml_models:/app/ml_models
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ============================================
+  # PostgreSQL Database
+  # ============================================
   postgres:
     image: postgres:15-alpine
     container_name: helixone-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_DB: helixone
       POSTGRES_USER: helixone
-      POSTGRES_PASSWORD: helixone_dev_password
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-helixone_secure_password}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - helixone-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U helixone"]
+      test: ["CMD-SHELL", "pg_isready -U helixone -d helixone"]
       interval: 10s
       timeout: 5s
       retries: 5
-    restart: unless-stopped
+      start_period: 10s
 
+  # ============================================
+  # Redis Cache
+  # ============================================
   redis:
     image: redis:7-alpine
     container_name: helixone-redis
+    restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    command: redis-server --appendonly yes
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    networks:
+      - helixone-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
-    restart: unless-stopped
 
+# ============================================
+# Volumes persistants
+# ============================================
 volumes:
   postgres_data:
     driver: local
   redis_data:
     driver: local
 
+# ============================================
+# Réseau interne
+# ============================================
 networks:
-  default:
-    name: helixone-network
+  helixone-network:
+    driver: bridge

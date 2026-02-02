@@ -1,42 +1,34 @@
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-sqlalchemy==2.0.23
-alembic==1.12.1
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
-python-multipart==0.0.6
-pydantic==2.5.0
-pydantic-settings==2.1.0
-stripe==7.4.0
-python-decouple==3.8
-sentry-sdk[fastapi]==1.38.0
-pytest==7.4.3
-pytest-asyncio==0.21.1
-httpx==0.25.2
-python-dateutil==2.8.2
-pytz==2023.3
+fastapi>=0.104.0
+uvicorn>=0.24.0
+gunicorn>=21.0.0
+sqlalchemy>=2.0.0
+alembic>=1.12.0
+psycopg2-binary>=2.9.0
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+python-multipart>=0.0.6
+pydantic[email]>=2.5.0
+pydantic-settings>=2.1.0
+email-validator>=2.0.0
+python-dateutil>=2.8.0
+pytz>=2023.3
 
-# Data sources
-yfinance==0.2.32
-requests==2.31.0
-aiohttp==3.9.1
-pandas==2.1.4
-numpy==1.26.2
+# HTTP
+requests>=2.31.0
+aiohttp>=3.9.0
 
-# Technical analysis
-ta==0.11.0
+# Data (used by formation paper trading)
+yfinance>=0.2.30
+pandas>=2.0.0
+numpy>=1.24.0
 
 # Rate limiting
-slowapi==0.1.9
+slowapi>=0.1.9
 
-# Redis for caching
-redis==5.0.1
-hiredis==2.2.3
+# 2FA Authentication
+pyotp>=2.9.0
+qrcode[pil]>=7.4.0
 
-# Email
-resend==0.7.0
-
-# API clients for financial data sources
-finnhub-python==2.4.19
-alpha-vantage==2.3.1
-requests-cache==1.1.1
+# Cache & Monitoring
+redis>=5.0.0
+psutil>=5.9.0

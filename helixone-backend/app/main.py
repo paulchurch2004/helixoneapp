@@ -5,25 +5,22 @@ Point d'entrée principal FastAPI
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
+from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
 from app.core.config import settings
 from app.core.database import engine
+from app.core.rate_limiter import limiter
 from app.models import Base
 
 # Créer les tables au démarrage
 Base.metadata.create_all(bind=engine)
 
-# Initialiser le rate limiter
-limiter = Limiter(key_func=get_remote_address)
-
 # Créer l'application FastAPI
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description="Backend API pour HelixOne - Analyse d'actions avec IA",
+    description="Backend API pour HelixOne - Formation Trading",
 )
 
 # Ajouter le rate limiter à l'app
@@ -52,142 +49,90 @@ def root():
 
 
 @app.get("/health")
-def health_check():
+async def health_check():
     """Vérification de santé détaillée"""
+    from datetime import datetime
+    import psutil
+    import os
+
+    # Vérifier la base de données
+    db_status = "connected"
+    db_error = None
+    try:
+        from app.core.database import SessionLocal
+        from sqlalchemy import text
+        db = SessionLocal()
+        db.execute(text("SELECT 1"))
+        db.close()
+    except Exception as e:
+        db_status = "disconnected"
+        db_error = str(e)
+
+    # Métriques système
+    system_metrics = {}
+    try:
+        process = psutil.Process(os.getpid())
+        system_metrics = {
+            "cpu_percent": process.cpu_percent(),
+            "memory_mb": round(process.memory_info().rss / 1024 / 1024, 2),
+            "threads": process.num_threads(),
+        }
+    except Exception:
+        pass
+
+    overall_status = "healthy" if db_status == "connected" else "degraded"
+
     return {
-        "status": "healthy",
+        "status": overall_status,
+        "timestamp": datetime.now().isoformat(),
         "app_name": settings.APP_NAME,
         "version": settings.APP_VERSION,
         "environment": settings.ENVIRONMENT,
-        "database": "connected"
+        "components": {
+            "database": {
+                "status": db_status,
+                "error": db_error
+            },
+        },
+        "system": system_metrics
     }
 
 
-# ============================================
-# ÉVÉNEMENTS DE DÉMARRAGE
-# ============================================
-
 @app.on_event("startup")
 async def startup_event():
-    """
-    Événement exécuté au démarrage de l'application
-    - Initialise les connexions IBKR auto-connect
-    - Démarre le scheduler d'analyse de portefeuille
-    """
+    """Événement exécuté au démarrage de l'application"""
     import logging
-    import asyncio
-    from app.services.ibkr_service import init_ibkr_connections
-    from app.services.portfolio.portfolio_scheduler import get_portfolio_scheduler
-    from app.core.database import SessionLocal
-
     logger = logging.getLogger(__name__)
-    logger.info("🚀 Démarrage de HelixOne Backend...")
+    logger.info("Démarrage de HelixOne Backend...")
 
-    # Initialiser les connexions IBKR dans une tâche en arrière-plan
-    # pour éviter de bloquer le démarrage
-    async def init_connections():
-        db = SessionLocal()
-        try:
-            logger.info("📊 Initialisation des connexions IBKR...")
-            await init_ibkr_connections(db)
-            logger.info("✅ Connexions IBKR initialisées")
-        except Exception as e:
-            logger.error(f"❌ Erreur initialisation IBKR: {e}")
-            import traceback
-            logger.error(traceback.format_exc())
-        finally:
-            db.close()
-
-    # Créer une tâche en arrière-plan
-    asyncio.create_task(init_connections())
-
-    # Démarrer le scheduler d'analyse de portefeuille
+    # Initialiser le cache Redis (optionnel)
     try:
-        logger.info("📅 Démarrage du Portfolio Scheduler...")
-        scheduler = get_portfolio_scheduler()
-        scheduler.start()
-        logger.info("✅ Portfolio Scheduler démarré (7h00 + 17h00 EST)")
+        from app.core.cache import init_cache
+        await init_cache()
     except Exception as e:
-        logger.error(f"❌ Erreur démarrage scheduler: {e}")
-
-    # 🆕 Démarrer le ML Training Scheduler
-    import os
-    if os.getenv('ML_WEEKLY_RETRAIN_ENABLED', 'true').lower() == 'true':
-        try:
-            from app.services.ml import get_training_scheduler
-            logger.info("🧠 Démarrage du ML Training Scheduler...")
-            ml_scheduler = get_training_scheduler()
-            ml_scheduler.start()
-
-            next_run = ml_scheduler.get_next_run_time()
-            if next_run:
-                logger.info(f"✅ ML Scheduler démarré (prochain entraînement: {next_run})")
-            else:
-                logger.info("✅ ML Scheduler démarré")
-        except Exception as e:
-            logger.error(f"❌ Erreur démarrage ML scheduler: {e}")
-
-    # 🆕 Pré-entraînement des top stocks (en arrière-plan)
-    if os.getenv('ML_PRETRAIN_ON_STARTUP', 'true').lower() == 'true':
-        async def pretrain():
-            try:
-                from app.services.ml import get_training_scheduler
-                logger.info("🚀 Démarrage pré-entraînement ML...")
-                ml_scheduler = get_training_scheduler()
-                await ml_scheduler.pretrain_top_stocks()
-                logger.info("✅ Pré-entraînement terminé")
-            except Exception as e:
-                logger.error(f"❌ Erreur pré-entraînement: {e}")
-                import traceback
-                logger.error(traceback.format_exc())
-
-        # Créer tâche en arrière-plan pour ne pas bloquer le démarrage
-        asyncio.create_task(pretrain())
+        logger.warning(f"Cache Redis non disponible: {e}")
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    """
-    Événement exécuté à l'arrêt de l'application
-    - Arrête les schedulers proprement
-    """
+    """Événement exécuté à l'arrêt de l'application"""
     import logging
-    from app.services.portfolio.portfolio_scheduler import get_portfolio_scheduler
-
     logger = logging.getLogger(__name__)
-    logger.info("🛑 Arrêt de HelixOne Backend...")
+    logger.info("Arrêt de HelixOne Backend...")
 
-    # Arrêter le Portfolio scheduler
     try:
-        scheduler = get_portfolio_scheduler()
-        scheduler.stop()
-        logger.info("✅ Portfolio Scheduler arrêté")
+        from app.core.cache import close_cache
+        await close_cache()
     except Exception as e:
-        logger.error(f"❌ Erreur arrêt scheduler: {e}")
-
-    # 🆕 Arrêter le ML Training Scheduler
-    try:
-        from app.services.ml import get_training_scheduler
-        ml_scheduler = get_training_scheduler()
-        ml_scheduler.stop()
-        logger.info("✅ ML Scheduler arrêté")
-    except Exception as e:
-        logger.error(f"❌ Erreur arrêt ML scheduler: {e}")
+        logger.error(f"Erreur fermeture cache: {e}")
 
 
 # Import des routes
-from app.api import auth, licenses, market_data, analysis, formation, data_collection, ibkr, advanced_data_collection, portfolio  # , scenarios
+from app.api import auth, licenses, formation
 
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(licenses.router, prefix="/licenses", tags=["Licenses"])
-app.include_router(market_data.router, prefix="/api/market", tags=["Market Data"])
-app.include_router(analysis.router, prefix="/api/analysis", tags=["Analysis"])
 app.include_router(formation.router, tags=["Formation & Paper Trading"])
-app.include_router(data_collection.router, prefix="/api/data", tags=["Data Collection"])
-app.include_router(advanced_data_collection.router, tags=["Advanced Data Collection"])
-app.include_router(ibkr.router, prefix="/api/ibkr", tags=["Interactive Brokers"])
-app.include_router(portfolio.router, prefix="/api/portfolio", tags=["Portfolio Analysis"])
-# app.include_router(scenarios.router, tags=["Scenario Simulations"])  # Temporairement désactivé
 
 
 if __name__ == "__main__":

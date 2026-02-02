@@ -1,12 +1,20 @@
 {
   "completed_modules": [
-    "basics_1",
-    "technical_analysis_basics"
+    "module_1_1",
+    "module_1_2",
+    "module_1_3"
   ],
-  "quiz_scores": {
-    "basics_1": 100
-  },
-  "total_xp": 250,
+  "quiz_scores": {},
+  "total_xp": 400,
   "level": 1,
-  "current_parcours": "debutant"
+  "current_parcours": "debutant",
+  "badges": [
+    "first_step"
+  ],
+  "certifications": [],
+  "login_dates": [
+    "2026-02-02"
+  ],
+  "community_messages": 0,
+  "users_helped": 0
 }

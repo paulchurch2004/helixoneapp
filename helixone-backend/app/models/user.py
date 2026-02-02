@@ -8,6 +8,7 @@ from datetime import datetime
 import uuid
 
 from app.core.database import Base
+from app.core.time_utils import utc_now_naive
 
 
 def generate_uuid():
@@ -47,8 +48,12 @@ class User(Base):
     
     is_active = Column(Boolean, default=True)
     email_verified = Column(Boolean, default=False)
-    
-    created_at = Column(DateTime, default=datetime.utcnow)
+
+    # 2FA Authentication
+    totp_secret = Column(String, nullable=True)  # Secret pour TOTP
+    totp_enabled = Column(Boolean, default=False)  # 2FA activé ou non
+
+    created_at = Column(DateTime, default=utc_now_naive)
     last_login = Column(DateTime, nullable=True)
     
     # Relations (définies plus tard)

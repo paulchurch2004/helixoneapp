@@ -10,7 +10,8 @@ import sys
 
 # Import du module de gestion de session
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from auth_session import set_auth_token
+from src.auth_session import set_auth_token
+from src.config import get_api_url
 
 INDICES = {
     "^FCHI": "CAC 40",
@@ -134,6 +135,56 @@ class HomePanel(ctk.CTkFrame):
         else:
             messagebox.showerror("Erreur", "Identifiants invalides.")
 
+    def _evaluer_force_mdp(self, password):
+        """Évalue la force d'un mot de passe. Retourne (score, label, couleur)."""
+        if not password:
+            return (0, "", "#333333")
+
+        score = 0
+        if len(password) >= 8:
+            score += 25
+        if len(password) >= 12:
+            score += 15
+        if len(password) >= 16:
+            score += 10
+        if any(c.isupper() for c in password):
+            score += 15
+        if any(c.islower() for c in password):
+            score += 10
+        if any(c.isdigit() for c in password):
+            score += 15
+        if any(c in "!@#$%^&*()_+-=[]{}|;':\",./<>?`~" for c in password):
+            score += 20
+
+        score = min(score, 100)
+
+        if score <= 25:
+            return (score, "Faible", "#FF3333")
+        elif score <= 50:
+            return (score, "Moyen", "#FF8800")
+        elif score <= 75:
+            return (score, "Fort", "#BBCC00")
+        else:
+            return (score, "Très fort", "#00CC44")
+
+    def _on_password_change(self, event=None):
+        """Met à jour la barre de force quand le mot de passe change."""
+        if self._destroyed:
+            return
+        password = self.register_password_entry.get()
+        score, label, color = self._evaluer_force_mdp(password)
+
+        try:
+            if password:
+                self._strength_bar.configure(fg_color=color)
+                self._strength_bar.place(relx=0, rely=0, relheight=1, relwidth=max(score / 100, 0.02))
+                self._strength_label.configure(text=label, text_color=color)
+            else:
+                self._strength_bar.place(relx=0, rely=0, relheight=1, relwidth=0)
+                self._strength_label.configure(text="", text_color="#666666")
+        except Exception:
+            pass
+
     def afficher_formulaire_inscription(self):
         """Affiche le formulaire d'inscription"""
         if self._destroyed:
@@ -152,23 +203,39 @@ class HomePanel(ctk.CTkFrame):
             font=("Segoe UI", 24, "bold"),
             text_color="#00BFFF"
         )
-        title_label.place(relx=0.5, rely=0.35, anchor="center")
+        title_label.place(relx=0.5, rely=0.30, anchor="center")
 
         # Prénom
         self.firstname_entry = ctk.CTkEntry(self, placeholder_text="Prénom", width=300)
-        self.firstname_entry.place(relx=0.5, rely=0.45, anchor="center")
+        self.firstname_entry.place(relx=0.5, rely=0.39, anchor="center")
 
         # Nom
         self.lastname_entry = ctk.CTkEntry(self, placeholder_text="Nom", width=300)
-        self.lastname_entry.place(relx=0.5, rely=0.51, anchor="center")
+        self.lastname_entry.place(relx=0.5, rely=0.45, anchor="center")
 
         # Email
         self.register_email_entry = ctk.CTkEntry(self, placeholder_text="Adresse Email", width=300)
-        self.register_email_entry.place(relx=0.5, rely=0.57, anchor="center")
+        self.register_email_entry.place(relx=0.5, rely=0.51, anchor="center")
 
         # Mot de passe
         self.register_password_entry = ctk.CTkEntry(self, placeholder_text="Mot de passe (12+ caractères)", show="*", width=300)
-        self.register_password_entry.place(relx=0.5, rely=0.63, anchor="center")
+        self.register_password_entry.place(relx=0.5, rely=0.57, anchor="center")
+        self.register_password_entry.bind("<KeyRelease>", self._on_password_change)
+
+        # Barre de force du mot de passe
+        self._strength_bg = ctk.CTkFrame(self, width=300, height=6, fg_color="#333333", corner_radius=3)
+        self._strength_bg.place(relx=0.5, rely=0.615, anchor="center", width=300, height=6)
+        self._strength_bar = ctk.CTkFrame(self._strength_bg, height=6, fg_color="#333333", corner_radius=3)
+        self._strength_bar.place(relx=0, rely=0, relheight=1, relwidth=0)
+
+        self._strength_label = ctk.CTkLabel(
+            self, text="", font=("Segoe UI", 9), text_color="#666666"
+        )
+        self._strength_label.place(relx=0.5, rely=0.64, anchor="center")
+
+        # Confirmer le mot de passe
+        self.register_confirm_entry = ctk.CTkEntry(self, placeholder_text="Confirmer le mot de passe", show="*", width=300)
+        self.register_confirm_entry.place(relx=0.5, rely=0.68, anchor="center")
 
         # Info mot de passe
         info_label = ctk.CTkLabel(
@@ -177,7 +244,7 @@ class HomePanel(ctk.CTkFrame):
             font=("Segoe UI", 9),
             text_color="#666666"
         )
-        info_label.place(relx=0.5, rely=0.68, anchor="center")
+        info_label.place(relx=0.5, rely=0.73, anchor="center")
 
         # Bouton inscription
         btn_signup = ctk.CTkButton(
@@ -189,7 +256,7 @@ class HomePanel(ctk.CTkFrame):
             font=("Segoe UI", 16, "bold"),
             command=self.creer_compte
         )
-        btn_signup.place(relx=0.5, rely=0.75, anchor="center")
+        btn_signup.place(relx=0.5, rely=0.79, anchor="center")
 
         # Bouton retour
         btn_back = ctk.CTkButton(
@@ -202,7 +269,7 @@ class HomePanel(ctk.CTkFrame):
             font=("Segoe UI", 12),
             command=self.retour_connexion
         )
-        btn_back.place(relx=0.5, rely=0.83, anchor="center")
+        btn_back.place(relx=0.5, rely=0.86, anchor="center")
 
     def creer_compte(self):
         """Crée un nouveau compte utilisateur"""
@@ -213,10 +280,15 @@ class HomePanel(ctk.CTkFrame):
         last_name = self.lastname_entry.get().strip()
         email = self.register_email_entry.get().strip()
         password = self.register_password_entry.get()
+        confirm_password = self.register_confirm_entry.get()
 
         # Validation basique
         if not email or not password:
             messagebox.showerror("Erreur", "Email et mot de passe requis.")
+            return
+
+        if password != confirm_password:
+            messagebox.showerror("Erreur", "Les mots de passe ne correspondent pas.")
             return
 
         if len(password) < 12:
@@ -225,7 +297,7 @@ class HomePanel(ctk.CTkFrame):
 
         try:
             response = requests.post(
-                "http://127.0.0.1:8000/auth/register",
+                f"{get_api_url()}/auth/register",
                 json={
                     "email": email,
                     "password": password,
@@ -319,7 +391,7 @@ class HomePanel(ctk.CTkFrame):
 
         try:
             response = requests.post(
-                "http://127.0.0.1:8000/auth/forgot-password",
+                f"{get_api_url()}/auth/forgot-password",
                 json={"email": email},
                 timeout=10
             )
@@ -440,7 +512,7 @@ class HomePanel(ctk.CTkFrame):
 
         try:
             response = requests.post(
-                "http://127.0.0.1:8000/auth/reset-password",
+                f"{get_api_url()}/auth/reset-password",
                 json={
                     "email": email,
                     "reset_code": code,
@@ -487,7 +559,7 @@ class HomePanel(ctk.CTkFrame):
         # === Sinon : Mode normal avec API ===
         try:
             response = requests.post(
-                "http://127.0.0.1:8000/auth/login",
+                f"{get_api_url()}/auth/login",
                 json={"email": email, "password": password},
                 timeout=5
             )

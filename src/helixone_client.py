@@ -11,6 +11,7 @@ Usage:
     license = client.get_license_status()
 """
 
+import os
 import requests
 import json
 from typing import Optional, Dict, Any
@@ -32,13 +33,16 @@ class HelixOneClient:
         user (dict): Informations de l'utilisateur connecté
     """
     
-    def __init__(self, base_url: str = "http://127.0.0.1:8000"):
+    def __init__(self, base_url: str = None):
         """
         Initialiser le client
         
         Args:
             base_url: URL du backend API (par défaut: http://127.0.0.1:8000)
         """
+        if base_url is None:
+            from src.config import get_api_url
+            base_url = get_api_url()
         self.base_url = base_url.rstrip('/')
         self.token: Optional[str] = None
         self.user: Optional[Dict[str, Any]] = None
@@ -94,7 +98,7 @@ class HelixOneClient:
                 try:
                     error_detail = response.json().get("detail", response.text)
                     error_msg += f": {error_detail}"
-                except:
+                except Exception:
                     error_msg += f": {response.text}"
                 raise HelixOneAPIError(error_msg)
             
@@ -230,9 +234,47 @@ class HelixOneClient:
                 license['status'] == 'active' and 
                 license['days_remaining'] > 0
             )
-        except:
+        except Exception:
             return False
     
+    # ========================================================================
+    # GESTION DU COMPTE
+    # ========================================================================
+
+    def change_password(self, current_password: str, new_password: str) -> Dict[str, Any]:
+        """
+        Changer le mot de passe de l'utilisateur connecté
+
+        Args:
+            current_password: Mot de passe actuel
+            new_password: Nouveau mot de passe
+
+        Returns:
+            Dict avec success et message
+        """
+        data = {
+            "current_password": current_password,
+            "new_password": new_password
+        }
+        return self._make_request("POST", "/auth/change-password", data, require_auth=True)
+
+    def delete_account(self, password: str, confirmation: str) -> Dict[str, Any]:
+        """
+        Supprimer définitivement le compte utilisateur
+
+        Args:
+            password: Mot de passe pour confirmer
+            confirmation: Doit être "SUPPRIMER"
+
+        Returns:
+            Dict avec success et message
+        """
+        data = {
+            "password": password,
+            "confirmation": confirmation
+        }
+        return self._make_request("POST", "/auth/delete-account", data, require_auth=True)
+
     # ========================================================================
     # ANALYSES (à implémenter plus tard)
     # ========================================================================
@@ -315,11 +357,13 @@ if __name__ == "__main__":
     print("\n2️⃣  Inscription d'un nouvel utilisateur")
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     test_email = f"demo_{timestamp}@helixone.com"
-    
+    # Mot de passe de démo - utiliser variable d'environnement en production
+    demo_password = os.environ.get("HELIXONE_DEMO_PASSWORD", "Demo123456!")
+
     try:
         result = client.register(
             email=test_email,
-            password="Demo123456!",
+            password=demo_password,
             first_name="Demo",
             last_name="User"
         )

@@ -1,0 +1,64 @@
+{
+  "certifications": {
+    "user": {
+      "name": "HelixOne Certified User",
+      "icon": "📜",
+      "level": 1,
+      "requirements": {
+        "parcours": "debutant",
+        "quiz_score_min": 80
+      },
+      "benefits": [
+        "Badge profil",
+        "Acces communaute avancee"
+      ],
+      "color": "#00D9FF"
+    },
+    "trader": {
+      "name": "HelixOne Certified Trader",
+      "icon": "📜",
+      "level": 2,
+      "requirements": {
+        "parcours": "intermediaire",
+        "quiz_score_min": 80,
+        "prerequisite": "user"
+      },
+      "benefits": [
+        "Reduction 10% abonnement",
+        "Acces analyses premium"
+      ],
+      "color": "#FFA500"
+    },
+    "expert": {
+      "name": "HelixOne Certified Expert",
+      "icon": "📜",
+      "level": 3,
+      "requirements": {
+        "parcours": "avance",
+        "quiz_score_min": 85,
+        "prerequisite": "trader"
+      },
+      "benefits": [
+        "Acces beta nouvelles fonctionnalites",
+        "Support prioritaire"
+      ],
+      "color": "#FF4444"
+    },
+    "master": {
+      "name": "HelixOne Master",
+      "icon": "🏅",
+      "level": 4,
+      "requirements": {
+        "parcours": "expert",
+        "quiz_score_min": 90,
+        "prerequisite": "expert"
+      },
+      "benefits": [
+        "Possibilite de devenir formateur",
+        "Acces complet API",
+        "Badge Master exclusif"
+      ],
+      "color": "#FFD700"
+    }
+  }
+}

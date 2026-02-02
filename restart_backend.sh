@@ -1,21 +1,29 @@
 #!/bin/bash
 # Script pour redémarrer le backend HelixOne
 
-echo "🛑 Arrêt du backend en cours..."
-# Trouver et tuer le processus uvicorn
-pkill -f "uvicorn.*helixone-backend"
+# Déterminer le répertoire du script
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
+echo "🛑 Arrêt du backend en cours..."
+# Arrêter proprement avec SIGTERM d'abord
+pkill -f "uvicorn app.main:app" 2>/dev/null
 sleep 2
 
-echo "🚀 Démarrage du backend avec le nouvel endpoint..."
-cd helixone-backend
+# Si toujours en cours, forcer l'arrêt
+if pgrep -f "uvicorn app.main:app" > /dev/null; then
+    pkill -9 -f "uvicorn app.main:app" 2>/dev/null
+    sleep 1
+fi
 
-# Activer l'environnement virtuel et lancer
-source ../venv/bin/activate
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 &
+echo "🚀 Démarrage du backend..."
+cd "${SCRIPT_DIR}/helixone-backend"
 
-echo "✅ Backend redémarré avec l'endpoint /stock-deep-analysis"
-echo "📡 Backend accessible sur http://localhost:8000"
+# Activer l'environnement virtuel et lancer (127.0.0.1 pour sécurité en dev)
+source "${SCRIPT_DIR}/venv/bin/activate"
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000 &
+
+echo "✅ Backend redémarré"
+echo "📡 Backend accessible sur http://127.0.0.1:8000"
 echo ""
-echo "Pour vérifier que l'endpoint existe:"
-echo "curl http://localhost:8000/docs | grep stock-deep-analysis"
+echo "Pour vérifier l'API:"
+echo "curl http://127.0.0.1:8000/health"

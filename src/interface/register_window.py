@@ -10,7 +10,7 @@ import os
 # Ajouter le chemin parent pour les imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from helixone_client import HelixOneAPIError
+from src.helixone_client import HelixOneAPIError
 
 
 class RegisterWindow(ctk.CTk):

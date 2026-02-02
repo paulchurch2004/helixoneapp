@@ -1,0 +1,124 @@
+# HelixOne Trading System - Configuration Generale
+# Version 2.0 - 7 Dimensions Architecture
+
+system:
+  name: "HelixOne Trading System"
+  version: "2.0.0"
+  environment: "production"  # development, staging, production
+  timezone: "UTC"
+  log_level: "INFO"
+
+# Objectifs de Performance
+performance_targets:
+  annual_return_min: 0.08    # 8% minimum
+  annual_return_max: 0.12    # 12% maximum
+  sharpe_ratio_min: 0.80     # Sharpe > 0.80
+  max_drawdown: 0.20         # Drawdown < 20%
+  target_volatility: 0.12    # 12% volatility target
+
+# Ponderation des 7 Dimensions
+dimension_weights:
+  macro: 0.15          # PIB, CPI, PMI, Yield Curve
+  fundamental: 0.20    # P/E, ROE, FCF Yield, Ratios
+  alternative: 0.10    # Web traffic, Job postings
+  esg: 0.10            # E, S, G scores
+  market: 0.20         # TSMOM, RSI, MACD, Bollinger
+  sentiment: 0.15      # VIX, Put/Call, NLP
+  calendar: 0.10       # FOMC, NFP, Earnings
+
+# Configuration des Scenarios
+scenarios:
+  bull:
+    base_probability: 0.35
+    conditions:
+      pmi_threshold: 50
+      yield_curve_positive: true
+      vix_max: 20
+    allocation:
+      equity: 0.60
+      bonds: 0.20
+      commodities: 0.15
+      cash: 0.05
+
+  bear:
+    base_probability: 0.20
+    conditions:
+      pmi_threshold: 50
+      yield_curve_negative: true
+      vix_min: 25
+    allocation:
+      equity: 0.10
+      bonds: 0.40
+      gold: 0.20
+      cash: 0.30
+
+  sideways:
+    base_probability: 0.30
+    conditions:
+      pmi_range: [48, 52]
+      vix_range: [15, 25]
+    allocation:
+      equity: 0.25
+      bonds: 0.35
+      commodities: 0.20
+      cash: 0.20
+
+  crisis:
+    base_probability: 0.15
+    conditions:
+      vix_min: 40
+      correlation_spike: true
+    allocation:
+      equity: 0.00
+      bonds: 0.20
+      gold: 0.30
+      cash: 0.50
+
+# Schedule Journalier (UTC)
+daily_schedule:
+  data_collection: "05:00"
+  preprocessing: "06:00"
+  model_execution: "07:00"
+  scenario_generation: "07:30"
+  trading_sheet: "08:00"
+  market_open_us: "09:30"
+  market_close_us: "16:00"
+  reconciliation: "16:00"
+  daily_report: "17:00"
+
+# Configuration Database
+database:
+  type: "postgresql"
+  host: "localhost"
+  port: 5432
+  name: "helixone"
+  pool_size: 10
+
+# Configuration Cache
+cache:
+  type: "redis"
+  host: "localhost"
+  port: 6379
+  ttl_seconds: 3600
+
+# APIs externes
+external_apis:
+  fred:
+    base_url: "https://api.stlouisfed.org/fred"
+    rate_limit: 120  # requests per minute
+
+  alpha_vantage:
+    base_url: "https://www.alphavantage.co/query"
+    rate_limit: 5
+
+  finnhub:
+    base_url: "https://finnhub.io/api/v1"
+    rate_limit: 60
+
+  yahoo_finance:
+    enabled: true
+
+  interactive_brokers:
+    host: "127.0.0.1"
+    port: 7497
+    client_id: 1

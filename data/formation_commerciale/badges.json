@@ -1,0 +1,60 @@
+{
+  "badges": {
+    "first_step": {
+      "name": "Premiere pousse",
+      "icon": "🌱",
+      "description": "Terminer le premier module",
+      "condition": "first_module",
+      "xp_reward": 50
+    },
+    "studious": {
+      "name": "Etudiant assidu",
+      "icon": "📚",
+      "description": "7 jours consecutifs de formation",
+      "condition": "7_days_streak",
+      "xp_reward": 100
+    },
+    "sharpshooter": {
+      "name": "Tireur d'elite",
+      "icon": "🎯",
+      "description": "100% au quiz d'un module",
+      "condition": "quiz_100",
+      "xp_reward": 75
+    },
+    "diamond": {
+      "name": "Diamant",
+      "icon": "💎",
+      "description": "Terminer un parcours complet",
+      "condition": "complete_parcours",
+      "xp_reward": 200
+    },
+    "champion": {
+      "name": "Champion",
+      "icon": "🏆",
+      "description": "Terminer tous les parcours",
+      "condition": "all_parcours",
+      "xp_reward": 500
+    },
+    "mentor": {
+      "name": "Mentor",
+      "icon": "🤝",
+      "description": "Repondre a 10 questions d'autres utilisateurs",
+      "condition": "help_10_users",
+      "xp_reward": 150
+    },
+    "on_fire": {
+      "name": "En feu",
+      "icon": "🔥",
+      "description": "30 jours consecutifs de connexion",
+      "condition": "30_days_streak",
+      "xp_reward": 300
+    },
+    "social": {
+      "name": "Social",
+      "icon": "💬",
+      "description": "Poster 50 messages dans la communaute",
+      "condition": "50_messages",
+      "xp_reward": 100
+    }
+  }
+}

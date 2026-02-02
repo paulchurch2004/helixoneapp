@@ -1,0 +1,170 @@
+# Configuration du module Crypto HelixOne
+# Ce fichier contient les paramètres par défaut pour le trading crypto
+
+# Stratégies activées par défaut
+strategies:
+  mvrv:
+    enabled: true
+    cache_duration_hours: 24
+    min_confidence: 60  # Score minimum pour générer un signal
+
+  tsmom:
+    enabled: true
+    cache_duration_hours: 1
+    timeframes:
+      - "1M"
+      - "3M"
+      - "6M"
+      - "12M"
+    weights:
+      "1M": 0.40
+      "3M": 0.30
+      "6M": 0.20
+      "12M": 0.10
+    min_confidence: 50
+
+  gem_detector:
+    enabled: false  # Désactivé par défaut (plus risqué)
+    cache_duration_hours: 6
+    scoring_weights:
+      age_score: 0.15
+      volume_growth: 0.20
+      social_momentum: 0.20
+      dev_activity: 0.15
+      holder_distribution: 0.10
+      liquidity_score: 0.10
+      market_cap_score: 0.10
+    min_total_score: 60
+    max_market_cap: 100000000  # 100M USD max
+
+# Configuration Bybit
+bybit:
+  testnet: true  # Utiliser testnet par défaut
+  enable_rate_limit: true
+  default_type: "spot"  # spot ou future
+  max_retries: 3
+
+# Gestion du risque
+risk_management:
+  default_risk_level: "moderate"
+  risk_levels:
+    conservative:
+      max_exposure_pct: 25
+      max_position_size_pct: 5
+      max_leverage: 1
+
+    moderate:
+      max_exposure_pct: 50
+      max_position_size_pct: 10
+      max_leverage: 2
+
+    aggressive:
+      max_exposure_pct: 75
+      max_position_size_pct: 20
+      max_leverage: 5
+
+    degen:
+      max_exposure_pct: 100
+      max_position_size_pct: 50
+      max_leverage: 10
+
+  # Stop-loss par défaut (%)
+  default_stop_loss_pct: 5
+
+  # Take-profit par défaut (%)
+  default_take_profit_pct: 10
+
+  # Trailing stop (%)
+  trailing_stop_pct: 3
+
+# Watchlist
+watchlist:
+  auto_analyze: true  # Analyser automatiquement les tokens de la watchlist
+  analysis_interval_hours: 6
+
+# Alertes
+alerts:
+  enable_email: false
+  enable_push: true
+  check_interval_minutes: 5
+
+# Sources de données
+data_sources:
+  coingecko:
+    base_url: "https://api.coingecko.com/api/v3"
+    rate_limit_per_minute: 10  # Free tier
+
+  glassnode:
+    base_url: "https://api.glassnode.com/v1"
+    rate_limit_per_minute: 60
+
+  etherscan:
+    base_url: "https://api.etherscan.io/api"
+    rate_limit_per_second: 5  # Free tier
+
+  bscscan:
+    base_url: "https://api.bscscan.com/api"
+    rate_limit_per_second: 5
+
+  honeypot_is:
+    base_url: "https://api.honeypot.is/v2"
+
+# Assets supportés
+supported_assets:
+  major:
+    - BTC
+    - ETH
+    - BNB
+    - SOL
+    - ADA
+    - AVAX
+    - DOT
+    - MATIC
+
+  stablecoins:
+    - USDT
+    - USDC
+    - BUSD
+    - DAI
+
+  defi:
+    - AAVE
+    - UNI
+    - LINK
+    - CRV
+    - SUSHI
+
+# Frais de trading
+fees:
+  bybit_spot: 0.001  # 0.1%
+  bybit_futures: 0.0006  # 0.06%
+
+# Logging
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  log_trades: true
+  log_signals: true
+  log_api_calls: false
+
+# Auto-trading
+auto_trading:
+  enabled: false  # Désactivé par défaut pour sécurité
+  strategies_enabled:
+    - "mvrv"
+    - "tsmom"
+  min_signal_confidence: 75
+  max_daily_trades: 10
+  cooldown_minutes: 60  # Délai minimum entre deux trades sur même symbole
+
+# Portfolio tracking
+portfolio:
+  update_interval_minutes: 15
+  calculate_pnl: true
+  track_allocation: true
+
+# Backtesting
+backtesting:
+  enabled: true
+  initial_capital: 10000  # USD
+  commission_pct: 0.1
+  slippage_pct: 0.05

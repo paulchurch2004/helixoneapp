@@ -1,9 +1,10 @@
 """
-Service d'envoi d'emails avec SendGrid
+Service d'envoi d'emails via SMTP
 """
 
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Email, To, Content
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from app.core.config import settings
 from typing import Optional
 import logging
@@ -12,11 +13,14 @@ logger = logging.getLogger(__name__)
 
 
 class EmailService:
-    """Service pour envoyer des emails via SendGrid"""
+    """Service pour envoyer des emails via SMTP"""
 
     def __init__(self):
         self.from_email = settings.FROM_EMAIL
-        self.sendgrid_api_key = settings.SENDGRID_API_KEY
+        self.smtp_host = settings.SMTP_HOST
+        self.smtp_port = settings.SMTP_PORT
+        self.smtp_user = settings.SMTP_USER
+        self.smtp_password = settings.SMTP_PASSWORD
         self.app_name = settings.APP_NAME
 
     def _send_email(
@@ -27,7 +31,7 @@ class EmailService:
         text_content: Optional[str] = None
     ) -> bool:
         """
-        Envoie un email via SendGrid
+        Envoie un email via SMTP
 
         Args:
             to_email: Email du destinataire
@@ -38,36 +42,32 @@ class EmailService:
         Returns:
             True si envoyé, False sinon
         """
-        # Si pas de clé API configurée, log et skip
-        if not self.sendgrid_api_key or self.sendgrid_api_key == "":
-            logger.warning(f"[EMAIL SKIP] Pas de clé SendGrid configurée. Email non envoyé à {to_email}")
+        if not self.smtp_host or not self.smtp_user:
+            logger.warning(f"[EMAIL SKIP] SMTP non configuré. Email non envoyé à {to_email}")
             logger.info(f"[EMAIL CONTENT] Sujet: {subject}")
             logger.info(f"[EMAIL CONTENT] Corps: {text_content or html_content[:200]}")
             return False
 
         try:
-            message = Mail(
-                from_email=Email(self.from_email, self.app_name),
-                to_emails=To(to_email),
-                subject=subject,
-                html_content=Content("text/html", html_content)
-            )
+            msg = MIMEMultipart("alternative")
+            msg["Subject"] = subject
+            msg["From"] = f"{self.app_name} <{self.from_email}>"
+            msg["To"] = to_email
 
             if text_content:
-                message.plain_text_content = Content("text/plain", text_content)
+                msg.attach(MIMEText(text_content, "plain", "utf-8"))
+            msg.attach(MIMEText(html_content, "html", "utf-8"))
 
-            sg = SendGridAPIClient(self.sendgrid_api_key)
-            response = sg.send(message)
+            with smtplib.SMTP(self.smtp_host, self.smtp_port, timeout=30) as server:
+                server.starttls()
+                server.login(self.smtp_user, self.smtp_password)
+                server.sendmail(self.from_email, to_email, msg.as_string())
 
-            if response.status_code in [200, 201, 202]:
-                logger.info(f"✅ Email envoyé à {to_email}: {subject}")
-                return True
-            else:
-                logger.error(f"❌ Erreur envoi email à {to_email}: Status {response.status_code}")
-                return False
+            logger.info(f"Email envoyé à {to_email}: {subject}")
+            return True
 
         except Exception as e:
-            logger.error(f"❌ Exception lors de l'envoi email à {to_email}: {str(e)}")
+            logger.error(f"Erreur envoi email à {to_email}: {str(e)}")
             return False
 
     def send_welcome_email(self, to_email: str, first_name: Optional[str] = None) -> bool:
@@ -83,7 +83,7 @@ class EmailService:
         """
         name = first_name if first_name else "Nouvel utilisateur"
 
-        subject = f"Bienvenue sur {self.app_name} ! 🚀"
+        subject = f"Bienvenue sur {self.app_name} !"
 
         html_content = f"""
 <!DOCTYPE html>
@@ -105,35 +105,30 @@ class EmailService:
     <div class="container">
         <div class="header">
             <h1>{self.app_name}</h1>
-            <p>Analyse d'actions avec IA</p>
+            <p>Formation Trading</p>
         </div>
         <div class="content">
-            <h2>Bienvenue, {name} ! 🎉</h2>
+            <h2>Bienvenue, {name} !</h2>
             <p>Merci d'avoir créé votre compte sur <strong>{self.app_name}</strong>.</p>
 
             <p>Votre compte a été créé avec succès et vous disposez maintenant d'une <strong>licence d'essai de 14 jours</strong> pour découvrir toutes nos fonctionnalités :</p>
 
             <ul>
-                <li>✅ Analyse technique avancée</li>
-                <li>✅ Analyse fondamentale complète</li>
-                <li>✅ Analyse de sentiment du marché</li>
-                <li>✅ Évaluation des risques</li>
-                <li>✅ Indicateurs macroéconomiques</li>
+                <li>Formation trading interactive</li>
+                <li>Simulateur paper trading</li>
+                <li>Modules débutant à expert</li>
+                <li>Suivi de progression</li>
             </ul>
 
-            <p>Commencez dès maintenant à analyser vos actions préférées et prenez des décisions éclairées !</p>
-
-            <center>
-                <a href="{settings.BACKEND_URL}" class="button">Commencer l'analyse</a>
-            </center>
+            <p>Connectez-vous dès maintenant pour commencer votre formation !</p>
 
             <p style="margin-top: 30px; color: #666; font-size: 14px;">
                 <strong>Besoin d'aide ?</strong><br>
-                Notre équipe est là pour vous accompagner. N'hésitez pas à nous contacter.
+                Notre équipe est là pour vous accompagner.
             </p>
         </div>
         <div class="footer">
-            <p>{self.app_name} - Votre assistant d'analyse boursière</p>
+            <p>{self.app_name} - Formation Trading</p>
             <p>Cet email a été envoyé à {to_email}</p>
         </div>
     </div>
@@ -149,13 +144,12 @@ Bonjour {name},
 Merci d'avoir créé votre compte. Vous disposez maintenant d'une licence d'essai de 14 jours.
 
 Fonctionnalités incluses :
-- Analyse technique avancée
-- Analyse fondamentale complète
-- Analyse de sentiment
-- Évaluation des risques
-- Indicateurs macroéconomiques
+- Formation trading interactive
+- Simulateur paper trading
+- Modules débutant à expert
+- Suivi de progression
 
-Connectez-vous dès maintenant pour commencer : {settings.BACKEND_URL}
+Connectez-vous dès maintenant pour commencer !
 
 L'équipe {self.app_name}
         """
@@ -198,7 +192,7 @@ L'équipe {self.app_name}
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔐 Réinitialisation du mot de passe</h1>
+            <h1>Réinitialisation du mot de passe</h1>
         </div>
         <div class="content">
             <h2>Demande de réinitialisation</h2>
@@ -221,7 +215,7 @@ L'équipe {self.app_name}
             </ol>
 
             <div class="warning">
-                <strong>⚠️ Important :</strong><br>
+                <strong>Important :</strong><br>
                 Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.
                 Votre mot de passe actuel reste inchangé.
             </div>
@@ -231,7 +225,7 @@ L'équipe {self.app_name}
             </p>
         </div>
         <div class="footer">
-            <p>{self.app_name} - Analyse boursière avec IA</p>
+            <p>{self.app_name} - Formation Trading</p>
             <p>Cet email a été envoyé à {to_email}</p>
         </div>
     </div>

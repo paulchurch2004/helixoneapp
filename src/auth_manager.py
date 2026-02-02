@@ -11,7 +11,7 @@ from typing import Optional, Dict, Any
 # Ajouter le dossier parent au path pour trouver helixone_client
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from helixone_client import HelixOneClient, HelixOneAPIError
+from src.helixone_client import HelixOneClient, HelixOneAPIError
 
 
 class AuthManager:
@@ -23,13 +23,16 @@ class AuthManager:
         token_file (str): Chemin du fichier de sauvegarde du token
     """
     
-    def __init__(self, backend_url: str = "http://127.0.0.1:8000"):
+    def __init__(self, backend_url: str = None):
         """
         Initialiser le gestionnaire d'authentification
         
         Args:
             backend_url: URL du backend API
         """
+        from src.config import get_api_url
+        if backend_url is None:
+            backend_url = get_api_url()
         self.client = HelixOneClient(base_url=backend_url)
         self.token_file = os.path.expanduser("~/.helixone_session.json")
     
@@ -172,7 +175,7 @@ class AuthManager:
         """
         try:
             return self.client.is_license_valid()
-        except:
+        except Exception:
             return False
 
 

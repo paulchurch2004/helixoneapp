@@ -1,0 +1,131 @@
+# HelixOne - Limites de Risque Institutionnelles
+# Configuration stricte pour gestion des risques
+
+# Limites de Position
+position_limits:
+  max_single_position: 0.25      # 25% max par position
+  max_sector_exposure: 0.40      # 40% max par secteur
+  max_country_non_us: 0.20       # 20% max hors US
+  min_positions: 10              # Minimum 10 positions
+  max_positions: 30              # Maximum 30 positions
+  max_leverage: 2.0              # Levier maximum 2x
+
+# Limites de Volatilite
+volatility_limits:
+  target_portfolio_vol: 0.12     # 12% volatilite cible
+  max_portfolio_vol: 0.18        # 18% volatilite max
+  vol_scaling_enabled: true      # Vol targeting actif
+
+# Limites Drawdown
+drawdown_limits:
+  alert_threshold: 0.10          # -10% alerte
+  reduction_threshold: 0.15      # -15% reduction 50%
+  exit_threshold: 0.20           # -20% sortie totale
+  daily_loss_limit: 0.03         # -3% perte journaliere max
+
+# Actions selon Drawdown
+drawdown_actions:
+  level_1:  # -10%
+    action: "ALERT"
+    reduce_exposure: 0.0
+    notify: ["email", "slack"]
+
+  level_2:  # -15%
+    action: "REDUCE"
+    reduce_exposure: 0.50
+    notify: ["email", "slack", "sms"]
+
+  level_3:  # -20%
+    action: "EXIT"
+    reduce_exposure: 1.0
+    notify: ["email", "slack", "sms", "call"]
+
+# Limites par Classe d'Actifs
+asset_class_limits:
+  equity:
+    min: 0.0
+    max: 0.70
+
+  bonds:
+    min: 0.10
+    max: 0.60
+
+  commodities:
+    min: 0.0
+    max: 0.25
+
+  cash:
+    min: 0.05
+    max: 0.50
+
+  alternatives:
+    min: 0.0
+    max: 0.15
+
+# Regles VIX
+vix_rules:
+  complacency:  # VIX < 12
+    equity_max: 0.50
+    action: "prudence - marche complaisant"
+
+  normal:  # VIX 15-20
+    equity_max: 0.70
+    action: "allocation normale"
+
+  elevated:  # VIX 25-30
+    equity_max: 0.40
+    reduce_equity: 0.20
+    action: "reduire exposition"
+
+  crisis:  # VIX > 40
+    equity_max: 0.20
+    action: "mode defensif / opportunite achat"
+
+# Regles Yield Curve
+yield_curve_rules:
+  inverted_3m:  # Inversee depuis 3 mois
+    reduce_equity: 0.30
+    action: "signal recession - reduire equity 30%"
+
+  steep:  # Pentue > 1%
+    action: "signal expansion - allocation normale"
+
+# Regles Calendrier Economique
+calendar_rules:
+  high_impact:  # FOMC, NFP, CPI
+    reduce_exposure: 0.50
+    hours_before: 24
+    events: ["FOMC", "NFP", "CPI"]
+
+  medium_impact:  # BCE, Earnings FAANG
+    reduce_exposure: 0.30
+    hours_before: 12
+    events: ["ECB", "EARNINGS_MAJOR"]
+
+# Position Sizing (Vol Targeting)
+position_sizing:
+  method: "volatility_targeting"
+  target_vol: 0.12
+  lookback_days: 60
+  min_weight: 0.02
+  max_weight: 0.25
+  formula: "size = (target_vol / asset_vol) * signal * portfolio_value"
+
+# Rebalancement
+rebalancing:
+  frequency: "monthly"
+  threshold: 0.05  # 5% drift trigger
+  tax_aware: true
+  transaction_cost_limit: 0.001  # 10 bps max
+
+# Correlation Limits
+correlation_limits:
+  max_pair_correlation: 0.85
+  portfolio_correlation_trigger: 0.70
+  action: "reduire positions correlees"
+
+# Liquidity Requirements
+liquidity:
+  min_avg_volume_usd: 10000000   # $10M volume min
+  max_adv_percent: 0.05          # 5% ADV max per trade
+  market_impact_limit: 0.001     # 10 bps impact max

@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 import uuid
 
 from app.core.database import Base
+from app.core.time_utils import utc_now_naive, is_expired, days_until
 
 
 def generate_uuid():
@@ -64,7 +65,7 @@ class License(Base):
     quota_daily_api_calls = Column(Integer, default=200)
     
     # Dates
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now_naive)
     activated_at = Column(DateTime, nullable=True)
     expires_at = Column(DateTime, nullable=True)
     last_validated_at = Column(DateTime, nullable=True)
@@ -83,16 +84,13 @@ class License(Base):
         """Vérifie si la licence est valide"""
         if self.status != "active":
             return False
-        
-        if self.expires_at and datetime.utcnow() > self.expires_at:
+
+        if is_expired(self.expires_at):
             return False
-        
+
         return True
-    
+
     def days_remaining(self):
         """Retourne le nombre de jours restants"""
-        if not self.expires_at:
-            return None
-        
-        delta = self.expires_at - datetime.utcnow()
-        return max(0, delta.days)
+        days = days_until(self.expires_at)
+        return max(0, days) if days is not None else None

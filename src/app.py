@@ -30,7 +30,7 @@ class HelixOneApp:
         ctk.set_default_color_theme("blue")
         
         # Créer le gestionnaire d'authentification
-        self.auth_manager = AuthManager(backend_url="http://127.0.0.1:8000")
+        self.auth_manager = AuthManager()
         
         # Variable pour stocker la fenêtre actuelle
         self.current_window = None
@@ -62,7 +62,7 @@ class HelixOneApp:
         if self.current_window:
             try:
                 self.current_window.destroy()
-            except:
+            except Exception:
                 pass
         
         # Créer la fenêtre de login
@@ -147,7 +147,7 @@ class HelixOneApp:
         if self.current_window:
             try:
                 self.current_window.destroy()
-            except:
+            except Exception:
                 pass
         
         # Importer depuis src/interface/main_app.py
@@ -183,7 +183,7 @@ class HelixOneApp:
             try:
                 self.current_window.quit()
                 self.current_window.destroy()
-            except:
+            except Exception:
                 pass
         
         # Retour au login

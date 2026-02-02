@@ -4,6 +4,7 @@ import threading
 import time
 import pygame
 from src.interface.main_window import launch_helixone_ui as lancer_interface
+from src.asset_path import get_asset_path
 
 # === Compatibilité Pillow : remplace ANTIALIAS si supprimé ===
 try:
@@ -59,8 +60,12 @@ class PlasmaIntro(tk.Tk):
 
     def load_logo(self):
         try:
-            img = Image.open("assets/logo2.png").convert("RGBA")
-            img = img.resize((180, 90), resample_mode)
+            img = Image.open(get_asset_path("logo.png")).convert("RGBA")
+            # Redimensionner en gardant les proportions
+            original_ratio = img.width / img.height
+            new_width = 160
+            new_height = int(new_width / original_ratio)
+            img = img.resize((new_width, new_height), resample_mode)
             self.logo_img = img
             self.update_logo(alpha=1.0)
         except Exception as e:
@@ -106,13 +111,13 @@ class PlasmaIntro(tk.Tk):
                 next_color = "#00C9FF" if current_width == 4 else "#0277BD"
                 self.canvas.itemconfig(self.halo, outline=next_color, width=next_width)
                 self.after(300, self.animate_halo)
-            except:
+            except Exception:
                 pass  # Widget supprimé, on ne relance pas
 
     def play_start_sound(self):
         try:
             pygame.mixer.init()
-            pygame.mixer.music.load("assets/son_start.mp3")
+            pygame.mixer.music.load(get_asset_path("son_start.mp3"))
             pygame.mixer.music.play()
         except Exception as e:
             print(f"[⚠️] Erreur audio : {e}")

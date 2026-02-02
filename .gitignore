@@ -48,8 +48,9 @@ helixone.db
 # Session files
 .helixone_session.json
 
-# Logs
+# Logs et Process IDs
 *.log
+*.pid
 logs/
 uvicorn.log
 
@@ -93,6 +94,13 @@ data/*.json
 tmp/
 temp/
 *.tmp
+*.bak
+*.backup
+
+# Diagnostic files
+diagnostic_*.json
+diagnostic_*.py
+test_*_affichage.py
 
 # User-specific files
 .helixone_config.json

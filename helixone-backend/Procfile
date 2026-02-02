@@ -1,0 +1,5 @@
+# Heroku Procfile pour HelixOne Backend
+# Release: exécuter les migrations avant le déploiement
+release: alembic upgrade head || echo "Pas de migrations ou alembic non configuré"
+# Web: serveur avec workers pour production
+web: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 2

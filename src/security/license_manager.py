@@ -90,7 +90,7 @@ class LicenseManager:
                         lines = result.stdout.strip().split('\n')
                         if len(lines) > 1:
                             machine_info.append(lines[1].strip())
-            except:
+            except Exception:
                 pass
             
             combined = "|".join(filter(None, machine_info))

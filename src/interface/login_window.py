@@ -4,13 +4,17 @@ Fenêtre de connexion HelixOne
 
 import customtkinter as ctk
 from tkinter import messagebox
+from PIL import Image
+from pathlib import Path
 import sys
 import os
 
 # Ajouter le chemin parent pour les imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from helixone_client import HelixOneAPIError
+from src.helixone_client import HelixOneAPIError
+from src.i18n import t
+from src.asset_path import get_asset_path
 
 
 class LoginWindow(ctk.CTk):
@@ -26,7 +30,7 @@ class LoginWindow(ctk.CTk):
         self.success_callback = None
         
         # Configuration fenêtre
-        self.title("HelixOne - Connexion")
+        self.title(f"HelixOne - {t('auth.login')}")
         self.geometry("450x550")
         self.resizable(False, False)
         
@@ -52,54 +56,79 @@ class LoginWindow(ctk.CTk):
         main_frame = ctk.CTkFrame(self, fg_color="transparent")
         main_frame.pack(fill="both", expand=True, padx=40, pady=40)
         
-        # Logo / Titre
-        title_label = ctk.CTkLabel(
-            main_frame,
-            text="HelixOne",
-            font=("Arial", 36, "bold"),
-            text_color="#1f538d"
-        )
-        title_label.pack(pady=(0, 10))
+        # Logo image
+        try:
+            logo_path = get_asset_path("logo.png")
+            if logo_path:
+                logo_image = Image.open(logo_path)
+                # Redimensionner pour la page login (max 150px de large)
+                ratio = logo_image.width / logo_image.height
+                new_width = min(150, logo_image.width)
+                new_height = int(new_width / ratio)
+
+                self.logo_ctk = ctk.CTkImage(
+                    light_image=logo_image,
+                    dark_image=logo_image,
+                    size=(new_width, new_height)
+                )
+
+                logo_label = ctk.CTkLabel(
+                    main_frame,
+                    image=self.logo_ctk,
+                    text=""
+                )
+                logo_label.pack(pady=(0, 10))
+            else:
+                raise FileNotFoundError()
+        except Exception:
+            # Fallback texte si logo non trouvé
+            title_label = ctk.CTkLabel(
+                main_frame,
+                text="HelixOne",
+                font=("Arial", 36, "bold"),
+                text_color="#1f538d"
+            )
+            title_label.pack(pady=(0, 10))
         
         subtitle_label = ctk.CTkLabel(
             main_frame,
-            text="Analyse d'actions avec IA",
+            text=t('app.subtitle'),
             font=("Arial", 14),
             text_color="gray"
         )
         subtitle_label.pack(pady=(0, 40))
-        
+
         # Email
         email_label = ctk.CTkLabel(
             main_frame,
-            text="Email",
+            text=t('auth.email'),
             font=("Arial", 12, "bold"),
             anchor="w"
         )
         email_label.pack(fill="x", pady=(0, 5))
-        
+
         self.email_entry = ctk.CTkEntry(
             main_frame,
             height=40,
-            placeholder_text="votre@email.com",
+            placeholder_text=t('auth.email_placeholder'),
             font=("Arial", 12)
         )
         self.email_entry.pack(fill="x", pady=(0, 20))
-        
+
         # Mot de passe
         password_label = ctk.CTkLabel(
             main_frame,
-            text="Mot de passe",
+            text=t('auth.password'),
             font=("Arial", 12, "bold"),
             anchor="w"
         )
         password_label.pack(fill="x", pady=(0, 5))
-        
+
         self.password_entry = ctk.CTkEntry(
             main_frame,
             height=40,
             show="•",
-            placeholder_text="Votre mot de passe",
+            placeholder_text=t('auth.password_placeholder'),
             font=("Arial", 12)
         )
         self.password_entry.pack(fill="x", pady=(0, 10))
@@ -119,30 +148,30 @@ class LoginWindow(ctk.CTk):
         # Bouton connexion
         login_button = ctk.CTkButton(
             main_frame,
-            text="Se connecter",
+            text=t('auth.login_button'),
             height=40,
             font=("Arial", 14, "bold"),
             command=self.handle_login
         )
         login_button.pack(fill="x", pady=(10, 20))
-        
+
         # Séparateur
         separator_frame = ctk.CTkFrame(main_frame, height=1, fg_color="gray")
         separator_frame.pack(fill="x", pady=20)
-        
+
         # Texte "Pas de compte ?"
         no_account_label = ctk.CTkLabel(
             main_frame,
-            text="Pas encore de compte ?",
+            text=t('auth.register'),
             font=("Arial", 11),
             text_color="gray"
         )
         no_account_label.pack()
-        
+
         # Bouton inscription
         register_button = ctk.CTkButton(
             main_frame,
-            text="Créer un compte",
+            text=t('auth.register_button'),
             height=40,
             font=("Arial", 13),
             fg_color="transparent",
@@ -154,51 +183,57 @@ class LoginWindow(ctk.CTk):
         )
         register_button.pack(fill="x", pady=(10, 0))
     
-    def handle_login(self):
-        """Gérer la connexion"""
+    def handle_login(self, totp_code: str = None):
+        """Gérer la connexion (avec support 2FA)"""
         email = self.email_entry.get().strip()
         password = self.password_entry.get()
-        
+
         # Validation
         if not email:
-            self.error_label.configure(text="⚠️ Veuillez entrer votre email")
+            self.error_label.configure(text=f"⚠️ {t('auth.email')}")
             return
-        
+
         if not password:
-            self.error_label.configure(text="⚠️ Veuillez entrer votre mot de passe")
+            self.error_label.configure(text=f"⚠️ {t('auth.password')}")
             return
-        
+
         # Désactiver le bouton pendant la requête
-        self.error_label.configure(text="⏳ Connexion en cours...", text_color="blue")
+        self.error_label.configure(text=f"⏳ {t('app.loading')}", text_color="blue")
         self.update()
-        
+
         try:
-            # Appeler l'API
-            result = self.auth_manager.login(email, password)
-            
+            # Appeler l'API avec le code 2FA si fourni
+            result = self.auth_manager.login(email, password, totp_code)
+
+            # Vérifier si 2FA est requis
+            if result.get("requires_2fa"):
+                self.error_label.configure(text="", text_color="red")
+                self._show_2fa_dialog(email, password)
+                return
+
             # Récupérer la licence
             license = self.auth_manager.get_license_info()
-            
+
             # Afficher message de succès
             messagebox.showinfo(
-                "Connexion réussie",
-                f"Bienvenue !\n\n"
+                t('auth.login_success'),
+                f"{t('app.success')} !\n\n"
                 f"Licence : {license['license_type'].upper()}\n"
                 f"Jours restants : {license['days_remaining']}"
             )
-            
+
             # Callback de succès
             if self.success_callback:
                 self.success_callback()
-            
+
             # Fermer la fenêtre
             self.destroy()
-            
+
         except HelixOneAPIError as e:
             error_msg = str(e)
             if "401" in error_msg or "incorrect" in error_msg.lower():
                 self.error_label.configure(
-                    text="❌ Email ou mot de passe incorrect",
+                    text=f"❌ {t('auth.invalid_credentials')}",
                     text_color="red"
                 )
             else:
@@ -208,21 +243,176 @@ class LoginWindow(ctk.CTk):
                 )
         except Exception as e:
             self.error_label.configure(
-                text=f"❌ Erreur : {str(e)}",
+                text=f"❌ {t('app.error')}: {str(e)}",
                 text_color="red"
             )
     
+    def _show_2fa_dialog(self, email: str, password: str):
+        """Affiche le dialogue pour entrer le code 2FA"""
+        dialog = TwoFALoginDialog(self, email, password, self.auth_manager, self._on_2fa_success)
+
+    def _on_2fa_success(self):
+        """Callback après 2FA réussi"""
+        # Récupérer la licence
+        try:
+            license = self.auth_manager.get_license_info()
+            messagebox.showinfo(
+                t('auth.login_success'),
+                f"{t('app.success')} !\n\n"
+                f"Licence : {license['license_type'].upper()}\n"
+                f"Jours restants : {license['days_remaining']}"
+            )
+        except Exception:
+            pass
+
+        if self.success_callback:
+            self.success_callback()
+        self.destroy()
+
     def show_register(self):
         if self.register_callback:
             self.register_callback()
-       
+
     def set_register_callback(self, callback):
         """Définir la fonction à appeler pour l'inscription"""
         self.register_callback = callback
-    
+
     def set_success_callback(self, callback):
         """Définir la fonction à appeler après connexion réussie"""
         self.success_callback = callback
+
+
+class TwoFALoginDialog(ctk.CTkToplevel):
+    """Dialogue pour entrer le code 2FA lors de la connexion"""
+
+    def __init__(self, parent, email: str, password: str, auth_manager, success_callback):
+        super().__init__(parent)
+
+        self.email = email
+        self.password = password
+        self.auth_manager = auth_manager
+        self.success_callback = success_callback
+
+        self.title("Authentification 2FA")
+        self.geometry("400x300")
+        self.configure(fg_color="#0f1117")
+        self.resizable(False, False)
+        self.transient(parent)
+        self.grab_set()
+
+        self._create_ui()
+
+        # Centrer
+        self.update_idletasks()
+        x = (self.winfo_screenwidth() - 400) // 2
+        y = (self.winfo_screenheight() - 300) // 2
+        self.geometry(f"+{x}+{y}")
+
+    def _create_ui(self):
+        # Header
+        header = ctk.CTkFrame(self, fg_color="#1a1d24", height=60)
+        header.pack(fill="x")
+        header.pack_propagate(False)
+
+        ctk.CTkLabel(
+            header, text="🔐 Vérification 2FA",
+            font=("Arial", 18, "bold"),
+            text_color="#FFFFFF"
+        ).pack(side="left", padx=25, pady=15)
+
+        # Content
+        content = ctk.CTkFrame(self, fg_color="transparent")
+        content.pack(fill="both", expand=True, padx=30, pady=25)
+
+        ctk.CTkLabel(
+            content,
+            text="Entrez le code à 6 chiffres de votre\napp d'authentification",
+            font=("Arial", 14),
+            text_color="#AAAAAA",
+            justify="center"
+        ).pack(pady=(0, 20))
+
+        # Code entry
+        self.code_entry = ctk.CTkEntry(
+            content,
+            height=60,
+            font=("Courier", 28, "bold"),
+            fg_color="#1a1d24",
+            border_color="#2a2d36",
+            justify="center",
+            placeholder_text="000000"
+        )
+        self.code_entry.pack(fill="x", pady=(0, 15))
+        self.code_entry.bind("<Return>", lambda e: self._verify())
+        self.code_entry.focus()
+
+        # Error label
+        self.error_label = ctk.CTkLabel(
+            content,
+            text="",
+            font=("Arial", 12),
+            text_color="#FF4444"
+        )
+        self.error_label.pack(pady=(0, 10))
+
+        # Buttons
+        btn_frame = ctk.CTkFrame(content, fg_color="transparent")
+        btn_frame.pack(fill="x")
+
+        ctk.CTkButton(
+            btn_frame,
+            text="Annuler",
+            font=("Arial", 13),
+            fg_color="#2a2d36",
+            hover_color="#3a3d46",
+            height=42,
+            corner_radius=8,
+            command=self.destroy
+        ).pack(side="left", expand=True, padx=(0, 5))
+
+        self.verify_btn = ctk.CTkButton(
+            btn_frame,
+            text="Vérifier",
+            font=("Arial", 13, "bold"),
+            fg_color="#00D9FF",
+            hover_color="#00B8E6",
+            text_color="#000000",
+            height=42,
+            corner_radius=8,
+            command=self._verify
+        )
+        self.verify_btn.pack(side="right", expand=True, padx=(5, 0))
+
+    def _verify(self):
+        """Vérifie le code 2FA"""
+        code = self.code_entry.get().strip()
+
+        if not code or len(code) != 6 or not code.isdigit():
+            self.error_label.configure(text="Entrez un code à 6 chiffres")
+            return
+
+        try:
+            self.verify_btn.configure(state="disabled", text="Vérification...")
+            self.update()
+
+            # Tenter la connexion avec le code 2FA
+            result = self.auth_manager.login(self.email, self.password, code)
+
+            if result.get("access_token"):
+                # Succès
+                self.destroy()
+                self.success_callback()
+            else:
+                self.error_label.configure(text="Erreur de connexion")
+                self.verify_btn.configure(state="normal", text="Vérifier")
+
+        except Exception as e:
+            error_msg = str(e)
+            if "invalide" in error_msg.lower() or "2fa" in error_msg.lower():
+                self.error_label.configure(text="Code incorrect")
+            else:
+                self.error_label.configure(text=f"Erreur: {error_msg}")
+            self.verify_btn.configure(state="normal", text="Vérifier")
 
 
 # Test du module

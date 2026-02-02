@@ -1,6 +1,7 @@
 import os
 import json
 import keyring
+import subprocess
 from cryptography.fernet import Fernet
 from pathlib import Path
 import base64
@@ -28,7 +29,7 @@ class SecureConfigManager:
             key_b64 = keyring.get_password(self.app_name, "encryption_key")
             if key_b64:
                 return base64.b64decode(key_b64.encode())
-        except:
+        except Exception:
             pass
         
         # Créer une nouvelle clé basée sur l'ID machine
@@ -38,14 +39,17 @@ class SecureConfigManager:
         try:
             # Stocker dans le keyring système
             keyring.set_password(self.app_name, "encryption_key", base64.b64encode(key).decode())
-        except:
+        except Exception:
             # Fallback : stocker dans un fichier caché
             key_file = self.config_dir / ".key"
             with open(key_file, "wb") as f:
                 f.write(key)
-            # Rendre le fichier caché sur Windows
+            # Rendre le fichier caché sur Windows (utilise subprocess pour éviter injection)
             if os.name == 'nt':
-                os.system(f'attrib +h "{key_file}"')
+                try:
+                    subprocess.run(['attrib', '+h', str(key_file)], check=False, capture_output=True)
+                except (subprocess.SubprocessError, FileNotFoundError):
+                    pass  # Ignorer si attrib n'est pas disponible
         
         return key
     
@@ -65,7 +69,7 @@ class SecureConfigManager:
         try:
             # Stocker dans le keyring système (préféré)
             keyring.set_password(self.app_name, f"api_{service}", base64.b64encode(encrypted_key).decode())
-        except:
+        except Exception:
             # Fallback : fichier chiffré
             keys_file = self.config_dir / "api_keys.enc"
             keys_data = {}
@@ -74,7 +78,7 @@ class SecureConfigManager:
                 try:
                     with open(keys_file, "r") as f:
                         keys_data = json.load(f)
-                except:
+                except Exception:
                     keys_data = {}
             
             keys_data[service] = base64.b64encode(encrypted_key).decode()
@@ -92,7 +96,7 @@ class SecureConfigManager:
         try:
             # Essayer le keyring système
             encrypted_key_b64 = keyring.get_password(self.app_name, f"api_{service}")
-        except:
+        except Exception:
             pass
         
         if not encrypted_key_b64:
@@ -103,7 +107,7 @@ class SecureConfigManager:
                     with open(keys_file, "r") as f:
                         keys_data = json.load(f)
                     encrypted_key_b64 = keys_data.get(service)
-                except:
+                except Exception:
                     pass
         
         if not encrypted_key_b64:
@@ -124,7 +128,7 @@ class SecureConfigManager:
             for service in ["openai", "finnhub", "polygon", "twelvedata", "alphavantage", "eod"]:
                 if keyring.get_password(self.app_name, f"api_{service}"):
                     apis.append(service)
-        except:
+        except Exception:
             pass
         
         # Vérifier le fichier
@@ -134,7 +138,7 @@ class SecureConfigManager:
                 with open(keys_file, "r") as f:
                     keys_data = json.load(f)
                 apis.extend(keys_data.keys())
-            except:
+            except Exception:
                 pass
         
         return list(set(apis))
@@ -150,7 +154,7 @@ class SecureConfigManager:
             try:
                 with open(self.config_file, "r") as f:
                     return json.load(f)
-            except:
+            except Exception:
                 pass
         
         return {
