@@ -102,5 +102,10 @@ diagnostic_*.json
 diagnostic_*.py
 test_*_affichage.py
 
+# Build artifacts
+HelixOne.app/
+*.dmg
+*.app/
+
 # User-specific files
 .helixone_config.json
