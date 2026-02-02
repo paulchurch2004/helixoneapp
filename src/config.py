@@ -30,7 +30,7 @@ _CONFIGS = {
     },
     "production": {
         # URL du backend deploye sur Render
-        "API_BASE_URL": os.environ.get("HELIXONE_API_URL", "https://helixone-api.onrender.com"),
+        "API_BASE_URL": os.environ.get("HELIXONE_API_URL", "https://helixone-apii.onrender.com"),
         "API_TIMEOUT": 45,
         "DEBUG": False,
     }
