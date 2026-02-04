@@ -7,6 +7,7 @@ import os
 from tkinter import messagebox
 import requests
 import sys
+from src.asset_path import get_asset_path
 
 # Import du module de gestion de session
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -34,15 +35,49 @@ class HomePanel(ctk.CTkFrame):
         self._destroyed = False
         self._update_thread = None
         self._stop_updates = False
+        self._server_ready = False
+        self._status_label = None
 
         self.place_ui()
         self.after(1000, self.afficher_logo)
         self.after(1500, self.afficher_formulaire_connexion)
         self.after(2000, self.afficher_indices)
 
+        # Wake-up ping au serveur en arrière-plan
+        threading.Thread(target=self._wake_up_server, daemon=True).start()
+
+    def _wake_up_server(self):
+        """Envoie un ping au serveur pour le réveiller (cold start Render)"""
+        try:
+            requests.get(f"{get_api_url()}/", timeout=120)
+            self._server_ready = True
+            print("[OK] Serveur réveillé")
+        except Exception:
+            self._server_ready = False
+            print("[WARN] Serveur non joignable")
+
+    def _show_status(self, text):
+        """Affiche un message de statut sous le formulaire"""
+        if self._destroyed:
+            return
+        if self._status_label:
+            self._status_label.destroy()
+        self._status_label = ctk.CTkLabel(
+            self, text=text,
+            font=("Segoe UI", 12),
+            text_color="#00BFFF"
+        )
+        self._status_label.place(relx=0.5, rely=0.92, anchor="center")
+
+    def _hide_status(self):
+        """Cache le message de statut"""
+        if self._status_label:
+            self._status_label.destroy()
+            self._status_label = None
+
     def place_ui(self):
         try:
-            bg_img = Image.open("assets/fond_texture.png").resize((1200, 800))
+            bg_img = Image.open(get_asset_path("fond_texture.png")).resize((1200, 800))
             bg = ctk.CTkImage(light_image=bg_img, size=(1200, 800))
             bg_label = ctk.CTkLabel(self, image=bg, text="")
             bg_label.image = bg
@@ -57,7 +92,7 @@ class HomePanel(ctk.CTkFrame):
         if self._destroyed:
             return
         try:
-            logo_img = Image.open("assets/logo2.png").resize((160, 160))
+            logo_img = Image.open(get_asset_path("logo2.png")).resize((160, 160))
             logo = ctk.CTkImage(light_image=logo_img, size=(160, 160))
             logo_label = ctk.CTkLabel(self, image=logo, text="")
             logo_label.image = logo
@@ -124,16 +159,33 @@ class HomePanel(ctk.CTkFrame):
     def verifier_connexion(self):
         if self._destroyed:
             return
-            
+
         email = self.email_entry.get()
         password = self.password_entry.get()
 
-        if self.authentifier_utilisateur(email, password):
+        if not email or not password:
+            messagebox.showerror("Erreur", "Email et mot de passe requis.")
+            return
+
+        self._show_status("Connexion en cours... (le serveur peut mettre quelques secondes)")
+        threading.Thread(target=self._do_login, args=(email, password), daemon=True).start()
+
+    def _do_login(self, email, password):
+        success, error_msg = self.authentifier_utilisateur(email, password)
+        if self._destroyed:
+            return
+        self.after(0, lambda: self._on_login_result(success, error_msg))
+
+    def _on_login_result(self, success, error_msg):
+        self._hide_status()
+        if self._destroyed:
+            return
+        if success:
             self._destroyed = True
             self._stop_updates = True
             self.on_continue_callback()
         else:
-            messagebox.showerror("Erreur", "Identifiants invalides.")
+            messagebox.showerror("Erreur", error_msg)
 
     def _evaluer_force_mdp(self, password):
         """Évalue la force d'un mot de passe. Retourne (score, label, couleur)."""
@@ -190,61 +242,68 @@ class HomePanel(ctk.CTkFrame):
         if self._destroyed:
             return
 
-        # Cacher les widgets de connexion
+        # Cacher TOUS les widgets existants (y compris frames)
         for widget in self.winfo_children():
-            if isinstance(widget, (ctk.CTkEntry, ctk.CTkButton, ctk.CTkLabel)):
-                if widget != self.top_frame:
-                    widget.place_forget()
+            widget.place_forget()
 
         # Titre
         title_label = ctk.CTkLabel(
             self,
             text="Créer un compte",
-            font=("Segoe UI", 24, "bold"),
+            font=("Segoe UI", 22, "bold"),
             text_color="#00BFFF"
         )
-        title_label.place(relx=0.5, rely=0.30, anchor="center")
+        title_label.place(relx=0.5, rely=0.05, anchor="center")
+        self._register_widgets = [title_label]
 
         # Prénom
-        self.firstname_entry = ctk.CTkEntry(self, placeholder_text="Prénom", width=300)
-        self.firstname_entry.place(relx=0.5, rely=0.39, anchor="center")
+        self.firstname_entry = ctk.CTkEntry(self, placeholder_text="Prénom", width=300, height=32)
+        self.firstname_entry.place(relx=0.5, rely=0.14, anchor="center")
+        self._register_widgets.append(self.firstname_entry)
 
         # Nom
-        self.lastname_entry = ctk.CTkEntry(self, placeholder_text="Nom", width=300)
-        self.lastname_entry.place(relx=0.5, rely=0.45, anchor="center")
+        self.lastname_entry = ctk.CTkEntry(self, placeholder_text="Nom", width=300, height=32)
+        self.lastname_entry.place(relx=0.5, rely=0.22, anchor="center")
+        self._register_widgets.append(self.lastname_entry)
 
         # Email
-        self.register_email_entry = ctk.CTkEntry(self, placeholder_text="Adresse Email", width=300)
-        self.register_email_entry.place(relx=0.5, rely=0.51, anchor="center")
+        self.register_email_entry = ctk.CTkEntry(self, placeholder_text="Adresse Email", width=300, height=32)
+        self.register_email_entry.place(relx=0.5, rely=0.30, anchor="center")
+        self._register_widgets.append(self.register_email_entry)
 
         # Mot de passe
-        self.register_password_entry = ctk.CTkEntry(self, placeholder_text="Mot de passe (12+ caractères)", show="*", width=300)
-        self.register_password_entry.place(relx=0.5, rely=0.57, anchor="center")
+        self.register_password_entry = ctk.CTkEntry(self, placeholder_text="Mot de passe (12+ caractères)", show="*", width=300, height=32)
+        self.register_password_entry.place(relx=0.5, rely=0.38, anchor="center")
         self.register_password_entry.bind("<KeyRelease>", self._on_password_change)
+        self._register_widgets.append(self.register_password_entry)
 
         # Barre de force du mot de passe
-        self._strength_bg = ctk.CTkFrame(self, width=300, height=6, fg_color="#333333", corner_radius=3)
-        self._strength_bg.place(relx=0.5, rely=0.615, anchor="center", width=300, height=6)
-        self._strength_bar = ctk.CTkFrame(self._strength_bg, height=6, fg_color="#333333", corner_radius=3)
+        self._strength_bg = ctk.CTkFrame(self, width=300, height=5, fg_color="#333333", corner_radius=3)
+        self._strength_bg.place(relx=0.5, rely=0.425, anchor="center")
+        self._strength_bar = ctk.CTkFrame(self._strength_bg, height=5, fg_color="#333333", corner_radius=3)
         self._strength_bar.place(relx=0, rely=0, relheight=1, relwidth=0)
+        self._register_widgets.append(self._strength_bg)
 
         self._strength_label = ctk.CTkLabel(
             self, text="", font=("Segoe UI", 9), text_color="#666666"
         )
-        self._strength_label.place(relx=0.5, rely=0.64, anchor="center")
+        self._strength_label.place(relx=0.5, rely=0.45, anchor="center")
+        self._register_widgets.append(self._strength_label)
 
         # Confirmer le mot de passe
-        self.register_confirm_entry = ctk.CTkEntry(self, placeholder_text="Confirmer le mot de passe", show="*", width=300)
-        self.register_confirm_entry.place(relx=0.5, rely=0.68, anchor="center")
+        self.register_confirm_entry = ctk.CTkEntry(self, placeholder_text="Confirmer le mot de passe", show="*", width=300, height=32)
+        self.register_confirm_entry.place(relx=0.5, rely=0.50, anchor="center")
+        self._register_widgets.append(self.register_confirm_entry)
 
         # Info mot de passe
         info_label = ctk.CTkLabel(
             self,
-            text="Le mot de passe doit contenir: majuscule, minuscule, chiffre et caractère spécial",
+            text="Majuscule, minuscule, chiffre et caractère spécial requis",
             font=("Segoe UI", 9),
             text_color="#666666"
         )
-        info_label.place(relx=0.5, rely=0.73, anchor="center")
+        info_label.place(relx=0.5, rely=0.56, anchor="center")
+        self._register_widgets.append(info_label)
 
         # Bouton inscription
         btn_signup = ctk.CTkButton(
@@ -253,10 +312,12 @@ class HomePanel(ctk.CTkFrame):
             fg_color="#00BFFF",
             hover_color="#0090FF",
             corner_radius=15,
+            height=40,
             font=("Segoe UI", 16, "bold"),
             command=self.creer_compte
         )
-        btn_signup.place(relx=0.5, rely=0.79, anchor="center")
+        btn_signup.place(relx=0.5, rely=0.64, anchor="center")
+        self._register_widgets.append(btn_signup)
 
         # Bouton retour
         btn_back = ctk.CTkButton(
@@ -269,7 +330,8 @@ class HomePanel(ctk.CTkFrame):
             font=("Segoe UI", 12),
             command=self.retour_connexion
         )
-        btn_back.place(relx=0.5, rely=0.86, anchor="center")
+        btn_back.place(relx=0.5, rely=0.72, anchor="center")
+        self._register_widgets.append(btn_back)
 
     def creer_compte(self):
         """Crée un nouveau compte utilisateur"""
@@ -295,6 +357,10 @@ class HomePanel(ctk.CTkFrame):
             messagebox.showerror("Erreur", "Le mot de passe doit contenir au moins 12 caractères.")
             return
 
+        self._show_status("Création du compte en cours...")
+        threading.Thread(target=self._do_register, args=(email, password, first_name, last_name), daemon=True).start()
+
+    def _do_register(self, email, password, first_name, last_name):
         try:
             response = requests.post(
                 f"{get_api_url()}/auth/register",
@@ -304,21 +370,31 @@ class HomePanel(ctk.CTkFrame):
                     "first_name": first_name if first_name else None,
                     "last_name": last_name if last_name else None
                 },
-                timeout=10
+                timeout=120
             )
-
-            if response.status_code == 201:
-                messagebox.showinfo(
-                    "Succès",
-                    "Compte créé avec succès !\n\nVous pouvez maintenant vous connecter."
-                )
-                self.retour_connexion()
-            else:
-                error_detail = response.json().get("detail", "Erreur inconnue")
-                messagebox.showerror("Erreur", f"Impossible de créer le compte:\n{error_detail}")
-
+            self.after(0, lambda: self._on_register_result(response))
         except Exception as e:
-            messagebox.showerror("Erreur", f"Erreur serveur:\n{str(e)}")
+            self.after(0, lambda: self._on_register_error(str(e)))
+
+    def _on_register_result(self, response):
+        self._hide_status()
+        if self._destroyed:
+            return
+        if response.status_code == 201:
+            messagebox.showinfo(
+                "Succès",
+                "Compte créé avec succès !\n\nVous pouvez maintenant vous connecter."
+            )
+            self.retour_connexion()
+        else:
+            error_detail = response.json().get("detail", "Erreur inconnue")
+            messagebox.showerror("Erreur", f"Impossible de créer le compte:\n{error_detail}")
+
+    def _on_register_error(self, error):
+        self._hide_status()
+        if self._destroyed:
+            return
+        messagebox.showerror("Erreur", f"Le serveur met du temps à répondre.\nRéessayez dans quelques secondes.\n\n{error}")
 
     def afficher_formulaire_reset_password(self):
         """Affiche le formulaire de réinitialisation du mot de passe"""
@@ -389,28 +465,40 @@ class HomePanel(ctk.CTkFrame):
             messagebox.showerror("Erreur", "Veuillez entrer votre adresse email.")
             return
 
+        self._show_status("Envoi du code en cours...")
+        threading.Thread(target=self._do_reset, args=(email,), daemon=True).start()
+
+    def _do_reset(self, email):
         try:
             response = requests.post(
                 f"{get_api_url()}/auth/forgot-password",
                 json={"email": email},
-                timeout=10
+                timeout=120
             )
-
-            if response.status_code == 200:
-                # Le code a été envoyé par email
-                messagebox.showinfo(
-                    "Email envoyé",
-                    "Un code de réinitialisation a été envoyé à votre adresse email.\n\n"
-                    "Vérifiez votre boîte de réception (et vos spams)."
-                )
-                # Afficher le formulaire de réinitialisation avec code
-                self.afficher_formulaire_nouveau_mdp()
-            else:
-                error_detail = response.json().get("detail", "Erreur inconnue")
-                messagebox.showerror("Erreur", f"Impossible d'envoyer le code:\n{error_detail}")
-
+            self.after(0, lambda: self._on_reset_result(response))
         except Exception as e:
-            messagebox.showerror("Erreur", f"Erreur serveur:\n{str(e)}")
+            self.after(0, lambda: self._on_reset_error(str(e)))
+
+    def _on_reset_result(self, response):
+        self._hide_status()
+        if self._destroyed:
+            return
+        if response.status_code == 200:
+            messagebox.showinfo(
+                "Email envoyé",
+                "Un code de réinitialisation a été envoyé à votre adresse email.\n\n"
+                "Vérifiez votre boîte de réception (et vos spams)."
+            )
+            self.afficher_formulaire_nouveau_mdp()
+        else:
+            error_detail = response.json().get("detail", "Erreur inconnue")
+            messagebox.showerror("Erreur", f"Impossible d'envoyer le code:\n{error_detail}")
+
+    def _on_reset_error(self, error):
+        self._hide_status()
+        if self._destroyed:
+            return
+        messagebox.showerror("Erreur", f"Le serveur met du temps à répondre.\nRéessayez dans quelques secondes.\n\n{error}")
 
     def afficher_formulaire_nouveau_mdp(self):
         """Affiche le formulaire pour entrer le nouveau mot de passe"""
@@ -518,7 +606,7 @@ class HomePanel(ctk.CTkFrame):
                     "reset_code": code,
                     "new_password": new_password
                 },
-                timeout=10
+                timeout=120
             )
 
             if response.status_code == 200:
@@ -532,7 +620,7 @@ class HomePanel(ctk.CTkFrame):
                 messagebox.showerror("Erreur", f"Impossible de réinitialiser:\n{error_detail}")
 
         except Exception as e:
-            messagebox.showerror("Erreur", f"Erreur serveur:\n{str(e)}")
+            messagebox.showerror("Erreur", f"Le serveur met du temps à répondre.\nRéessayez dans quelques secondes.\n\n{str(e)}")
 
     def retour_connexion(self):
         """Retourne au formulaire de connexion"""
@@ -552,36 +640,49 @@ class HomePanel(ctk.CTkFrame):
         # === MODE DEV : AUTO-CONNEXION ===
         if os.environ.get("HELIXONE_DEV") == "1":
             print("[⚙️ MODE DEV] Login bypassé automatiquement.")
-            # Définir un token de test pour le mode DEV (valide 1 an)
             set_auth_token("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMjI2ZjI0MDctNGY2Yi00ODMyLWJjMTQtZGZhNzQ4M2JmY2Y0IiwiZW1haWwiOiJ0ZXN0QGhlbGl4b25lLmNvbSIsImV4cCI6MTc5MTkzMDA2N30.DDnZTWxmHCfPW6mVJrhKCU0HJeD7vCxcPTTIXwjmq5M")
-            return True
+            return (True, "")
 
         # === Sinon : Mode normal avec API ===
         try:
             response = requests.post(
                 f"{get_api_url()}/auth/login",
                 json={"email": email, "password": password},
-                timeout=5
+                timeout=120
             )
 
             if response.status_code == 200:
-                # Extraire et stocker le token JWT
                 response_data = response.json()
                 token = response_data.get("access_token")
 
                 if token:
                     set_auth_token(token)
                     print(f"✅ Authentification réussie pour {email}")
-                    return True
+                    return (True, "")
                 else:
-                    print("⚠️  Aucun token reçu de l'API")
-                    return False
+                    return (False, "Erreur serveur : aucun token reçu.")
 
-            return False
+            # Erreur d'authentification
+            try:
+                detail = response.json().get("detail", "")
+            except Exception:
+                detail = ""
+            if response.status_code == 401:
+                return (False, "Email ou mot de passe incorrect.")
+            elif response.status_code == 403:
+                return (False, detail or "Compte désactivé. Contactez le support.")
+            elif response.status_code == 429:
+                return (False, "Trop de tentatives. Réessayez dans quelques minutes.")
+            else:
+                return (False, f"Erreur serveur ({response.status_code}).\n{detail}")
 
+        except requests.exceptions.Timeout:
+            return (False, "Le serveur met du temps à répondre.\nRéessayez dans quelques secondes.")
+        except requests.exceptions.ConnectionError:
+            return (False, "Impossible de contacter le serveur.\nVérifiez votre connexion internet.")
         except Exception as e:
             print(f"[⛔] Erreur serveur : {e}")
-            return False
+            return (False, f"Erreur de connexion au serveur.\n{str(e)}")
 
     def afficher_indices(self):
         if self._destroyed:
@@ -651,7 +752,7 @@ class HomePanel(ctk.CTkFrame):
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
                 })
 
-                data = ticker_obj.history(period="1d", timeout=10)
+                data = ticker_obj.history(period="1d", timeout=60)
 
                 if not data.empty:
                     last_price = data["Close"].iloc[-1]
