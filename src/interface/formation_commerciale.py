@@ -7,8 +7,10 @@ import customtkinter as ctk
 from tkinter import messagebox
 import json
 import os
+import sys
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
+from src.asset_path import get_base_path
 
 # Définition des badges
 BADGES = {
@@ -53,7 +55,7 @@ class FormationAcademy(ctk.CTkFrame):
     def load_modules(self):
         """Charge tous les modules depuis le JSON"""
         try:
-            json_path = "data/formation_commerciale/modules_complets.json"
+            json_path = os.path.join(get_base_path(), "data", "formation_commerciale", "modules_complets.json")
             with open(json_path, 'r', encoding='utf-8') as f:
                 modules = json.load(f)
 
@@ -97,7 +99,7 @@ class FormationAcademy(ctk.CTkFrame):
     def load_user_progress(self):
         """Charge ou crée la progression utilisateur"""
         try:
-            progress_path = "data/formation_commerciale/user_progress.json"
+            progress_path = os.path.join(get_base_path(), "data", "formation_commerciale", "user_progress.json")
             with open(progress_path, 'r', encoding='utf-8') as f:
                 progress = json.load(f)
                 # S'assurer que les nouveaux champs existent
@@ -275,7 +277,7 @@ class FormationAcademy(ctk.CTkFrame):
     def save_user_progress(self):
         """Sauvegarde la progression utilisateur"""
         try:
-            progress_path = "data/formation_commerciale/user_progress.json"
+            progress_path = os.path.join(get_base_path(), "data", "formation_commerciale", "user_progress.json")
             os.makedirs(os.path.dirname(progress_path), exist_ok=True)
             with open(progress_path, 'w', encoding='utf-8') as f:
                 json.dump(self.user_progress, f, indent=2)
@@ -1590,7 +1592,7 @@ class ModuleViewer(ctk.CTkFrame):
             import sqlite3
             from pathlib import Path
 
-            db_path = Path("data/formation_commerciale/qa.db")
+            db_path = Path(os.path.join(get_base_path(), "data", "formation_commerciale", "qa.db"))
             if not db_path.exists():
                 # Créer la base si elle n'existe pas
                 self._init_qa_database(db_path)
@@ -1702,7 +1704,7 @@ class ModuleViewer(ctk.CTkFrame):
             from pathlib import Path
             from datetime import datetime
 
-            db_path = Path("data/formation_commerciale/qa.db")
+            db_path = Path(os.path.join(get_base_path(), "data", "formation_commerciale", "qa.db"))
             self._init_qa_database(db_path)
 
             with sqlite3.connect(db_path) as conn:
@@ -1784,7 +1786,7 @@ class ModuleViewer(ctk.CTkFrame):
             import uuid
             from pathlib import Path
 
-            db_path = Path("data/formation_commerciale/qa.db")
+            db_path = Path(os.path.join(get_base_path(), "data", "formation_commerciale", "qa.db"))
 
             with sqlite3.connect(db_path) as conn:
                 conn.execute("""
