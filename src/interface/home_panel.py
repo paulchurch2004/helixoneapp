@@ -29,7 +29,7 @@ CACHE_DURATION = 300  # 5 minutes
 
 class HomePanel(ctk.CTkFrame):
     def __init__(self, master, on_continue_callback):
-        super().__init__(master, fg_color="#111111")
+        super().__init__(master, fg_color="#0a0a0f", corner_radius=0)
         self.indice_labels = {}
         self.on_continue_callback = on_continue_callback
         self._destroyed = False
@@ -76,17 +76,48 @@ class HomePanel(ctk.CTkFrame):
             self._status_label = None
 
     def place_ui(self):
+        # Fond uni qui couvre toute la fenêtre (évite les bandes noires)
+        self._bg_frame = ctk.CTkFrame(self, fg_color="#0a0a0f", corner_radius=0)
+        self._bg_frame.place(x=0, y=0, relwidth=1, relheight=1)
+
+        # Image de fond par-dessus (optionnelle)
         try:
-            bg_img = Image.open(get_asset_path("fond_texture.png")).resize((1200, 800))
-            bg = ctk.CTkImage(light_image=bg_img, size=(1200, 800))
-            bg_label = ctk.CTkLabel(self, image=bg, text="")
-            bg_label.image = bg
-            bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+            self._bg_original = Image.open(get_asset_path("fond_texture.png"))
+            self._bg_label = ctk.CTkLabel(self._bg_frame, text="", fg_color="transparent")
+            self._bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+            # Mettre à jour l'image quand la fenêtre change de taille
+            self.bind("<Configure>", self._on_resize)
+            self.after(100, self._update_background)
         except Exception as e:
             print(f"[⚠️] Erreur fond : {e}")
 
+        # Barre supérieure pour les indices (créée une seule fois)
         self.top_frame = ctk.CTkFrame(self, fg_color="#1c1f26", height=60, corner_radius=10)
         self.top_frame.place(relx=0.5, rely=0.05, anchor="n", relwidth=0.92)
+
+    def _on_resize(self, event=None):
+        """Redimensionne le fond quand la fenêtre change de taille"""
+        # Mise à jour immédiate pour éviter les bandes noires
+        self._update_background()
+
+    def _update_background(self):
+        """Met à jour l'image de fond pour couvrir toute la fenêtre"""
+        if self._destroyed or not hasattr(self, '_bg_original'):
+            return
+        try:
+            w = self.winfo_width()
+            h = self.winfo_height()
+            if w > 1 and h > 1:
+                # Redimensionner l'image pour couvrir la fenêtre
+                bg_resized = self._bg_original.resize((w, h), Image.Resampling.LANCZOS)
+                bg_ctk = ctk.CTkImage(light_image=bg_resized, dark_image=bg_resized, size=(w, h))
+                self._bg_label.configure(image=bg_ctk)
+                self._bg_label.image = bg_ctk
+                # S'assurer que les widgets sont au-dessus du fond
+                if hasattr(self, 'top_frame'):
+                    self.top_frame.lift()
+        except Exception as e:
+            print(f"[⚠️] Erreur resize fond : {e}")
 
     def afficher_logo(self):
         if self._destroyed:

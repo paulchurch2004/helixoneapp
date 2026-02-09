@@ -1,26 +1,23 @@
 """
-Service d'envoi d'emails via SMTP
+Service d'envoi d'emails via Resend API
 """
 
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import requests
 from app.core.config import settings
 from typing import Optional
 import logging
 
 logger = logging.getLogger(__name__)
 
+RESEND_API_URL = "https://api.resend.com/emails"
+
 
 class EmailService:
-    """Service pour envoyer des emails via SMTP"""
+    """Service pour envoyer des emails via Resend API"""
 
     def __init__(self):
         self.from_email = settings.FROM_EMAIL
-        self.smtp_host = settings.SMTP_HOST
-        self.smtp_port = settings.SMTP_PORT
-        self.smtp_user = settings.SMTP_USER
-        self.smtp_password = settings.SMTP_PASSWORD
+        self.api_key = settings.SMTP_PASSWORD  # Clé API Resend
         self.app_name = settings.APP_NAME
 
     def _send_email(
@@ -31,7 +28,7 @@ class EmailService:
         text_content: Optional[str] = None
     ) -> bool:
         """
-        Envoie un email via SMTP
+        Envoie un email via Resend API
 
         Args:
             to_email: Email du destinataire
@@ -42,32 +39,44 @@ class EmailService:
         Returns:
             True si envoyé, False sinon
         """
-        if not self.smtp_host or not self.smtp_user:
-            logger.warning(f"[EMAIL SKIP] SMTP non configuré. Email non envoyé à {to_email}")
-            logger.info(f"[EMAIL CONTENT] Sujet: {subject}")
-            logger.info(f"[EMAIL CONTENT] Corps: {text_content or html_content[:200]}")
+        if not self.api_key or not self.api_key.startswith("re_"):
+            print(f"⚠️ [EMAIL SKIP] Resend API non configurée. Email non envoyé à {to_email}")
+            print(f"📝 [EMAIL CONTENT] Sujet: {subject}")
             return False
 
         try:
-            msg = MIMEMultipart("alternative")
-            msg["Subject"] = subject
-            msg["From"] = f"{self.app_name} <{self.from_email}>"
-            msg["To"] = to_email
+            headers = {
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json"
+            }
+
+            data = {
+                "from": f"{self.app_name} <{self.from_email}>",
+                "to": [to_email],
+                "subject": subject,
+                "html": html_content
+            }
 
             if text_content:
-                msg.attach(MIMEText(text_content, "plain", "utf-8"))
-            msg.attach(MIMEText(html_content, "html", "utf-8"))
+                data["text"] = text_content
 
-            with smtplib.SMTP(self.smtp_host, self.smtp_port, timeout=30) as server:
-                server.starttls()
-                server.login(self.smtp_user, self.smtp_password)
-                server.sendmail(self.from_email, to_email, msg.as_string())
+            response = requests.post(RESEND_API_URL, headers=headers, json=data, timeout=30)
 
-            logger.info(f"Email envoyé à {to_email}: {subject}")
-            return True
+            if response.status_code in (200, 201, 202):
+                print(f"✅ Email envoyé à {to_email}: {subject}")
+                return True
+            else:
+                print(f"❌ Erreur Resend API: {response.status_code} - {response.text}")
+                return False
 
+        except requests.exceptions.Timeout:
+            print(f"❌ [EMAIL TIMEOUT] Timeout API Resend pour {to_email}")
+            return False
+        except requests.exceptions.ConnectionError as e:
+            print(f"❌ [EMAIL CONNECTION] Erreur connexion Resend: {str(e)}")
+            return False
         except Exception as e:
-            logger.error(f"Erreur envoi email à {to_email}: {str(e)}")
+            print(f"❌ [EMAIL ERROR] {type(e).__name__}: {str(e)}")
             return False
 
     def send_welcome_email(self, to_email: str, first_name: Optional[str] = None) -> bool:

@@ -5,18 +5,23 @@ API Endpoints pour la formation commerciale et le paper trading
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from typing import Dict, List, Optional
+from sqlalchemy.orm import Session
 import json
 import os
 from pathlib import Path
+from datetime import datetime, date
 
 from app.services.paper_trading import PaperTradingService
+from app.core.database import get_db
+from app.models.user_progress import UserProgress
+from app.models.user import User
 
 router = APIRouter(prefix="/api/formation", tags=["Formation"])
 
 # Mock user pour testing sans auth
 class MockUser:
     def __init__(self):
-        self.id = "test_user_001"
+        self.id = "bbbe7c84-2c7f-4773-8f18-15c2ea08d2a7"  # ID réel de test@test.com
         self.email = "test@test.com"
 
 def get_mock_user():
@@ -56,6 +61,15 @@ class CancelOrderRequest(BaseModel):
     """Requête pour annuler des ordres"""
     ticker: str
     order_type: Optional[str] = "all"  # "stop_loss", "take_profit", or "all"
+
+
+class ProgressSyncRequest(BaseModel):
+    """Requête pour synchroniser la progression"""
+    total_xp: int
+    level: int
+    completed_modules: List[str]
+    module_scores: Dict[str, Dict]
+    current_streak: int = 0
 
 
 # ============================================================================
@@ -148,7 +162,8 @@ async def complete_module(
     module_id: str,
     quiz_score: Optional[int] = None,
     time_spent: Optional[int] = None,
-    user: MockUser = Depends(get_mock_user)
+    user: MockUser = Depends(get_mock_user),
+    db: Session = Depends(get_db)
 ):
     """
     Marque un module comme complété et met à jour la progression
@@ -161,9 +176,6 @@ async def complete_module(
     Returns:
         Confirmation et XP gagnés
     """
-    # TODO: Implémenter la sauvegarde de progression en base de données
-    # Pour le moment, retourner une réponse simulée
-
     # Charger le module pour récupérer les points XP
     modules_file = Path(__file__).parent.parent.parent.parent / "data" / "formation_commerciale" / "modules_complets.json"
 
@@ -184,19 +196,61 @@ async def complete_module(
     if quiz_score and quiz_score >= 90:
         xp_earned = int(xp_earned * 1.2)
 
+    # Sauvegarder dans la base de données
+    progress = db.query(UserProgress).filter(UserProgress.user_id == user.id).first()
+
+    if not progress:
+        # Créer une nouvelle progression
+        progress = UserProgress(
+            user_id=user.id,
+            total_xp=0,
+            level=1,
+            completed_modules=[],
+            module_scores={}
+        )
+        db.add(progress)
+
+    # Mettre à jour la progression
+    if module_id not in (progress.completed_modules or []):
+        progress.completed_modules = (progress.completed_modules or []) + [module_id]
+
+    progress.total_xp = (progress.total_xp or 0) + xp_earned
+
+    # Calculer le niveau (100 XP par niveau)
+    progress.level = 1 + (progress.total_xp // 100)
+
+    # Sauvegarder le score du module
+    module_scores = progress.module_scores or {}
+    module_scores[module_id] = {
+        "score": quiz_score,
+        "time_spent": time_spent,
+        "completed_at": datetime.now().isoformat()
+    }
+    progress.module_scores = module_scores
+
+    # Mettre à jour la date d'activité
+    progress.last_activity_date = datetime.now()
+    progress.updated_at = datetime.now()
+
+    db.commit()
+    db.refresh(progress)
+
     return {
         "success": True,
         "module_id": module_id,
         "xp_earned": xp_earned,
         "quiz_score": quiz_score,
         "time_spent": time_spent,
+        "total_xp": progress.total_xp,
+        "level": progress.level,
         "message": f"Module complété ! +{xp_earned} XP"
     }
 
 
 @router.get("/progress")
 async def get_user_progress(
-    user: MockUser = Depends(get_mock_user)
+    user: MockUser = Depends(get_mock_user),
+    db: Session = Depends(get_db)
 ):
     """
     Récupère la progression de l'utilisateur dans la formation
@@ -204,18 +258,96 @@ async def get_user_progress(
     Returns:
         Statistiques de progression
     """
-    # TODO: Implémenter lecture depuis base de données
-    # Pour le moment, retourner des données simulées
+    progress = db.query(UserProgress).filter(UserProgress.user_id == user.id).first()
+
+    if not progress:
+        # Retourner une progression vide pour un nouvel utilisateur
+        return {
+            "user_id": user.id,
+            "total_xp": 0,
+            "level": 1,
+            "modules_completed": 0,
+            "modules_total": 20,  # TODO: Compter dynamiquement
+            "completion_percent": 0,
+            "current_streak": 0,
+            "completed_modules": [],
+            "module_scores": {}
+        }
+
+    completed_count = len(progress.completed_modules or [])
+    modules_total = 20  # TODO: Compter depuis modules_complets.json
 
     return {
         "user_id": user.id,
-        "total_xp": 250,
-        "level": 2,
-        "modules_completed": 1,
-        "modules_total": 20,
-        "completion_percent": 5,
-        "current_streak": 3,
-        "completed_modules": ["basics_1"]
+        "total_xp": progress.total_xp,
+        "level": progress.level,
+        "modules_completed": completed_count,
+        "modules_total": modules_total,
+        "completion_percent": int((completed_count / modules_total) * 100) if modules_total > 0 else 0,
+        "current_streak": progress.current_streak or 0,
+        "completed_modules": progress.completed_modules or [],
+        "module_scores": progress.module_scores or {},
+        "last_activity": progress.last_activity_date.isoformat() if progress.last_activity_date else None
+    }
+
+
+@router.post("/progress/sync")
+async def sync_progress(
+    data: ProgressSyncRequest,
+    user: MockUser = Depends(get_mock_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Synchronise la progression de l'utilisateur depuis le client
+
+    Args:
+        data: Données de progression à synchroniser
+
+    Returns:
+        Confirmation et progression mise à jour
+    """
+    progress = db.query(UserProgress).filter(UserProgress.user_id == user.id).first()
+
+    if not progress:
+        # Créer une nouvelle progression
+        progress = UserProgress(
+            user_id=user.id,
+            total_xp=data.total_xp,
+            level=data.level,
+            completed_modules=data.completed_modules,
+            module_scores=data.module_scores,
+            current_streak=data.current_streak
+        )
+        db.add(progress)
+    else:
+        # Mettre à jour avec les données les plus récentes
+        # On prend toujours le maximum (pour éviter de perdre de la progression)
+        progress.total_xp = max(progress.total_xp or 0, data.total_xp)
+        progress.level = max(progress.level or 1, data.level)
+
+        # Fusionner les modules complétés (union)
+        existing_modules = set(progress.completed_modules or [])
+        new_modules = set(data.completed_modules)
+        progress.completed_modules = list(existing_modules | new_modules)
+
+        # Fusionner les scores (garder le meilleur score pour chaque module)
+        existing_scores = progress.module_scores or {}
+        for module_id, score_data in data.module_scores.items():
+            if module_id not in existing_scores or score_data.get('score', 0) > existing_scores[module_id].get('score', 0):
+                existing_scores[module_id] = score_data
+        progress.module_scores = existing_scores
+
+        progress.current_streak = max(progress.current_streak or 0, data.current_streak)
+        progress.last_activity_date = datetime.now()
+        progress.updated_at = datetime.now()
+
+    db.commit()
+    db.refresh(progress)
+
+    return {
+        "success": True,
+        "message": "Progression synchronisée avec succès",
+        "progress": progress.to_dict()
     }
 
 

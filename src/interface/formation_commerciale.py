@@ -11,6 +11,7 @@ import sys
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 from src.asset_path import get_base_path
+from src.formation_sync import FormationSyncService
 
 # Définition des badges
 BADGES = {
@@ -35,9 +36,15 @@ CERTIFICATIONS = {
 class FormationAcademy(ctk.CTkFrame):
     """Interface principale de formation HelixOne"""
 
-    def __init__(self, parent):
+    def __init__(self, parent, user_email=None):
         super().__init__(parent, fg_color="#0a0e12")
         self.pack(fill="both", expand=True)
+
+        # Stocker l'email utilisateur pour la progression personnalisée
+        self.user_email = user_email or "default"
+
+        # Initialiser le service de synchronisation
+        self.sync_service = FormationSyncService(self.user_email)
 
         # Chargement des données
         self.modules_data = self.load_modules()
@@ -97,36 +104,28 @@ class FormationAcademy(ctk.CTkFrame):
             return {"debutant": [], "intermediaire": [], "avance": [], "expert": []}
 
     def load_user_progress(self):
-        """Charge ou crée la progression utilisateur"""
-        try:
-            progress_path = os.path.join(get_base_path(), "data", "formation_commerciale", "user_progress.json")
-            with open(progress_path, 'r', encoding='utf-8') as f:
-                progress = json.load(f)
-                # S'assurer que les nouveaux champs existent
-                if "badges" not in progress:
-                    progress["badges"] = []
-                if "certifications" not in progress:
-                    progress["certifications"] = []
-                if "login_dates" not in progress:
-                    progress["login_dates"] = []
-                if "community_messages" not in progress:
-                    progress["community_messages"] = 0
-                if "users_helped" not in progress:
-                    progress["users_helped"] = 0
-                return progress
-        except Exception:
-            return {
-                "completed_modules": [],
-                "quiz_scores": {},
-                "total_xp": 0,
-                "level": 1,
-                "current_parcours": "debutant",
-                "badges": [],
-                "certifications": [],
-                "login_dates": [],
-                "community_messages": 0,
-                "users_helped": 0
-            }
+        """Charge la progression utilisateur depuis le backend (avec fallback local)"""
+        progress = self.sync_service.load_progress()
+
+        # S'assurer que tous les champs nécessaires existent
+        default_fields = {
+            "badges": [],
+            "certifications": [],
+            "login_dates": [],
+            "community_messages": 0,
+            "users_helped": 0,
+            "completed_modules": [],
+            "quiz_scores": {},
+            "total_xp": 0,
+            "level": 1,
+            "current_parcours": "debutant"
+        }
+
+        for field, default_value in default_fields.items():
+            if field not in progress:
+                progress[field] = default_value
+
+        return progress
 
     def check_and_award_badges(self) -> List[str]:
         """Vérifie et attribue les badges mérités"""
@@ -275,12 +274,11 @@ class FormationAcademy(ctk.CTkFrame):
         return True
 
     def save_user_progress(self):
-        """Sauvegarde la progression utilisateur"""
+        """Sauvegarde la progression utilisateur (local + backend sync)"""
         try:
-            progress_path = os.path.join(get_base_path(), "data", "formation_commerciale", "user_progress.json")
-            os.makedirs(os.path.dirname(progress_path), exist_ok=True)
-            with open(progress_path, 'w', encoding='utf-8') as f:
-                json.dump(self.user_progress, f, indent=2)
+            success = self.sync_service.save_progress(self.user_progress)
+            if not success:
+                print(f"[✗] Erreur sauvegarde progression")
         except Exception as e:
             print(f"[✗] Erreur sauvegarde progression: {e}")
 
@@ -2213,7 +2211,7 @@ class QuizInterface(ctk.CTkFrame):
         self.module_viewer.pack(fill="both", expand=True)
 
 
-def afficher_formation_commerciale(parent):
+def afficher_formation_commerciale(parent, user_email=None):
     """Point d'entrée pour lancer l'interface de formation"""
     print("[✓] Chargement HelixOne Academy v2.0...")
 
@@ -2222,8 +2220,8 @@ def afficher_formation_commerciale(parent):
         for widget in parent.winfo_children():
             widget.destroy()
 
-        # Créer l'academy
-        academy = FormationAcademy(parent)
+        # Créer l'academy avec l'email utilisateur pour la progression personnalisée
+        academy = FormationAcademy(parent, user_email=user_email)
 
         print("[✓] HelixOne Academy chargée avec succès!")
         return academy

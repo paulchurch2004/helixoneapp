@@ -242,7 +242,7 @@ def check_for_updates_async(callback: Callable[[Optional[Dict]], None]):
 
 def show_update_dialog_ctk(parent, version_info: Dict) -> bool:
     """
-    Show update dialog using CustomTkinter.
+    Show modern update dialog using CustomTkinter.
 
     Args:
         parent: Parent CTk window
@@ -252,32 +252,220 @@ def show_update_dialog_ctk(parent, version_info: Dict) -> bool:
         True if user chose to update
     """
     try:
-        from tkinter import messagebox
+        import customtkinter as ctk
+        import tkinter as tk
 
         version = version_info.get('version', 'Unknown')
         changelog = version_info.get('changelog', [])
         mandatory = version_info.get('mandatory', False)
 
-        message = f"Nouvelle version disponible: {version}\n\n"
-        if changelog:
-            message += "Nouveautes:\n"
-            for item in changelog[:5]:
-                message += f"  - {item}\n"
+        result = {'update': False}
 
-        if mandatory:
-            message += "\nCette mise a jour est obligatoire."
+        # Créer une fenêtre toplevel moderne
+        dialog = ctk.CTkToplevel(parent)
+        dialog.title("Mise à jour disponible")
+        dialog.geometry("500x400")
+        dialog.resizable(False, False)
 
-        result = messagebox.askyesno(
-            "Mise a jour disponible",
-            message + "\n\nVoulez-vous mettre a jour maintenant?",
-            parent=parent
+        # Centrer la fenêtre
+        dialog.transient(parent)
+        dialog.grab_set()
+
+        # Forcer au premier plan
+        dialog.lift()
+        dialog.focus_force()
+
+        # Frame principale
+        main_frame = ctk.CTkFrame(dialog, fg_color="transparent")
+        main_frame.pack(fill="both", expand=True, padx=20, pady=20)
+
+        # Titre
+        title_label = ctk.CTkLabel(
+            main_frame,
+            text=f"🚀 Nouvelle version disponible : v{version}",
+            font=("Arial", 18, "bold")
         )
+        title_label.pack(pady=(0, 20))
 
-        return result
+        # Changelog
+        changelog_label = ctk.CTkLabel(
+            main_frame,
+            text="Nouveautés :",
+            font=("Arial", 14, "bold"),
+            anchor="w"
+        )
+        changelog_label.pack(anchor="w", pady=(0, 10))
 
-    except ImportError:
-        logger.error("Tkinter not available for update dialog")
-        return False
+        # Frame scrollable pour le changelog
+        changelog_frame = ctk.CTkScrollableFrame(main_frame, height=150)
+        changelog_frame.pack(fill="both", expand=True, pady=(0, 20))
+
+        for item in changelog:
+            item_label = ctk.CTkLabel(
+                changelog_frame,
+                text=f"• {item}",
+                font=("Arial", 12),
+                anchor="w",
+                wraplength=400
+            )
+            item_label.pack(anchor="w", pady=2)
+
+        # Message obligatoire si nécessaire
+        if mandatory:
+            mandatory_label = ctk.CTkLabel(
+                main_frame,
+                text="⚠️ Cette mise à jour est obligatoire",
+                font=("Arial", 12, "bold"),
+                text_color="#FF6B6B"
+            )
+            mandatory_label.pack(pady=(0, 10))
+
+        # Boutons
+        button_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
+        button_frame.pack(fill="x", pady=(10, 0))
+
+        def on_update():
+            result['update'] = True
+            dialog.destroy()
+
+        def on_cancel():
+            if not mandatory:
+                result['update'] = False
+                dialog.destroy()
+
+        update_btn = ctk.CTkButton(
+            button_frame,
+            text="Mettre à jour maintenant",
+            command=on_update,
+            fg_color="#4CAF50",
+            hover_color="#45a049",
+            height=40,
+            font=("Arial", 14, "bold")
+        )
+        update_btn.pack(side="left", expand=True, fill="x", padx=(0, 5))
+
+        if not mandatory:
+            cancel_btn = ctk.CTkButton(
+                button_frame,
+                text="Plus tard",
+                command=on_cancel,
+                fg_color="gray40",
+                hover_color="gray30",
+                height=40,
+                font=("Arial", 14)
+            )
+            cancel_btn.pack(side="right", expand=True, fill="x", padx=(5, 0))
+
+        # Attendre la fermeture du dialogue
+        dialog.wait_window()
+
+        return result['update']
+
+    except Exception as e:
+        logger.error(f"Error showing update dialog: {e}")
+        # Fallback sur messagebox basique
+        try:
+            from tkinter import messagebox
+            version = version_info.get('version', 'Unknown')
+            return messagebox.askyesno(
+                "Mise à jour disponible",
+                f"Version {version} disponible.\nMettre à jour maintenant?",
+                parent=parent
+            )
+        except:
+            return False
+
+
+def show_download_progress_dialog(parent, updater: AutoUpdater, download_url: str):
+    """
+    Show download progress dialog with CustomTkinter.
+
+    Args:
+        parent: Parent CTk window
+        updater: AutoUpdater instance
+        download_url: URL to download from
+
+    Returns:
+        Path to downloaded installer, or None if cancelled/failed
+    """
+    try:
+        import customtkinter as ctk
+        import threading
+
+        result = {'installer_path': None}
+
+        # Créer le dialogue de progression
+        dialog = ctk.CTkToplevel(parent)
+        dialog.title("Téléchargement de la mise à jour")
+        dialog.geometry("450x200")
+        dialog.resizable(False, False)
+
+        # Centrer
+        dialog.transient(parent)
+        dialog.grab_set()
+        dialog.lift()
+        dialog.focus_force()
+
+        # Frame principale
+        main_frame = ctk.CTkFrame(dialog, fg_color="transparent")
+        main_frame.pack(fill="both", expand=True, padx=20, pady=20)
+
+        # Label statut
+        status_label = ctk.CTkLabel(
+            main_frame,
+            text="Téléchargement en cours...",
+            font=("Arial", 14)
+        )
+        status_label.pack(pady=(0, 20))
+
+        # Barre de progression
+        progress_bar = ctk.CTkProgressBar(main_frame, width=400)
+        progress_bar.pack(pady=(0, 10))
+        progress_bar.set(0)
+
+        # Label pourcentage
+        percent_label = ctk.CTkLabel(
+            main_frame,
+            text="0%",
+            font=("Arial", 12)
+        )
+        percent_label.pack(pady=(0, 20))
+
+        # Bouton annuler
+        cancel_btn = ctk.CTkButton(
+            main_frame,
+            text="Annuler",
+            command=lambda: updater.cancel_download(),
+            fg_color="gray40",
+            hover_color="gray30"
+        )
+        cancel_btn.pack()
+
+        # Fonction de mise à jour de la progression
+        def update_progress(percent):
+            if dialog.winfo_exists():
+                progress_bar.set(percent / 100)
+                percent_label.configure(text=f"{percent}%")
+
+        # Télécharger dans un thread séparé
+        def download_thread():
+            installer = updater.download_update(download_url, progress_callback=update_progress)
+            result['installer_path'] = installer
+            if dialog.winfo_exists():
+                dialog.destroy()
+
+        thread = threading.Thread(target=download_thread, daemon=True)
+        thread.start()
+
+        # Attendre la fermeture
+        dialog.wait_window()
+
+        return result['installer_path']
+
+    except Exception as e:
+        logger.error(f"Error showing download progress: {e}")
+        # Télécharger sans dialogue de progression
+        return updater.download_update(download_url)
 
 
 def check_updates_on_startup(parent=None, auto_install: bool = False):
@@ -306,7 +494,8 @@ def check_updates_on_startup(parent=None, auto_install: bool = False):
         updater.remote_version_info = version_info
         download_url = updater.get_download_url()
         if download_url:
-            installer = updater.download_update(download_url)
+            # Afficher le dialogue de progression
+            installer = show_download_progress_dialog(parent, updater, download_url)
             if installer:
                 updater.install_update(installer)
 

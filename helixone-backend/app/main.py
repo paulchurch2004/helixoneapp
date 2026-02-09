@@ -103,7 +103,15 @@ async def startup_event():
     """Événement exécuté au démarrage de l'application"""
     import logging
     logger = logging.getLogger(__name__)
-    logger.info("Démarrage de HelixOne Backend...")
+
+    # Version identifier pour debug (print pour être visible dans les logs Render)
+    BUILD_ID = "2025-02-08-resend-api-v3"
+    print(f"=== HelixOne Backend Build: {BUILD_ID} ===")
+
+    # Log email config (sans exposer la clé complète)
+    api_key = settings.SMTP_PASSWORD or ""
+    key_preview = f"{api_key[:6]}..." if len(api_key) > 6 else "(non configuré)"
+    print(f"📧 Email Config: FROM={settings.FROM_EMAIL}, API_KEY={key_preview}")
 
     # Initialiser le cache Redis (optionnel)
     try:

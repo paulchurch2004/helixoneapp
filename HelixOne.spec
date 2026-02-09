@@ -16,6 +16,7 @@ a = Analysis(
         'requests', 'urllib3',
         'pandas', 'numpy',
         'yfinance',
+        'cv2', 'pygame',
         'src', 'src.interface', 'src.interface.main_app',
         'src.interface.main_window', 'src.interface.login_window',
         'src.interface.home_panel', 'src.interface.formation_commerciale',

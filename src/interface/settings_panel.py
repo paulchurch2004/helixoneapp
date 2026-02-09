@@ -12,6 +12,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from src.i18n import t, set_language, get_language, get_available_languages, LanguagePreferences
 from src.interface.theme_manager import get_theme_manager, ThemeSwitcher
+from src.updater.version import get_version_info
+from src.updater.auto_updater import AutoUpdater, show_update_dialog_ctk, show_download_progress_dialog
 
 
 class SettingsPanel(ctk.CTkFrame):
@@ -56,6 +58,13 @@ class SettingsPanel(ctk.CTkFrame):
         # Séparateur
         separator2 = ctk.CTkFrame(self.scroll_frame, height=2, fg_color="gray30")
         separator2.pack(fill="x", pady=20)
+
+        # === SECTION À PROPOS / MISES À JOUR ===
+        self.create_about_section()
+
+        # Séparateur
+        separator3 = ctk.CTkFrame(self.scroll_frame, height=2, fg_color="gray30")
+        separator3.pack(fill="x", pady=20)
 
         # === BOUTON SAUVEGARDER ===
         save_button = ctk.CTkButton(
@@ -170,6 +179,95 @@ class SettingsPanel(ctk.CTkFrame):
             manager.toggle_dark_light()
         except Exception as e:
             print(f"Erreur changement thème: {e}")
+
+    def create_about_section(self):
+        """Créer la section À propos et mises à jour"""
+
+        about_frame = ctk.CTkFrame(self.scroll_frame, fg_color="gray20", corner_radius=10)
+        about_frame.pack(fill="x", pady=10)
+
+        # Titre
+        about_title = ctk.CTkLabel(
+            about_frame,
+            text="À propos",
+            font=("Roboto", 18, "bold"),
+            anchor="w"
+        )
+        about_title.pack(fill="x", padx=20, pady=(20, 10))
+
+        # Version actuelle
+        version_info = get_version_info()
+        version_text = f"Version {version_info['version']} (Build {version_info['build_number']})"
+        version_label = ctk.CTkLabel(
+            about_frame,
+            text=version_text,
+            font=("Roboto", 14),
+            text_color="gray70",
+            anchor="w"
+        )
+        version_label.pack(fill="x", padx=20, pady=(0, 5))
+
+        # Date de build
+        build_date_label = ctk.CTkLabel(
+            about_frame,
+            text=f"Date de build: {version_info['build_date']}",
+            font=("Roboto", 12),
+            text_color="gray60",
+            anchor="w"
+        )
+        build_date_label.pack(fill="x", padx=20, pady=(0, 15))
+
+        # Bouton vérifier les mises à jour
+        self.check_update_btn = ctk.CTkButton(
+            about_frame,
+            text="🔄 Vérifier les mises à jour",
+            command=self.check_for_updates_manual,
+            height=40,
+            font=("Roboto", 14),
+            fg_color="#1f538d",
+            hover_color="#2a6cb8"
+        )
+        self.check_update_btn.pack(fill="x", padx=20, pady=(0, 20))
+
+    def check_for_updates_manual(self):
+        """Vérifier manuellement les mises à jour"""
+        # Désactiver le bouton pendant la vérification
+        self.check_update_btn.configure(state="disabled", text="⏳ Vérification...")
+
+        def check_thread():
+            updater = AutoUpdater()
+            version_info = updater.check_for_updates()
+
+            # Mettre à jour l'interface dans le thread principal
+            self.after(0, lambda: self.handle_update_result(version_info, updater))
+
+        import threading
+        thread = threading.Thread(target=check_thread, daemon=True)
+        thread.start()
+
+    def handle_update_result(self, version_info, updater):
+        """Gérer le résultat de la vérification de mise à jour"""
+        # Réactiver le bouton
+        self.check_update_btn.configure(state="normal", text="🔄 Vérifier les mises à jour")
+
+        if version_info is None:
+            messagebox.showinfo(
+                "Mises à jour",
+                "Vous utilisez déjà la dernière version de HelixOne !"
+            )
+        else:
+            # Afficher le dialogue de mise à jour
+            if show_update_dialog_ctk(self.winfo_toplevel(), version_info):
+                # L'utilisateur veut mettre à jour
+                download_url = updater.get_download_url()
+                if download_url:
+                    installer = show_download_progress_dialog(
+                        self.winfo_toplevel(),
+                        updater,
+                        download_url
+                    )
+                    if installer:
+                        updater.install_update(installer)
 
     def on_language_change(self, lang_code: str):
         """

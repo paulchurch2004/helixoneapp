@@ -2,130 +2,175 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import threading
 import time
-import pygame
+import os
+import sys
+import cv2
+
 from src.interface.main_window import launch_helixone_ui as lancer_interface
 from src.asset_path import get_asset_path
 
-# === Compatibilité Pillow : remplace ANTIALIAS si supprimé ===
-try:
-    resample_mode = Image.Resampling.LANCZOS
-except AttributeError:
-    resample_mode = Image.ANTIALIAS
 
+class VideoIntro(tk.Tk):
+    """Intro vidéo synchronisée avec le son"""
 
-class PlasmaIntro(tk.Tk):
     def __init__(self):
         super().__init__()
-
-        # === Fenêtre principale ===
         self.title("HelixOne Boot")
-        self.geometry("800x500+350+150")
-        self.overrideredirect(True)
-        self.configure(bg="#0A0A0A")
+        self.configure(bg="black")
 
-        # === Canvas pour animation ===
-        self.canvas = tk.Canvas(self, width=800, height=500, bg="#0A0A0A", highlightthickness=0)
-        self.canvas.pack(fill="both", expand=True)
+        # Forcer la fenêtre au premier plan sur macOS
+        self.attributes("-topmost", True)
+        self.lift()
+        self.focus_force()
 
-        # === Halo animé ===
-        self.halo = self.canvas.create_oval(250, 100, 550, 400, outline="#00C9FF", width=4)
+        self._closed = False
+        self.tk_img = None
+        self.canvas_image_id = None
+        self.cap = None
 
-        # === Logo ===
-        self.logo_img = None
-        self.tk_logo = None
-        self.logo_canvas_id = None
-        self.load_logo()
+        # Ouvrir la vidéo
+        video_path = get_asset_path("intro.mp4")
+        self.cap = cv2.VideoCapture(video_path)
 
-        # === Texte de statut ===
-        self.status_texts = [
-            "Chargement moteur FXI...",
-            "Connexion aux APIs...",
-            "Analyse des sources...",
-            "Initialisation interface..."
-        ]
-        self.status_index = 0
-        self.status_label = tk.Label(self, text="", font=("Roboto", 14), fg="#00C9FF", bg="#0A0A0A")
-        self.status_label.place(relx=0.5, rely=0.88, anchor="center")
-
-        # === Son de démarrage ===
-        threading.Thread(target=self.play_start_sound, daemon=True).start()
-
-        # === Lancements des animations ===
-        self.after(0, self.animate_text)
-        self.after(0, self.animate_halo)
-        threading.Thread(target=self.animate_logo_fade, daemon=True).start()
-
-        # === Fermeture après délai ===
-        self.after(5000, self.close_intro)
-
-    def load_logo(self):
-        try:
-            img = Image.open(get_asset_path("logo.png")).convert("RGBA")
-            # Redimensionner en gardant les proportions
-            original_ratio = img.width / img.height
-            new_width = 160
-            new_height = int(new_width / original_ratio)
-            img = img.resize((new_width, new_height), resample_mode)
-            self.logo_img = img
-            self.update_logo(alpha=1.0)
-        except Exception as e:
-            print(f"[⚠️] Erreur chargement logo : {e}")
-
-    def update_logo(self, alpha=1.0):
-        if not self.logo_img:
+        if not self.cap.isOpened():
+            self.after(100, self.close_intro)
             return
-        faded = self.logo_img.copy()
-        alpha_layer = faded.getchannel("A").point(lambda p: int(p * alpha))
-        faded.putalpha(alpha_layer)
-        self.tk_logo = ImageTk.PhotoImage(faded)
 
-        if self.logo_canvas_id:
-            self.canvas.itemconfig(self.logo_canvas_id, image=self.tk_logo)
-        else:
-            self.logo_canvas_id = self.canvas.create_image(400, 250, image=self.tk_logo)
+        # Propriétés vidéo
+        self.fps = self.cap.get(cv2.CAP_PROP_FPS) or 24
+        vid_w = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        vid_h = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-    def animate_logo_fade(self):
-        alpha = 1.0
-        delta = -0.03
+        # Adapter à la taille max tout en gardant les proportions
+        max_w, max_h = 900, 900
+        scale = min(max_w / vid_w, max_h / vid_h, 1.0)
+        self.display_w = int(vid_w * scale)
+        self.display_h = int(vid_h * scale)
+        self.need_resize = (vid_w, vid_h) != (self.display_w, self.display_h)
+
+        # Centrer la fenêtre
+        screen_w = self.winfo_screenwidth()
+        screen_h = self.winfo_screenheight()
+        x = (screen_w - self.display_w) // 2
+        y = (screen_h - self.display_h) // 2
+        self.geometry(f"{self.display_w}x{self.display_h}+{x}+{y}")
+
+        # Canvas vidéo
+        self.canvas = tk.Canvas(
+            self, width=self.display_w, height=self.display_h,
+            bg="black", highlightthickness=0
+        )
+        self.canvas.pack()
+
+        # Clic ou Echap pour skip
+        self.canvas.bind("<Button-1>", lambda e: self.close_intro())
+        self.bind("<Escape>", lambda e: self.close_intro())
+
+        # Temps de départ pour la synchro audio/vidéo
+        self.start_time = None
+
+        # Lancer l'audio en arrière-plan
+        threading.Thread(target=self.play_audio, daemon=True).start()
+
+        # Lancer la lecture vidéo
+        self.after(0, self.play_frame)
+
+    def play_audio(self):
+        """Joue l'audio (mp3 séparé ou depuis le mp4)"""
         try:
-            while self.winfo_exists():
-                alpha += delta
-                if alpha <= 0.5 or alpha >= 1.0:
-                    delta *= -1
-                self.update_logo(alpha)
-                time.sleep(0.05)
-        except tk.TclError:
-            pass  # La fenêtre a été fermée pendant le thread
-
-    def animate_text(self):
-        if self.winfo_exists():
-            self.status_label.config(text=self.status_texts[self.status_index])
-            self.status_index = (self.status_index + 1) % len(self.status_texts)
-            self.after(1200, self.animate_text)
-
-    def animate_halo(self):
-        if self.canvas.winfo_exists():
-            try:
-                current_width = int(float(self.canvas.itemcget(self.halo, "width")))
-                next_width = 6 if current_width == 4 else 4
-                next_color = "#00C9FF" if current_width == 4 else "#0277BD"
-                self.canvas.itemconfig(self.halo, outline=next_color, width=next_width)
-                self.after(300, self.animate_halo)
-            except Exception:
-                pass  # Widget supprimé, on ne relance pas
-
-    def play_start_sound(self):
-        try:
+            import pygame
             pygame.mixer.init()
-            pygame.mixer.music.load(get_asset_path("son_start.mp3"))
+
+            audio_path = get_asset_path("intro.mp3")
+            video_path = get_asset_path("intro.mp4")
+
+            if os.path.exists(audio_path):
+                pygame.mixer.music.load(audio_path)
+            elif os.path.exists(video_path):
+                pygame.mixer.music.load(video_path)
+            else:
+                return
+
             pygame.mixer.music.play()
-        except Exception as e:
-            print(f"[⚠️] Erreur audio : {e}")
+            # Marquer le temps de départ pour la synchro
+            self.start_time = time.time()
+        except Exception:
+            pass
+
+    def play_frame(self):
+        """Lit et affiche la frame vidéo synchronisée avec l'audio"""
+        if self._closed:
+            return
+
+        # Attendre que l'audio démarre pour synchroniser
+        if self.start_time is None:
+            self.start_time = time.time()
+
+        # Calculer quelle frame on devrait afficher selon le temps écoulé
+        elapsed = time.time() - self.start_time
+        target_frame = int(elapsed * self.fps)
+        current_frame = int(self.cap.get(cv2.CAP_PROP_POS_FRAMES))
+
+        # Sauter les frames en retard pour rester synchronisé
+        skip = target_frame - current_frame
+        if skip > 1:
+            for _ in range(skip - 1):
+                if not self.cap.grab():
+                    self.close_intro()
+                    return
+
+        # Lire la frame courante
+        ret, frame = self.cap.read()
+        if not ret:
+            self.close_intro()
+            return
+
+        # Resize avec cv2 (interpolation NEAREST = plus rapide)
+        if self.need_resize:
+            frame = cv2.resize(frame, (self.display_w, self.display_h),
+                                    interpolation=cv2.INTER_NEAREST)
+
+        # BGR → RGB → PIL → PhotoImage
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        img = Image.fromarray(frame_rgb)
+        self.tk_img = ImageTk.PhotoImage(img)
+
+        # Mettre à jour le canvas (sans recréer l'objet)
+        if self.canvas_image_id is None:
+            self.canvas_image_id = self.canvas.create_image(
+                0, 0, anchor="nw", image=self.tk_img
+            )
+        else:
+            self.canvas.itemconfig(self.canvas_image_id, image=self.tk_img)
+
+        # Calculer le délai jusqu'à la prochaine frame
+        next_frame_time = (target_frame + 1) / self.fps
+        delay_ms = max(1, int((next_frame_time - elapsed) * 1000))
+        self.after(delay_ms, self.play_frame)
 
     def close_intro(self):
+        """Arrête tout et lance l'interface principale"""
+        if self._closed:
+            return
+        self._closed = True
+
+        try:
+            import pygame
+            if pygame.mixer.get_init():
+                pygame.mixer.music.stop()
+                pygame.mixer.quit()
+        except Exception:
+            pass
+
+        try:
+            if self.cap and self.cap.isOpened():
+                self.cap.release()
+        except Exception:
+            pass
+
         self.destroy()
         lancer_interface()
 
 
 if __name__ == "__main__":
-    PlasmaIntro().mainloop()
+    VideoIntro().mainloop()

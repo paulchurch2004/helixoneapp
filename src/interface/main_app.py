@@ -46,8 +46,12 @@ from src.i18n import t, set_language, LanguagePreferences
 # ============================================================================
 def setup_logging() -> logging.Logger:
     """Configure le système de logging"""
-    log_dir = Path("logs")
-    log_dir.mkdir(exist_ok=True)
+    # En mode packagé, écrire les logs dans ~/Library/Logs/HelixOne/
+    if getattr(sys, 'frozen', False):
+        log_dir = Path.home() / "Library" / "Logs" / "HelixOne"
+    else:
+        log_dir = Path("logs")
+    log_dir.mkdir(parents=True, exist_ok=True)
 
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -764,7 +768,9 @@ class ModernSidebar(ctk.CTkFrame):
         """Affiche le module de formation"""
         try:
             safe_clear_main_frame()
-            afficher_formation_commerciale(self.main_frame)
+            # Passer l'email utilisateur pour la progression personnalisée
+            user_email = self.user_info.get('email', 'default')
+            afficher_formation_commerciale(self.main_frame, user_email=user_email)
         except ImportError as e:
             logger.error(f"Module formation non trouvé: {e}")
             self.show_error_message("Module formation non disponible")
@@ -1033,7 +1039,12 @@ def _apply_runtime_theme(theme_name):
             # Réafficher la formation
             safe_clear_main_frame()
             try:
-                afficher_formation_commerciale(app_state.main_frame)
+                # Obtenir l'email utilisateur pour la progression personnalisée
+                user_email = 'default'
+                if auth_manager_global:
+                    user = auth_manager_global.get_current_user()
+                    user_email = user.get('email', 'default') if user else 'default'
+                afficher_formation_commerciale(app_state.main_frame, user_email=user_email)
             except Exception:
                 pass
 
@@ -1125,7 +1136,8 @@ def launch_main_app_with_auth(app, auth_manager, logout_callback):
 
         # Afficher la Formation directement
         try:
-            afficher_formation_commerciale(main_frame)
+            user_email = user.get('email', 'default') if user else 'default'
+            afficher_formation_commerciale(main_frame, user_email=user_email)
         except Exception as e:
             logger.error(f"Erreur affichage formation: {e}")
 
@@ -1198,7 +1210,8 @@ def launch_main_app_old(app):
 
         # Afficher la Formation directement
         try:
-            afficher_formation_commerciale(main_frame)
+            user_email = user.get('email', 'default') if user else 'default'
+            afficher_formation_commerciale(main_frame, user_email=user_email)
         except Exception as e:
             logger.error(f"Erreur affichage formation: {e}")
 
@@ -1219,9 +1232,16 @@ def create_fallback_sidebar(parent):
         text_color=COLORS['accent_blue']
     ).pack(pady=30)
 
+    def open_formation():
+        user_email = 'default'
+        if auth_manager_global:
+            user = auth_manager_global.get_current_user()
+            user_email = user.get('email', 'default') if user else 'default'
+        afficher_formation_commerciale(main_frame, user_email=user_email)
+
     ctk.CTkButton(
         sidebar, text="Formation",
-        command=lambda: afficher_formation_commerciale(main_frame)
+        command=open_formation
     ).pack(pady=10, padx=20, fill="x")
 
     return sidebar
@@ -1416,9 +1436,16 @@ def show_error_page(title, message):
             text_color=COLORS['text_secondary'], wraplength=400
         ).pack(pady=10, padx=20)
 
+        def return_to_formation():
+            user_email = 'default'
+            if auth_manager_global:
+                user = auth_manager_global.get_current_user()
+                user_email = user.get('email', 'default') if user else 'default'
+            afficher_formation_commerciale(main_frame, user_email=user_email)
+
         ctk.CTkButton(
             error_container, text="Retour à la Formation",
-            command=lambda: afficher_formation_commerciale(main_frame),
+            command=return_to_formation,
             fg_color=COLORS['accent_blue']
         ).pack(pady=20)
 

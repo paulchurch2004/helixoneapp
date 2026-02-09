@@ -15,7 +15,8 @@ import os
 # ============================================
 # Changer ici pour basculer entre les environnements
 # Options: "local" pour dev, "production" pour distribution
-ENVIRONMENT = os.environ.get("HELIXONE_ENV", "local")
+# Par défaut "production" pour l'app packagée
+ENVIRONMENT = os.environ.get("HELIXONE_ENV", "production")
 
 
 # ============================================

@@ -169,7 +169,7 @@ class AuthManager:
     def is_license_valid(self) -> bool:
         """
         Vérifier rapidement si la licence est valide
-        
+
         Returns:
             True si la licence est active
         """
@@ -177,6 +177,12 @@ class AuthManager:
             return self.client.is_license_valid()
         except Exception:
             return False
+
+    def logout(self):
+        """
+        Déconnexion de l'utilisateur (supprime le token et la session locale)
+        """
+        self.clear_session()
 
 
 # Test du module

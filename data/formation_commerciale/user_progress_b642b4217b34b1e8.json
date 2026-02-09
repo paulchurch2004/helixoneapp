@@ -1,0 +1,20 @@
+{
+  "completed_modules": [
+    "intermediate_1",
+    "basics_3",
+    "basics_1",
+    "basics_2"
+  ],
+  "quiz_scores": {
+    "basics_1": 95,
+    "basics_2": 88
+  },
+  "total_xp": 600,
+  "level": 6,
+  "current_parcours": "debutant",
+  "badges": [],
+  "certifications": [],
+  "login_dates": [],
+  "community_messages": 0,
+  "users_helped": 0
+}

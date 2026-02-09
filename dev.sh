@@ -43,7 +43,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 cd "$SCRIPT_DIR"
 export PYTHONPATH="$SCRIPT_DIR:$PYTHONPATH"
-HELIXONE_DEV=1 ./venv/bin/python -m src.interface
+HELIXONE_ENV=local HELIXONE_DEV=1 ./venv/bin/python -m src.interface
 
 # Nettoyage à la sortie
 echo ""

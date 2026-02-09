@@ -565,12 +565,29 @@ class ProfilePanel(ctk.CTkScrollableFrame):
 
     def _delete_account(self):
         """Suppression du compte"""
+        print("[DEBUG] _delete_account appelé")
+
         if not self.auth_manager:
+            print("[DEBUG] auth_manager est None!")
             messagebox.showerror("Erreur", "Connexion requise")
             return
 
-        dialog = DeleteAccountDialog(self, self.auth_manager)
-        self.wait_window(dialog)
+        if not hasattr(self.auth_manager, 'client'):
+            print("[DEBUG] auth_manager n'a pas d'attribut 'client'!")
+            messagebox.showerror("Erreur", "Client API non initialisé")
+            return
+
+        try:
+            print("[DEBUG] Ouverture du dialogue de suppression...")
+            dialog = DeleteAccountDialog(self, self.auth_manager)
+            dialog.focus_force()  # Force le focus sur le dialogue
+            self.wait_window(dialog)
+            print("[DEBUG] Dialogue fermé")
+        except Exception as e:
+            print(f"[DEBUG] Erreur ouverture dialogue: {e}")
+            import traceback
+            traceback.print_exc()
+            messagebox.showerror("Erreur", f"Impossible d'ouvrir le dialogue:\n{str(e)}")
 
 
 class ChangePasswordDialog(ctk.CTkToplevel):

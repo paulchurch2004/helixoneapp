@@ -6,17 +6,36 @@ Se connecte automatiquement au backend cloud
 
 import sys
 import os
+import traceback
 
 # Forcer le mode production
 os.environ["HELIXONE_ENV"] = "production"
 
-import customtkinter as ctk
+# Écrire TOUT dans un fichier log sur le bureau
+_log_path = os.path.join(os.path.expanduser("~"), "Desktop", "helixone_debug.log")
+_log_file = open(_log_path, "w")
+sys.stdout = _log_file
+sys.stderr = _log_file
+print("=== HelixOne Debug Log ===", flush=True)
+print(f"Python: {sys.version}", flush=True)
+print(f"Frozen: {getattr(sys, 'frozen', False)}", flush=True)
+print(f"MEIPASS: {getattr(sys, '_MEIPASS', 'N/A')}", flush=True)
+
+try:
+    import customtkinter as ctk
+    print("customtkinter imported OK", flush=True)
+except Exception as e:
+    print(f"ERREUR customtkinter: {e}", flush=True)
+    traceback.print_exc(file=_log_file)
+    _log_file.flush()
+
 import logging
 
 # Configuration du logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    stream=_log_file
 )
 logger = logging.getLogger(__name__)
 
@@ -43,15 +62,27 @@ def main():
     ctk.set_appearance_mode("dark")
     ctk.set_default_color_theme("dark-blue")
 
-    # Lancement avec le splash screen
+    # Sur macOS packagé, forcer l'app au premier plan
+    if sys.platform == "darwin" and getattr(sys, 'frozen', False):
+        try:
+            os.system('''/usr/bin/osascript -e 'tell app "System Events" to set frontmost of the first process whose unix id is ''' + str(os.getpid()) + ''' to true' &''')
+        except Exception:
+            pass
+
+    # Lancement avec le splash screen vidéo
     try:
-        from src.plasma_intro import PlasmaIntro
-        PlasmaIntro().mainloop()
+        from src.plasma_intro import VideoIntro
+        VideoIntro().mainloop()
     except Exception as e:
         logger.error(f"Erreur PlasmaIntro: {e}")
-        # Fallback: lancer directement l'interface
         from src.interface.main_window import launch_helixone_ui
         launch_helixone_ui()
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"FATAL ERROR: {e}", flush=True)
+        traceback.print_exc(file=_log_file)
+        _log_file.flush()
+        _log_file.close()

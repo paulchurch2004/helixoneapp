@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from datetime import timedelta
@@ -26,7 +26,7 @@ router = APIRouter()
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 @limiter.limit("3/hour")
-def register(request: Request, user_data: UserRegister, db: Session = Depends(get_db)):
+def register(request: Request, user_data: UserRegister, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     """Créer un nouveau compte utilisateur"""
     
     # Vérifier si l'email existe déjà
@@ -73,8 +73,9 @@ def register(request: Request, user_data: UserRegister, db: Session = Depends(ge
     db.add(trial_license)
     db.commit()
 
-    # Envoyer l'email de bienvenue
-    email_service.send_welcome_email(
+    # Envoyer l'email de bienvenue en arrière-plan
+    background_tasks.add_task(
+        email_service.send_welcome_email,
         to_email=new_user.email,
         first_name=new_user.first_name
     )
@@ -225,7 +226,7 @@ class ResetPasswordRequest(BaseModel):
 
 @router.post("/forgot-password", response_model=ForgotPasswordResponse)
 @limiter.limit("3/hour")
-def forgot_password(request: Request, data: ForgotPasswordRequest, db: Session = Depends(get_db)):
+def forgot_password(request: Request, data: ForgotPasswordRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     """Génère un code de réinitialisation de mot de passe"""
 
     # Vérifier que l'utilisateur existe
@@ -249,8 +250,9 @@ def forgot_password(request: Request, data: ForgotPasswordRequest, db: Session =
     db.add(reset_token)
     db.commit()
 
-    # Envoyer le code par email
-    email_service.send_password_reset_email(
+    # Envoyer le code par email en arrière-plan
+    background_tasks.add_task(
+        email_service.send_password_reset_email,
         to_email=data.email,
         reset_code=reset_token.reset_code
     )
@@ -564,6 +566,10 @@ def delete_account(
 
     user_email = current_user.email
     user_id = current_user.id
+
+    # Supprimer la progression formation
+    from app.models.user_progress import UserProgress
+    db.query(UserProgress).filter(UserProgress.user_id == current_user.id).delete()
 
     # Supprimer la licence associée
     db.query(License).filter(License.user_id == current_user.id).delete()
