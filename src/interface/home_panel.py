@@ -123,7 +123,7 @@ class HomePanel(ctk.CTkFrame):
         if self._destroyed:
             return
         try:
-            logo_img = Image.open(get_asset_path("logo2.png")).resize((160, 160))
+            logo_img = Image.open(get_asset_path("logo.png")).resize((160, 160))
             logo = ctk.CTkImage(light_image=logo_img, size=(160, 160))
             logo_label = ctk.CTkLabel(self, image=logo, text="")
             logo_label.image = logo
