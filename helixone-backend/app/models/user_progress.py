@@ -44,6 +44,8 @@ class UserProgress(Base):
     level = Column(Integer, default=1)
     completed_modules = Column(JSON, default=list)  # Liste des IDs de modules complétés
     module_scores = Column(JSON, default=dict)  # {module_id: {"score": 85, "time_spent": 120, "completed_at": "2026-01-15"}}
+    badges = Column(JSON, default=list)  # Liste des badges obtenus
+    certifications = Column(JSON, default=list)  # Liste des certifications obtenues
 
     # Statistiques
     current_streak = Column(Integer, default=0)
@@ -65,6 +67,8 @@ class UserProgress(Base):
             "level": self.level,
             "completed_modules": self.completed_modules or [],
             "module_scores": self.module_scores or {},
+            "badges": self.badges or [],
+            "certifications": self.certifications or [],
             "current_streak": self.current_streak,
             "last_activity_date": self.last_activity_date.isoformat() if self.last_activity_date else None,
             "created_at": self.created_at.isoformat() if self.created_at else None,

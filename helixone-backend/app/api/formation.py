@@ -70,6 +70,8 @@ class ProgressSyncRequest(BaseModel):
     completed_modules: List[str]
     module_scores: Dict[str, Dict]
     current_streak: int = 0
+    badges: List[str] = []
+    certifications: List[str] = []
 
 
 # ============================================================================
@@ -316,7 +318,9 @@ async def sync_progress(
             level=data.level,
             completed_modules=data.completed_modules,
             module_scores=data.module_scores,
-            current_streak=data.current_streak
+            current_streak=data.current_streak,
+            badges=data.badges,
+            certifications=data.certifications
         )
         db.add(progress)
     else:
@@ -336,6 +340,15 @@ async def sync_progress(
             if module_id not in existing_scores or score_data.get('score', 0) > existing_scores[module_id].get('score', 0):
                 existing_scores[module_id] = score_data
         progress.module_scores = existing_scores
+
+        # Fusionner les badges et certifications (union)
+        existing_badges = set(progress.badges or [])
+        new_badges = set(data.badges)
+        progress.badges = list(existing_badges | new_badges)
+
+        existing_certs = set(progress.certifications or [])
+        new_certs = set(data.certifications)
+        progress.certifications = list(existing_certs | new_certs)
 
         progress.current_streak = max(progress.current_streak or 0, data.current_streak)
         progress.last_activity_date = datetime.now()

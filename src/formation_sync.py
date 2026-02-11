@@ -161,6 +161,12 @@ class FormationSyncService:
         progress["level"] = backend_data.get("level", 1)
         progress["completed_modules"] = backend_data.get("completed_modules", [])
 
+        # IMPORTANT: Récupérer les badges et certifications
+        if "badges" in backend_data:
+            progress["badges"] = backend_data["badges"]
+        if "certifications" in backend_data:
+            progress["certifications"] = backend_data["certifications"]
+
         # Convertir module_scores en quiz_scores
         module_scores = backend_data.get("module_scores", {})
         for module_id, score_data in module_scores.items():
@@ -195,5 +201,7 @@ class FormationSyncService:
             "level": progress.get("level", 1),
             "completed_modules": progress.get("completed_modules", []),
             "module_scores": module_scores,
-            "current_streak": len(progress.get("login_dates", []))
+            "current_streak": len(progress.get("login_dates", [])),
+            "badges": progress.get("badges", []),
+            "certifications": progress.get("certifications", [])
         }

@@ -549,7 +549,7 @@ class FormationAcademy(ctk.CTkFrame):
             self.create_parcours_card(scroll, parcours_id, parcours_name, color, level_num, locked)
 
     def create_badges_section(self, parent):
-        """Crée la section des badges"""
+        """Crée la section des badges avec barre de progression"""
         section = ctk.CTkFrame(parent, fg_color="#1c2028", corner_radius=15)
         section.pack(fill="x", pady=20)
 
@@ -558,65 +558,136 @@ class FormationAcademy(ctk.CTkFrame):
 
         ctk.CTkLabel(
             header,
-            text="Badges Obtenus",
+            text="🏆 Badges & Réalisations",
             font=("Arial", 20, "bold"),
             text_color="#FFD700"
         ).pack(side="left")
 
         user_badges = self.user_progress.get("badges", [])
+        badges_count = len(user_badges)
+        total_badges = len(BADGES)
+
+        # Compteur avec pourcentage
+        progress_pct = int((badges_count / total_badges * 100))
         ctk.CTkLabel(
             header,
-            text=f"{len(user_badges)}/8",
-            font=("Arial", 14),
-            text_color="#888888"
+            text=f"{badges_count}/{total_badges} ({progress_pct}%)",
+            font=("Arial", 14, "bold"),
+            text_color="#00FF88"
         ).pack(side="right")
 
-        # Grille des badges
+        # Barre de progression horizontale
+        progress_container = ctk.CTkFrame(section, fg_color="transparent")
+        progress_container.pack(fill="x", padx=20, pady=(10, 20))
+
+        # Fond de la barre
+        progress_bg = ctk.CTkFrame(
+            progress_container,
+            fg_color="#2a2d36",
+            height=30,
+            corner_radius=15
+        )
+        progress_bg.pack(fill="x")
+
+        # Barre de progression remplie
+        if progress_pct > 0:
+            progress_fill = ctk.CTkFrame(
+                progress_bg,
+                fg_color="#FFD700",
+                height=30,
+                corner_radius=15
+            )
+            progress_fill.place(relx=0, rely=0, relwidth=progress_pct/100, relheight=1)
+
+            # Texte sur la barre
+            ctk.CTkLabel(
+                progress_bg,
+                text=f"{badges_count} badge{'s' if badges_count > 1 else ''} déverrouillé{'s' if badges_count > 1 else ''}",
+                font=("Arial", 12, "bold"),
+                text_color="#000000" if progress_pct > 30 else "#FFFFFF"
+            ).place(relx=0.5, rely=0.5, anchor="center")
+
+        # Grille des badges (2 lignes de 4)
         badges_frame = ctk.CTkFrame(section, fg_color="transparent")
         badges_frame.pack(fill="x", padx=20, pady=(0, 15))
 
         for i, (badge_id, badge_data) in enumerate(BADGES.items()):
             is_earned = badge_id in user_badges
-            self.create_badge_widget(badges_frame, badge_id, badge_data, is_earned, i)
+            row = i // 4
+            col = i % 4
+            self.create_badge_widget(badges_frame, badge_id, badge_data, is_earned, row, col)
 
-    def create_badge_widget(self, parent, badge_id, badge_data, is_earned, index):
-        """Crée un widget de badge"""
+    def create_badge_widget(self, parent, badge_id, badge_data, is_earned, row, col):
+        """Crée un widget de badge amélioré"""
+        # Couleur selon l'état
+        if is_earned:
+            bg_color = "#2a3f2f"  # Vert foncé pour badge obtenu
+            border_color = "#00FF88"
+        else:
+            bg_color = "#16181c"
+            border_color = "#2a2d36"
+
         frame = ctk.CTkFrame(
             parent,
-            fg_color="#2a2d36" if is_earned else "#16181c",
-            corner_radius=10,
-            width=80,
-            height=90
+            fg_color=bg_color,
+            border_width=2,
+            border_color=border_color,
+            corner_radius=12,
+            width=160,
+            height=110
         )
-        frame.grid(row=0, column=index, padx=5, pady=5)
+        frame.grid(row=row, column=col, padx=8, pady=8, sticky="ew")
         frame.grid_propagate(False)
+        parent.grid_columnconfigure(col, weight=1)
 
-        # Icône
-        icon_color = "#FFFFFF" if is_earned else "#444444"
+        # Container intérieur
+        inner = ctk.CTkFrame(frame, fg_color="transparent")
+        inner.pack(fill="both", expand=True, padx=10, pady=10)
+
+        # Icône avec fond circulaire
+        icon_bg = ctk.CTkFrame(
+            inner,
+            fg_color="#FFD700" if is_earned else "#2a2d36",
+            corner_radius=30,
+            width=50,
+            height=50
+        )
+        icon_bg.pack(pady=(0, 8))
+        icon_bg.pack_propagate(False)
+
+        icon_color = "#000000" if is_earned else "#555555"
         ctk.CTkLabel(
-            frame,
+            icon_bg,
             text=badge_data["icon"],
-            font=("Arial", 28),
+            font=("Arial", 24),
             text_color=icon_color
-        ).pack(pady=(10, 0))
+        ).place(relx=0.5, rely=0.5, anchor="center")
 
-        # Nom
-        name_color = "#FFFFFF" if is_earned else "#555555"
+        # Nom du badge
+        name_color = "#FFFFFF" if is_earned else "#666666"
         ctk.CTkLabel(
-            frame,
-            text=badge_data["name"][:10],
-            font=("Arial", 9),
-            text_color=name_color
-        ).pack(pady=(5, 0))
+            inner,
+            text=badge_data["name"],
+            font=("Arial", 11, "bold"),
+            text_color=name_color,
+            wraplength=140
+        ).pack()
 
-        # XP si gagné
+        # XP ou condition
         if is_earned:
             ctk.CTkLabel(
-                frame,
-                text=f"+{badge_data['xp']} XP",
-                font=("Arial", 8),
-                text_color="#FFD700"
-            ).pack()
+                inner,
+                text=f"✓ +{badge_data['xp']} XP",
+                font=("Arial", 9, "bold"),
+                text_color="#00FF88"
+            ).pack(pady=(2, 0))
+        else:
+            ctk.CTkLabel(
+                inner,
+                text="🔒 Verrouillé",
+                font=("Arial", 9),
+                text_color="#666666"
+            ).pack(pady=(2, 0))
 
     def create_certifications_section(self, parent):
         """Crée la section des certifications"""
@@ -727,9 +798,11 @@ class FormationAcademy(ctk.CTkFrame):
         """Affiche une notification pour les nouveaux badges"""
         badge_names = [f"{BADGES[b]['icon']} {BADGES[b]['name']}" for b in badge_ids]
         messagebox.showinfo(
-            "Nouveau Badge!",
+            "🏆 Nouveau Badge!",
             f"Félicitations! Vous avez obtenu:\n\n" + "\n".join(badge_names)
         )
+        # Rafraîchir le dashboard pour mettre à jour les compteurs
+        self.show_dashboard()
 
     def create_stat_card(self, parent, label, value, color):
         """Crée une carte de statistique"""
