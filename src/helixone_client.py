@@ -195,11 +195,26 @@ class HelixOneClient:
         """
         return self.token is not None
     
+    def fetch_current_user(self) -> Optional[Dict[str, Any]]:
+        """
+        Récupérer les infos utilisateur depuis l'API (GET /auth/me)
+        et mettre à jour self.user
+
+        Returns:
+            Dict avec les infos utilisateur ou None
+        """
+        try:
+            user_data = self._make_request("GET", "/auth/me", require_auth=True)
+            self.user = user_data
+            return user_data
+        except Exception:
+            return None
+
     def logout(self):
         """Déconnexion (supprime le token local)"""
         self.token = None
         self.user = None
-    
+
     # ========================================================================
     # LICENCES
     # ========================================================================

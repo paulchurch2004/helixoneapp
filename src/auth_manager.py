@@ -57,11 +57,12 @@ class AuthManager:
         """
         # Charger la session sauvegardée
         if self.load_session():
-            # Vérifier que le token est toujours valide en essayant d'accéder à la licence
+            # Vérifier que le token est toujours valide et rafraîchir les infos user
             try:
-                self.client.get_license_status()
+                self.client.fetch_current_user()
+                self.save_session()
                 return True
-            except HelixOneAPIError:
+            except Exception:
                 # Token invalide ou expiré
                 self.clear_session()
                 return False

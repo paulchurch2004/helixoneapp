@@ -1347,8 +1347,8 @@ def safe_afficher_profil():
         if auth_manager_global:
             try:
                 user_info = auth_manager_global.get_current_user() or {}
-            except Exception:
-                pass
+            except Exception as e:
+                logger.error(f"Erreur récupération infos utilisateur: {e}")
 
         profile_panel = ProfilePanel(
             container,

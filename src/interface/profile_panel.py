@@ -176,7 +176,7 @@ class ProfilePanel(ctk.CTkScrollableFrame):
         ).pack(anchor="w")
 
         # Email
-        email = self.user_info.get('email', 'email@example.com')
+        email = self.user_info.get('email', '')
         ctk.CTkLabel(
             info_frame, text=email,
             font=ctk.CTkFont(size=13),
