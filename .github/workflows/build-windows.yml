@@ -10,6 +10,9 @@ on:
         required: true
         default: '1.0.5'
 
+permissions:
+  contents: write
+
 jobs:
   build-windows:
     runs-on: windows-latest
