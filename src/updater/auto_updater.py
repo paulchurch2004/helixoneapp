@@ -34,7 +34,7 @@ class AutoUpdater:
     # Update manifest URL - JSON file with latest version info
     # Format: {"version": "1.1.0", "mandatory": false, "changelog": [...],
     #          "download_url_mac": "...", "download_url_windows": "..."}
-    VERSION_URL = "https://clever-conkies-89d13b.netlify.app/api/version.json"
+    VERSION_URL = "https://helixone.fr/api/version.json"
 
     REQUEST_TIMEOUT = 10
     CHUNK_SIZE = 8192

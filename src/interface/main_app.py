@@ -1160,18 +1160,20 @@ def launch_main_app_with_auth(app, auth_manager, logout_callback):
 
 def launch_main_app(app, auth_manager=None, logout_callback=None):
     """Fonction d'entrée compatible avec et sans authentification"""
-    if auth_manager and logout_callback:
+    if auth_manager:
+        if not logout_callback:
+            logout_callback = lambda: None
         return launch_main_app_with_auth(app, auth_manager, logout_callback)
     else:
         return launch_main_app_old(app)
 
 
 def launch_main_app_old(app):
-    """Ancienne fonction pour compatibilité"""
+    """Ancienne fonction pour compatibilité (sans auth)"""
     global main_frame, sidebar, langue_var, toast_manager
 
     try:
-        logger.info("Démarrage de l'application HelixOne")
+        logger.info("Démarrage de l'application HelixOne (sans auth)")
 
         initial_theme = getattr(config_manager.config, 'theme', 'dark')
         initial_theme = "light" if initial_theme.lower() == "light" else "dark"
@@ -1210,7 +1212,10 @@ def launch_main_app_old(app):
 
         # Afficher la Formation directement
         try:
-            user_email = user.get('email', 'default') if user else 'default'
+            user_email = 'default'
+            if auth_manager_global:
+                _user = auth_manager_global.get_current_user()
+                user_email = _user.get('email', 'default') if _user else 'default'
             afficher_formation_commerciale(main_frame, user_email=user_email)
         except Exception as e:
             logger.error(f"Erreur affichage formation: {e}")

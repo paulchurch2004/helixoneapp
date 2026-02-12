@@ -258,7 +258,7 @@ def create_version_json(version: str, installer_path: Path, checksum: str):
         version_info = {
             "version": version,
             "release_date": datetime.now().strftime("%Y-%m-%d"),
-            "download_url": f"https://clever-conkies-89d13b.netlify.app/downloads/{installer_path.name}",
+            "download_url": f"https://helixone.fr/downloads/{installer_path.name}",
             "file_size": file_size,
             "checksum": checksum,
             "changelog": [

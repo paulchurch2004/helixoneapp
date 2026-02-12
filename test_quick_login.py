@@ -99,7 +99,17 @@ def test_biometric_auth():
 
     print(f"Platform: {bio.platform}")
     print(f"Biométrie disponible: {bio.is_available()}")
-    print(f"Type de biométrie: {bio.get_biometry_type()}")
+
+    biometry_type = bio.get_biometry_type()
+    print(f"Type de biométrie: {biometry_type}")
+
+    # Afficher le type spécifique
+    if biometry_type == "touchid":
+        print("   → Touch ID (macOS)")
+    elif biometry_type == "faceid":
+        print("   → Face ID (macOS)")
+    elif biometry_type == "windowshello":
+        print("   → Windows Hello (Windows)")
 
     if bio.is_available():
         print("\n✅ Biométrie disponible sur cet appareil")
@@ -143,6 +153,16 @@ def test_biometric_auth():
             return True
     else:
         print("⚠️  Biométrie non disponible sur cet appareil")
+        print("\nRaisons possibles:")
+        if bio.platform == 'Darwin':
+            print("  - Mac sans Touch ID/Face ID (Mac mini, iMac, ancien MacBook)")
+            print("  - Aucune empreinte enregistrée dans Préférences Système > Touch ID")
+            print("  - Touch ID désactivé")
+        elif bio.platform == 'Windows':
+            print("  - Windows Hello non configuré")
+            print("  - Aucune empreinte/PIN/reconnaissance faciale enregistrée")
+            print("  - Windows 10+ requis")
+            print("  - winrt-runtime non installé (pip install winrt-runtime)")
         return True
 
 

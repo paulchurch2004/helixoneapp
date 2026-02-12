@@ -1,7 +1,14 @@
-name: Build Windows Executable
+name: Build Windows Installer
 
 on:
+  release:
+    types: [published]
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g. 1.0.5)'
+        required: true
+        default: '1.0.5'
 
 jobs:
   build-windows:
@@ -17,30 +24,99 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
+      - name: Determine version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            VERSION="${{ github.event.release.tag_name }}"
+            VERSION="${VERSION#v}"
+          else
+            VERSION="${{ github.event.inputs.version }}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Building version: $VERSION"
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Convert logo to ICO
+        run: |
+          python -c "
+          from PIL import Image
+          import os
+          ico_path = os.path.join('assets', 'logo.ico')
+          if not os.path.exists(ico_path):
+              img = Image.open(os.path.join('assets', 'logo.png'))
+              if img.mode != 'RGBA':
+                  img = img.convert('RGBA')
+              sizes = [16, 24, 32, 48, 64, 128, 256]
+              icons = [img.resize((s, s), Image.Resampling.LANCZOS) for s in sizes]
+              icons[0].save(ico_path, format='ICO', sizes=[(s, s) for s in sizes], append_images=icons[1:])
+              print(f'Created {ico_path}')
+          else:
+              print(f'{ico_path} already exists')
+          "
 
       - name: Build with PyInstaller
         run: |
           pyinstaller HelixOne_Windows.spec --noconfirm
 
-      - name: Create ZIP archive
+      - name: Verify build output
         run: |
-          Compress-Archive -Path "dist\HelixOne\*" -DestinationPath "dist\HelixOne-1.0.0-windows.zip"
+          if (Test-Path "dist\HelixOne\HelixOne.exe") {
+            $size = (Get-Item "dist\HelixOne\HelixOne.exe").Length / 1MB
+            Write-Host "HelixOne.exe built successfully ($([math]::Round($size, 1)) MB)"
+          } else {
+            Write-Error "Build failed - HelixOne.exe not found"
+            exit 1
+          }
+        shell: pwsh
+
+      - name: Install Inno Setup
+        run: |
+          choco install innosetup -y --no-progress
+        shell: pwsh
+
+      - name: Build installer with Inno Setup
+        run: |
+          $env:PATH += ";C:\Program Files (x86)\Inno Setup 6"
+          iscc /DMyAppVersion=${{ steps.version.outputs.version }} installer\HelixOne.iss
+        shell: pwsh
+
+      - name: Verify installer
+        run: |
+          $installer = "dist\installer\HelixOne_Setup.exe"
+          if (Test-Path $installer) {
+            $size = (Get-Item $installer).Length / 1MB
+            Write-Host "Installer created: HelixOne_Setup.exe ($([math]::Round($size, 1)) MB)"
+          } else {
+            Write-Error "Installer not found at $installer"
+            exit 1
+          }
         shell: pwsh
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: HelixOne-Windows
-          path: dist/HelixOne-1.0.0-windows.zip
+          name: HelixOne-Windows-Setup
+          path: dist/installer/HelixOne_Setup.exe
 
       - name: Upload to GitHub Release
+        if: github.event_name == 'release'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.0
-          files: dist/HelixOne-1.0.0-windows.zip
+          files: dist/installer/HelixOne_Setup.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload to existing release (manual trigger)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          gh release upload "v${{ steps.version.outputs.version }}" "dist\installer\HelixOne_Setup.exe" --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash

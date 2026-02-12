@@ -13,3 +13,4 @@ pygame>=2.5.0
 opencv-python>=4.8.0
 pyinstaller>=6.0.0
 pyobjc-framework-LocalAuthentication>=10.0; sys_platform == 'darwin'
+winrt-runtime>=2.0.0; sys_platform == 'win32'

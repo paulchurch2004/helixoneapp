@@ -1,6 +1,6 @@
 """
 Authentification biométrique pour HelixOne
-Support de Touch ID et Face ID sur macOS via LocalAuthentication
+Support de Touch ID/Face ID (macOS) et Windows Hello (Windows)
 """
 
 import platform
@@ -12,7 +12,7 @@ class BiometricAuth:
     """
     Gère l'authentification biométrique
     - macOS: Touch ID / Face ID via LocalAuthentication
-    - Windows: Windows Hello (future)
+    - Windows: Windows Hello via UserConsentVerifier
     - Linux: Non supporté
     """
 
@@ -20,18 +20,27 @@ class BiometricAuth:
         """Initialiser l'authentification biométrique"""
         self.platform = platform.system()
         self._context = None
+        self._winrt_available = False
+
+        # Vérifier si winrt est disponible sur Windows
+        if self.platform == 'Windows':
+            try:
+                import winrt
+                self._winrt_available = True
+            except ImportError:
+                pass
 
     def is_available(self) -> bool:
         """
         Vérifier si l'authentification biométrique est disponible
 
         Returns:
-            True si Touch ID/Face ID est disponible
+            True si Touch ID/Face ID/Windows Hello est disponible
         """
         if self.platform == 'Darwin':  # macOS
             return self._is_available_macos()
         elif self.platform == 'Windows':
-            return False  # TODO: Windows Hello
+            return self._is_available_windows()
         else:
             return False
 
@@ -58,6 +67,14 @@ class BiometricAuth:
             else:
                 # Mode synchrone
                 return self._authenticate_macos_sync(reason)
+        elif self.platform == 'Windows':
+            if callback:
+                # Mode asynchrone (recommandé pour GUI)
+                self._authenticate_windows_async(reason, callback)
+                return True
+            else:
+                # Mode synchrone
+                return self._authenticate_windows_sync(reason)
         else:
             if callback:
                 callback(False, "Biométrie non supportée sur cette plateforme")
@@ -168,15 +185,87 @@ class BiometricAuth:
         thread = threading.Thread(target=run_auth, daemon=True)
         thread.start()
 
+    # ====== Windows Hello ======
+
+    def _is_available_windows(self) -> bool:
+        """Vérifier si Windows Hello est disponible"""
+        if not self._winrt_available:
+            # Essayer sans winrt - simplement vérifier si Windows 10+
+            try:
+                import sys
+                if sys.getwindowsversion().build >= 10240:  # Windows 10 build 10240+
+                    return True
+            except:
+                pass
+            return False
+
+        try:
+            from winrt.windows.security.credentials.ui import UserConsentVerifier, UserConsentVerifierAvailability
+
+            # Vérifier la disponibilité
+            availability = UserConsentVerifier.check_availability_async().get()
+            return availability == UserConsentVerifierAvailability.AVAILABLE
+
+        except Exception as e:
+            print(f"Erreur vérification Windows Hello: {e}")
+            return False
+
+    def _authenticate_windows_sync(self, reason: str) -> bool:
+        """Authentifier avec Windows Hello (synchrone)"""
+        if not self._winrt_available:
+            print("❌ winrt non installé. Installez: pip install winrt-runtime")
+            return False
+
+        try:
+            from winrt.windows.security.credentials.ui import UserConsentVerifier, UserConsentVerificationResult
+
+            # Demander l'authentification
+            result = UserConsentVerifier.request_verification_async(reason).get()
+
+            return result == UserConsentVerificationResult.VERIFIED
+
+        except Exception as e:
+            print(f"Erreur authentification Windows Hello: {e}")
+            return False
+
+    def _authenticate_windows_async(self, reason: str, callback: Callable[[bool, Optional[str]], None]):
+        """Authentifier avec Windows Hello (asynchrone)"""
+        def run_auth():
+            if not self._winrt_available:
+                callback(False, "winrt non installé. Installez: pip install winrt-runtime")
+                return
+
+            try:
+                from winrt.windows.security.credentials.ui import UserConsentVerifier, UserConsentVerificationResult
+
+                # Demander l'authentification
+                result = UserConsentVerifier.request_verification_async(reason).get()
+
+                success = (result == UserConsentVerificationResult.VERIFIED)
+                error_msg = None if success else "Authentification refusée ou annulée"
+
+                callback(success, error_msg)
+
+            except Exception as e:
+                callback(False, f"Erreur: {str(e)}")
+
+        # Lancer dans un thread pour ne pas bloquer l'UI
+        thread = threading.Thread(target=run_auth, daemon=True)
+        thread.start()
+
+    # ====== Type de biométrie ======
+
     def get_biometry_type(self) -> str:
         """
         Obtenir le type de biométrie disponible
 
         Returns:
-            "touchid", "faceid", "none"
+            "touchid", "faceid", "windowshello", "none"
         """
         if self.platform == 'Darwin':
             return self._get_biometry_type_macos()
+        elif self.platform == 'Windows':
+            return "windowshello" if self._is_available_windows() else "none"
         return "none"
 
     def _get_biometry_type_macos(self) -> str:

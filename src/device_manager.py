@@ -96,7 +96,7 @@ class DeviceManager:
         Obtenir un nom lisible pour l'appareil
 
         Returns:
-            Nom de l'appareil (ex: "MacBook Pro")
+            Nom de l'appareil (ex: "MacBook Pro" ou "DESKTOP-ABC123")
         """
         try:
             # Sur macOS
@@ -110,6 +110,13 @@ class DeviceManager:
                 )
                 if result.returncode == 0 and result.stdout.strip():
                     return result.stdout.strip()
+
+            # Sur Windows
+            elif platform.system() == 'Windows':
+                import os
+                computer_name = os.environ.get('COMPUTERNAME')
+                if computer_name:
+                    return computer_name
 
             # Fallback sur hostname
             return platform.node() or "Appareil inconnu"

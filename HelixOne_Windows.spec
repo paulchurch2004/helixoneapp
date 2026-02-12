@@ -37,6 +37,8 @@ hiddenimports = [
     'src.plasma_intro', 'src.auth_session', 'src.auth_manager',
     'src.helixone_client', 'src.config', 'src.i18n', 'src.asset_path',
     'src.updater', 'src.updater.auto_updater', 'src.updater.version',
+    'src.secure_storage', 'src.biometric_auth', 'src.device_manager',
+    'keyring', 'keyring.backends',
 ]
 
 hiddenimports += collect_submodules('customtkinter')

@@ -1,29 +1,37 @@
 """
 Stockage sécurisé pour HelixOne
-Utilise le Keychain macOS pour stocker les credentials de manière sécurisée
+Utilise Keychain (macOS) et Windows Credential Manager (Windows) via la bibliothèque keyring
 """
 
 import os
 import sys
-import subprocess
 import platform
 import json
 from typing import Optional, Dict
+
+try:
+    import keyring
+    KEYRING_AVAILABLE = True
+except ImportError:
+    KEYRING_AVAILABLE = False
+    print("⚠️ keyring non installé - utilisation du fallback fichier")
 
 
 class SecureStorage:
     """
     Gère le stockage sécurisé des credentials
-    - macOS: utilise Keychain
-    - Windows: utilise Windows Credential Manager
-    - Linux: utilise Secret Service (ou fichier chiffré en fallback)
+    - macOS: utilise Keychain via keyring
+    - Windows: utilise Windows Credential Manager via keyring
+    - Linux: utilise Secret Service via keyring
+    - Fallback: fichier avec permissions restreintes
     """
 
-    SERVICE_NAME = "fr.helixone.app"
+    SERVICE_NAME = "HelixOne"
 
     def __init__(self):
         """Initialiser le stockage sécurisé"""
         self.platform = platform.system()
+        self.use_keyring = KEYRING_AVAILABLE
 
     def save_credentials(self, email: str, password: str) -> bool:
         """
@@ -36,10 +44,8 @@ class SecureStorage:
         Returns:
             True si sauvegarde réussie
         """
-        if self.platform == 'Darwin':  # macOS
-            return self._save_to_keychain_macos(email, password)
-        elif self.platform == 'Windows':
-            return self._save_to_credential_manager_windows(email, password)
+        if self.use_keyring:
+            return self._save_with_keyring(email, password)
         else:
             # Fallback: fichier avec permissions restreintes
             return self._save_to_file(email, password)
@@ -54,10 +60,8 @@ class SecureStorage:
         Returns:
             Mot de passe ou None si non trouvé
         """
-        if self.platform == 'Darwin':
-            return self._get_from_keychain_macos(email)
-        elif self.platform == 'Windows':
-            return self._get_from_credential_manager_windows(email)
+        if self.use_keyring:
+            return self._get_with_keyring(email)
         else:
             return self._get_from_file(email)
 
@@ -71,139 +75,42 @@ class SecureStorage:
         Returns:
             True si suppression réussie
         """
-        if self.platform == 'Darwin':
-            return self._delete_from_keychain_macos(email)
-        elif self.platform == 'Windows':
-            return self._delete_from_credential_manager_windows(email)
+        if self.use_keyring:
+            return self._delete_with_keyring(email)
         else:
             return self._delete_from_file(email)
 
-    # ====== macOS Keychain ======
+    # ====== Méthodes avec keyring (macOS, Windows, Linux) ======
 
-    def _save_to_keychain_macos(self, email: str, password: str) -> bool:
-        """Sauvegarder dans Keychain macOS"""
+    def _save_with_keyring(self, email: str, password: str) -> bool:
+        """Sauvegarder avec keyring (fonctionne sur macOS, Windows, Linux)"""
         try:
-            # Supprimer l'ancienne entrée si elle existe
-            self._delete_from_keychain_macos(email)
-
-            # Ajouter la nouvelle entrée
-            cmd = [
-                'security', 'add-generic-password',
-                '-s', self.SERVICE_NAME,  # service name
-                '-a', email,              # account name
-                '-w', password,           # password
-                '-U'                      # update if exists
-            ]
-
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=5
-            )
-
-            return result.returncode == 0
-
+            keyring.set_password(self.SERVICE_NAME, email, password)
+            return True
         except Exception as e:
-            print(f"Erreur sauvegarde Keychain: {e}")
+            print(f"Erreur sauvegarde keyring: {e}")
             return False
 
-    def _get_from_keychain_macos(self, email: str) -> Optional[str]:
-        """Récupérer depuis Keychain macOS"""
+    def _get_with_keyring(self, email: str) -> Optional[str]:
+        """Récupérer avec keyring"""
         try:
-            cmd = [
-                'security', 'find-generic-password',
-                '-s', self.SERVICE_NAME,
-                '-a', email,
-                '-w'  # output only the password
-            ]
-
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=5
-            )
-
-            if result.returncode == 0:
-                return result.stdout.strip()
-
+            return keyring.get_password(self.SERVICE_NAME, email)
+        except Exception as e:
+            print(f"Erreur lecture keyring: {e}")
             return None
 
-        except Exception as e:
-            print(f"Erreur lecture Keychain: {e}")
-            return None
-
-    def _delete_from_keychain_macos(self, email: str) -> bool:
-        """Supprimer depuis Keychain macOS"""
+    def _delete_with_keyring(self, email: str) -> bool:
+        """Supprimer avec keyring"""
         try:
-            cmd = [
-                'security', 'delete-generic-password',
-                '-s', self.SERVICE_NAME,
-                '-a', email
-            ]
-
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=5
-            )
-
-            # returncode 0 = supprimé, 44 = pas trouvé (aussi OK)
-            return result.returncode in [0, 44]
-
+            keyring.delete_password(self.SERVICE_NAME, email)
+            return True
+        except keyring.errors.PasswordDeleteError:
+            # Password not found - c'est OK
+            return True
         except Exception as e:
-            print(f"Erreur suppression Keychain: {e}")
+            print(f"Erreur suppression keyring: {e}")
             return False
 
-    # ====== Windows Credential Manager ======
-
-    def _save_to_credential_manager_windows(self, email: str, password: str) -> bool:
-        """Sauvegarder dans Windows Credential Manager"""
-        try:
-            # Utiliser cmdkey.exe
-            target_name = f"{self.SERVICE_NAME}:{email}"
-
-            # Supprimer l'ancienne entrée
-            subprocess.run(
-                ['cmdkey', '/delete', target_name],
-                capture_output=True,
-                timeout=5
-            )
-
-            # Ajouter la nouvelle
-            result = subprocess.run(
-                ['cmdkey', '/generic', target_name, '/user', email, '/pass', password],
-                capture_output=True,
-                timeout=5
-            )
-
-            return result.returncode == 0
-
-        except Exception as e:
-            print(f"Erreur sauvegarde Windows Credential Manager: {e}")
-            return False
-
-    def _get_from_credential_manager_windows(self, email: str) -> Optional[str]:
-        """Récupérer depuis Windows Credential Manager"""
-        # Windows cmdkey ne permet pas de lire les mots de passe directement
-        # Il faudrait utiliser une lib comme keyring ou win32cred
-        # Pour l'instant, fallback sur fichier
-        return self._get_from_file(email)
-
-    def _delete_from_credential_manager_windows(self, email: str) -> bool:
-        """Supprimer depuis Windows Credential Manager"""
-        try:
-            target_name = f"{self.SERVICE_NAME}:{email}"
-            result = subprocess.run(
-                ['cmdkey', '/delete', target_name],
-                capture_output=True,
-                timeout=5
-            )
-            return result.returncode == 0
-        except Exception:
-            return False
 
     # ====== Fallback: Fichier avec permissions restreintes ======
 

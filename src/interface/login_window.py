@@ -113,10 +113,13 @@ class LoginWindow(ctk.CTk):
 
             if biometry_type == "touchid":
                 icon = "👆"
-                text = f"Connexion rapide avec Touch ID"
+                text = "Connexion rapide avec Touch ID"
             elif biometry_type == "faceid":
                 icon = "😀"
-                text = f"Connexion rapide avec Face ID"
+                text = "Connexion rapide avec Face ID"
+            elif biometry_type == "windowshello":
+                icon = "🔐"
+                text = "Connexion rapide avec Windows Hello"
             else:
                 icon = "🔐"
                 text = "Connexion rapide"
@@ -212,6 +215,8 @@ class LoginWindow(ctk.CTk):
                 bio_text = "(Touch ID)"
             elif biometry_type == "faceid":
                 bio_text = "(Face ID)"
+            elif biometry_type == "windowshello":
+                bio_text = "(Windows Hello)"
             else:
                 bio_text = ""
 

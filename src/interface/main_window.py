@@ -21,13 +21,29 @@ def launch_helixone_ui():
     main_frame = ctk.CTkFrame(app, fg_color=BG_COLOR, corner_radius=0)
     main_frame.pack(fill="both", expand=True)
 
+    # Page d'accueil avec login, création compte et indices boursiers
+    accueil = HomePanel(main_frame, on_continue_callback=None)
+
     # Callback : appelé après connexion réussie
     def show_main_app():
-        main_frame.destroy()
-        launch_main_app(app)
+        auth_manager = accueil.auth_manager
 
-    # Page d'accueil avec login, création compte et indices boursiers
-    accueil = HomePanel(main_frame, on_continue_callback=show_main_app)
+        def logout_callback():
+            """Déconnexion et retour à l'écran de connexion"""
+            auth_manager.logout()
+            # Recréer l'écran d'accueil
+            for widget in app.winfo_children():
+                widget.destroy()
+            new_frame = ctk.CTkFrame(app, fg_color=BG_COLOR, corner_radius=0)
+            new_frame.pack(fill="both", expand=True)
+            new_accueil = HomePanel(new_frame, on_continue_callback=None)
+            new_accueil.on_continue_callback = show_main_app
+            new_accueil.pack(fill="both", expand=True)
+
+        main_frame.destroy()
+        launch_main_app(app, auth_manager=auth_manager, logout_callback=logout_callback)
+
+    accueil.on_continue_callback = show_main_app
     accueil.pack(fill="both", expand=True)
 
     # Vérifier les mises à jour en arrière-plan

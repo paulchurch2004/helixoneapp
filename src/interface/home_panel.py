@@ -157,6 +157,9 @@ class HomePanel(ctk.CTkFrame):
             elif biometry_type == "faceid":
                 icon = "😀"
                 text = "Connexion rapide avec Face ID"
+            elif biometry_type == "windowshello":
+                icon = "🔐"
+                text = "Connexion rapide avec Windows Hello"
             else:
                 icon = "🔐"
                 text = "Connexion rapide"
@@ -799,39 +802,30 @@ class HomePanel(ctk.CTkFrame):
             set_auth_token("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMjI2ZjI0MDctNGY2Yi00ODMyLWJjMTQtZGZhNzQ4M2JmY2Y0IiwiZW1haWwiOiJ0ZXN0QGhlbGl4b25lLmNvbSIsImV4cCI6MTc5MTkzMDA2N30.DDnZTWxmHCfPW6mVJrhKCU0HJeD7vCxcPTTIXwjmq5M")
             return (True, "")
 
-        # === Sinon : Mode normal avec API ===
+        # === Mode normal avec AuthManager ===
         try:
-            response = requests.post(
-                f"{get_api_url()}/auth/login",
-                json={"email": email, "password": password},
-                timeout=120
-            )
+            from src.helixone_client import HelixOneAPIError
+            result = self.auth_manager.login(email, password)
 
-            if response.status_code == 200:
-                response_data = response.json()
-                token = response_data.get("access_token")
+            # Configurer le token de session
+            token = result.get("access_token")
+            if token:
+                set_auth_token(token)
+                print(f"✅ Authentification réussie pour {email}")
+                return (True, "")
+            else:
+                return (False, "Erreur serveur : aucun token reçu.")
 
-                if token:
-                    set_auth_token(token)
-                    print(f"✅ Authentification réussie pour {email}")
-                    return (True, "")
-                else:
-                    return (False, "Erreur serveur : aucun token reçu.")
-
-            # Erreur d'authentification
-            try:
-                detail = response.json().get("detail", "")
-            except Exception:
-                detail = ""
-            if response.status_code == 401:
+        except HelixOneAPIError as e:
+            error_msg = str(e)
+            if "401" in error_msg or "incorrect" in error_msg.lower():
                 return (False, "Email ou mot de passe incorrect.")
-            elif response.status_code == 403:
-                return (False, detail or "Compte désactivé. Contactez le support.")
-            elif response.status_code == 429:
+            elif "403" in error_msg:
+                return (False, "Compte désactivé. Contactez le support.")
+            elif "429" in error_msg:
                 return (False, "Trop de tentatives. Réessayez dans quelques minutes.")
             else:
-                return (False, f"Erreur serveur ({response.status_code}).\n{detail}")
-
+                return (False, f"Erreur serveur.\n{error_msg}")
         except requests.exceptions.Timeout:
             return (False, "Le serveur met du temps à répondre.\nRéessayez dans quelques secondes.")
         except requests.exceptions.ConnectionError:

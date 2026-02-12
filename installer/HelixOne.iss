@@ -4,7 +4,7 @@
 #define MyAppName "HelixOne"
 #define MyAppVersion "1.0.0"
 #define MyAppPublisher "HelixOne Technologies"
-#define MyAppURL "https://clever-conkies-89d13b.netlify.app/"
+#define MyAppURL "https://helixone.fr/"
 #define MyAppExeName "HelixOne.exe"
 #define MyAppAssocName "HelixOne Trading Platform"
 #define MyAppAssocExt ".hlx"
@@ -27,7 +27,7 @@ DefaultGroupName={#MyAppName}
 
 ; Output settings
 OutputDir=..\dist\installer
-OutputBaseFilename=HelixOne_Setup_{#MyAppVersion}
+OutputBaseFilename=HelixOne_Setup
 
 ; Compression (maximum)
 Compression=lzma2/ultra64
@@ -37,8 +37,6 @@ LZMAUseSeparateProcess=yes
 ; Visual settings
 SetupIconFile=..\assets\logo.ico
 WizardStyle=modern
-WizardImageFile=..\assets\wizard_image.bmp
-WizardSmallImageFile=..\assets\wizard_small.bmp
 
 ; Privileges
 PrivilegesRequired=lowest

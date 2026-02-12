@@ -463,8 +463,9 @@ class FormationAcademy(ctk.CTkFrame):
 
     def show_dashboard(self):
         """Affiche le dashboard principal (avec changement d'onglet)"""
+        # IMPORTANT: Mettre a jour _last_tab AVANT de changer l'onglet pour eviter doublon
+        self._last_tab = "Dashboard"
         self._changing_tab = True
-        self._last_tab = "Dashboard"  # Mettre a jour pour eviter double appel
         try:
             self.tabs.set("Dashboard")
             self.content_area = self.tabs.tab("Dashboard")
@@ -801,8 +802,7 @@ class FormationAcademy(ctk.CTkFrame):
             "🏆 Nouveau Badge!",
             f"Félicitations! Vous avez obtenu:\n\n" + "\n".join(badge_names)
         )
-        # Rafraîchir le dashboard pour mettre à jour les compteurs
-        self.show_dashboard()
+        # Note: Ne pas recharger le dashboard ici car on est déjà en train de le construire
 
     def create_stat_card(self, parent, label, value, color):
         """Crée une carte de statistique"""
