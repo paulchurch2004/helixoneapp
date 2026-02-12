@@ -3,11 +3,11 @@ HelixOne Version Management
 """
 
 # Current application version
-CURRENT_VERSION = "1.0.3"
+CURRENT_VERSION = "1.0.5"
 
 # Build info
-BUILD_DATE = "2026-02-10"
-BUILD_NUMBER = 4
+BUILD_DATE = "2026-02-12"
+BUILD_NUMBER = 1
 
 def get_version_info() -> dict:
     """Get complete version information"""

@@ -24,21 +24,29 @@ class LoginWindow(ctk.CTk):
     
     def __init__(self, auth_manager):
         super().__init__()
-        
+
         self.auth_manager = auth_manager
         self.register_callback = None
         self.success_callback = None
-        
+
         # Configuration fenêtre
         self.title(f"HelixOne - {t('auth.login')}")
-        self.geometry("450x550")
+        self.geometry("450x650")  # Augmenté pour bouton biométrique
         self.resizable(False, False)
-        
+
         # Centrer la fenêtre
         self.center_window()
-        
+
+        # Vérifier si connexion rapide disponible
+        self.quick_login_available = self.auth_manager.is_quick_login_enabled()
+        self.biometric_available = self.auth_manager.is_biometric_available()
+
         # Créer l'interface
         self.create_ui()
+
+        # Si connexion rapide activée ET biométrie dispo, proposer auto-login
+        if self.quick_login_available and self.biometric_available:
+            self.after(500, self._prompt_biometric_login)
     
     def center_window(self):
         """Centrer la fenêtre sur l'écran"""
@@ -96,7 +104,51 @@ class LoginWindow(ctk.CTk):
             font=("Arial", 14),
             text_color="gray"
         )
-        subtitle_label.pack(pady=(0, 40))
+        subtitle_label.pack(pady=(0, 20))
+
+        # Bouton connexion biométrique (si disponible)
+        if self.quick_login_available and self.biometric_available:
+            biometry_type = self.auth_manager.get_biometry_type()
+            quick_email = self.auth_manager.get_quick_login_email()
+
+            if biometry_type == "touchid":
+                icon = "👆"
+                text = f"Connexion rapide avec Touch ID"
+            elif biometry_type == "faceid":
+                icon = "😀"
+                text = f"Connexion rapide avec Face ID"
+            else:
+                icon = "🔐"
+                text = "Connexion rapide"
+
+            biometric_button = ctk.CTkButton(
+                main_frame,
+                text=f"{icon} {text}",
+                height=50,
+                font=("Arial", 14, "bold"),
+                fg_color="#4CAF50",
+                hover_color="#45a049",
+                command=self._handle_biometric_login
+            )
+            biometric_button.pack(fill="x", pady=(0, 10))
+
+            # Label email pour connexion rapide
+            quick_email_label = ctk.CTkLabel(
+                main_frame,
+                text=f"Connecté en tant que {quick_email}",
+                font=("Arial", 10),
+                text_color="gray"
+            )
+            quick_email_label.pack(pady=(0, 20))
+
+            # Séparateur
+            separator = ctk.CTkLabel(
+                main_frame,
+                text="─── ou ───",
+                font=("Arial", 11),
+                text_color="gray"
+            )
+            separator.pack(pady=(0, 20))
 
         # Email
         email_label = ctk.CTkLabel(
@@ -132,10 +184,46 @@ class LoginWindow(ctk.CTk):
             font=("Arial", 12)
         )
         self.password_entry.pack(fill="x", pady=(0, 10))
-        
+
         # Bind Enter key
         self.password_entry.bind("<Return>", lambda e: self.handle_login())
-        
+
+        # Checkbox "Se souvenir de cet appareil"
+        remember_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
+        remember_frame.pack(fill="x", pady=(0, 10))
+
+        self.remember_device_var = ctk.BooleanVar(
+            value=self.auth_manager.is_quick_login_enabled()
+        )
+
+        self.remember_checkbox = ctk.CTkCheckBox(
+            remember_frame,
+            text="Se souvenir de cet appareil",
+            variable=self.remember_device_var,
+            font=("Arial", 11),
+            command=self._on_remember_changed
+        )
+        self.remember_checkbox.pack(side="left")
+
+        # Info biométrie si disponible
+        if self.biometric_available and not self.quick_login_available:
+            biometry_type = self.auth_manager.get_biometry_type()
+            if biometry_type == "touchid":
+                bio_text = "(Touch ID)"
+            elif biometry_type == "faceid":
+                bio_text = "(Face ID)"
+            else:
+                bio_text = ""
+
+            if bio_text:
+                bio_label = ctk.CTkLabel(
+                    remember_frame,
+                    text=bio_text,
+                    font=("Arial", 10),
+                    text_color="#4CAF50"
+                )
+                bio_label.pack(side="left", padx=(5, 0))
+
         # Message d'erreur
         self.error_label = ctk.CTkLabel(
             main_frame,
@@ -211,6 +299,10 @@ class LoginWindow(ctk.CTk):
                 self._show_2fa_dialog(email, password)
                 return
 
+            # Si "Se souvenir de cet appareil" est coché, activer connexion rapide
+            if self.remember_device_var.get():
+                self.auth_manager.enable_quick_login(email, password)
+
             # Récupérer la licence
             license = self.auth_manager.get_license_info()
 
@@ -246,6 +338,53 @@ class LoginWindow(ctk.CTk):
                 text=f"❌ {t('app.error')}: {str(e)}",
                 text_color="red"
             )
+
+    def _handle_biometric_login(self):
+        """Gérer la connexion avec biométrie"""
+        self.error_label.configure(text="🔐 Authentification...", text_color="blue")
+        self.update()
+
+        def on_result(success, error):
+            if success:
+                # Connexion réussie
+                try:
+                    license = self.auth_manager.get_license_info()
+                    messagebox.showinfo(
+                        t('auth.login_success'),
+                        f"{t('app.success')} !\n\n"
+                        f"Licence : {license['license_type'].upper()}\n"
+                        f"Jours restants : {license['days_remaining']}"
+                    )
+
+                    if self.success_callback:
+                        self.success_callback()
+
+                    self.destroy()
+                except Exception as e:
+                    self.error_label.configure(
+                        text=f"❌ Erreur: {str(e)}",
+                        text_color="red"
+                    )
+            else:
+                # Authentification échouée
+                self.error_label.configure(
+                    text=f"❌ {error or 'Authentification annulée'}",
+                    text_color="red"
+                )
+
+        self.auth_manager.biometric_login(callback=on_result)
+
+    def _prompt_biometric_login(self):
+        """Proposer la connexion biométrique au démarrage"""
+        # Auto-déclencher la connexion biométrique
+        self._handle_biometric_login()
+
+    def _on_remember_changed(self):
+        """Callback quand la checkbox 'Se souvenir' change"""
+        if not self.remember_device_var.get():
+            # Si décochée, désactiver la connexion rapide
+            if self.auth_manager.is_quick_login_enabled():
+                self.auth_manager.disable_quick_login()
     
     def _show_2fa_dialog(self, email: str, password: str):
         """Affiche le dialogue pour entrer le code 2FA"""

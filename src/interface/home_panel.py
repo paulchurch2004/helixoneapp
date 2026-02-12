@@ -13,6 +13,7 @@ from src.asset_path import get_asset_path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.auth_session import set_auth_token
 from src.config import get_api_url
+from src.auth_manager import AuthManager
 
 INDICES = {
     "^FCHI": "CAC 40",
@@ -38,10 +39,19 @@ class HomePanel(ctk.CTkFrame):
         self._server_ready = False
         self._status_label = None
 
+        # AuthManager pour connexion rapide et biométrique
+        self.auth_manager = AuthManager()
+        self.quick_login_available = self.auth_manager.is_quick_login_enabled()
+        self.biometric_available = self.auth_manager.is_biometric_available()
+
         self.place_ui()
         self.after(1000, self.afficher_logo)
         self.after(1500, self.afficher_formulaire_connexion)
         self.after(2000, self.afficher_indices)
+
+        # Si connexion rapide activée, proposer auto-login biométrique
+        if self.quick_login_available and self.biometric_available:
+            self.after(2500, self._prompt_biometric_login)
 
         # Wake-up ping au serveur en arrière-plan
         threading.Thread(target=self._wake_up_server, daemon=True).start()
@@ -135,11 +145,80 @@ class HomePanel(ctk.CTkFrame):
         if self._destroyed:
             return
 
+        # Si connexion rapide disponible, afficher bouton biométrique
+        current_y = 0.46
+        if self.quick_login_available and self.biometric_available:
+            biometry_type = self.auth_manager.get_biometry_type()
+            quick_email = self.auth_manager.get_quick_login_email()
+
+            if biometry_type == "touchid":
+                icon = "👆"
+                text = "Connexion rapide avec Touch ID"
+            elif biometry_type == "faceid":
+                icon = "😀"
+                text = "Connexion rapide avec Face ID"
+            else:
+                icon = "🔐"
+                text = "Connexion rapide"
+
+            biometric_button = ctk.CTkButton(
+                self,
+                text=f"{icon} {text}",
+                fg_color="#4CAF50",
+                hover_color="#45a049",
+                corner_radius=15,
+                font=("Segoe UI", 16, "bold"),
+                width=320,
+                height=50,
+                command=self._handle_biometric_login
+            )
+            biometric_button.place(relx=0.5, rely=current_y, anchor="center")
+            current_y += 0.08
+
+            # Label email pour connexion rapide
+            quick_email_label = ctk.CTkLabel(
+                self,
+                text=f"Connecté en tant que {quick_email}",
+                font=("Segoe UI", 10),
+                text_color="#888888"
+            )
+            quick_email_label.place(relx=0.5, rely=current_y, anchor="center")
+            current_y += 0.05
+
+            # Séparateur
+            separator = ctk.CTkLabel(
+                self,
+                text="─── ou ───",
+                font=("Segoe UI", 11),
+                text_color="#666666"
+            )
+            separator.place(relx=0.5, rely=current_y, anchor="center")
+            current_y += 0.05
+
         self.email_entry = ctk.CTkEntry(self, placeholder_text="Adresse Email", width=300)
-        self.email_entry.place(relx=0.5, rely=0.52, anchor="center")
+        self.email_entry.place(relx=0.5, rely=current_y, anchor="center")
+        current_y += 0.07
 
         self.password_entry = ctk.CTkEntry(self, placeholder_text="Mot de passe", show="*", width=300)
-        self.password_entry.place(relx=0.5, rely=0.59, anchor="center")
+        self.password_entry.place(relx=0.5, rely=current_y, anchor="center")
+        current_y += 0.05
+
+        # Checkbox "Se souvenir de cet appareil"
+        self.remember_device_var = ctk.BooleanVar(
+            value=self.auth_manager.is_quick_login_enabled()
+        )
+
+        remember_checkbox = ctk.CTkCheckBox(
+            self,
+            text="Se souvenir de cet appareil",
+            variable=self.remember_device_var,
+            font=("Segoe UI", 11),
+            fg_color="#00BFFF",
+            hover_color="#0090FF",
+            command=self._on_remember_changed
+        )
+        remember_checkbox.place(relx=0.5, rely=current_y, anchor="center")
+        current_y += 0.06
 
         btn_connexion = ctk.CTkButton(
             self,
@@ -150,7 +229,8 @@ class HomePanel(ctk.CTkFrame):
             font=("Segoe UI", 16, "bold"),
             command=self.verifier_connexion
         )
-        btn_connexion.place(relx=0.5, rely=0.67, anchor="center")
+        btn_connexion.place(relx=0.5, rely=current_y, anchor="center")
+        current_y += 0.05
 
         # Lien "Mot de passe oublié"
         forgot_password_label = ctk.CTkLabel(
@@ -160,8 +240,9 @@ class HomePanel(ctk.CTkFrame):
             text_color="#00BFFF",
             cursor="hand2"
         )
-        forgot_password_label.place(relx=0.5, rely=0.72, anchor="center")
+        forgot_password_label.place(relx=0.5, rely=current_y, anchor="center")
         forgot_password_label.bind("<Button-1>", lambda e: self.afficher_formulaire_reset_password())
+        current_y += 0.05
 
         # Séparateur "ou"
         separator_label = ctk.CTkLabel(
@@ -170,7 +251,8 @@ class HomePanel(ctk.CTkFrame):
             font=("Segoe UI", 12),
             text_color="#666666"
         )
-        separator_label.place(relx=0.5, rely=0.77, anchor="center")
+        separator_label.place(relx=0.5, rely=current_y, anchor="center")
+        current_y += 0.05
 
         # Bouton Créer un compte
         btn_register = ctk.CTkButton(
@@ -185,7 +267,7 @@ class HomePanel(ctk.CTkFrame):
             font=("Segoe UI", 14),
             command=self.afficher_formulaire_inscription
         )
-        btn_register.place(relx=0.5, rely=0.84, anchor="center")
+        btn_register.place(relx=0.5, rely=current_y, anchor="center")
 
     def verifier_connexion(self):
         if self._destroyed:
@@ -205,6 +287,11 @@ class HomePanel(ctk.CTkFrame):
         success, error_msg = self.authentifier_utilisateur(email, password)
         if self._destroyed:
             return
+
+        # Si connexion réussie ET "Se souvenir de cet appareil" est coché
+        if success and hasattr(self, 'remember_device_var') and self.remember_device_var.get():
+            self.auth_manager.enable_quick_login(email, password)
+
         self.after(0, lambda: self._on_login_result(success, error_msg))
 
     def _on_login_result(self, success, error_msg):
@@ -217,6 +304,44 @@ class HomePanel(ctk.CTkFrame):
             self.on_continue_callback()
         else:
             messagebox.showerror("Erreur", error_msg)
+
+    def _handle_biometric_login(self):
+        """Gérer la connexion avec biométrie"""
+        if self._destroyed:
+            return
+
+        self._show_status("🔐 Authentification biométrique...")
+
+        def on_result(success, error):
+            if self._destroyed:
+                return
+
+            if success:
+                # Connexion réussie, continuer
+                self.after(0, lambda: self._on_login_result(True, ""))
+            else:
+                # Échec authentification
+                self._hide_status()
+                messagebox.showerror(
+                    "Authentification échouée",
+                    error or "Authentification annulée"
+                )
+
+        self.auth_manager.biometric_login(callback=on_result)
+
+    def _prompt_biometric_login(self):
+        """Proposer la connexion biométrique au démarrage"""
+        if self._destroyed:
+            return
+        # Auto-déclencher la connexion biométrique
+        self._handle_biometric_login()
+
+    def _on_remember_changed(self):
+        """Callback quand la checkbox 'Se souvenir' change"""
+        if not self.remember_device_var.get():
+            # Si décochée, désactiver la connexion rapide
+            if self.auth_manager.is_quick_login_enabled():
+                self.auth_manager.disable_quick_login()
 
     def _evaluer_force_mdp(self, password):
         """Évalue la force d'un mot de passe. Retourne (score, label, couleur)."""
