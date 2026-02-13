@@ -194,13 +194,18 @@ class ThemeManager:
         """Retourne le nom du thème actuel"""
         return self.current_theme
 
-    def set_theme(self, theme_name: str):
+    def set_theme(self, theme_name: str, show_restart_message: bool = True):
         """Change le thème actuel"""
         if theme_name in self.THEMES:
+            old_theme = self.current_theme
             self.current_theme = theme_name
             self._save_config()
             self._apply_theme()
             self._notify_callbacks()
+
+            # Afficher message si le thème a vraiment changé
+            if show_restart_message and old_theme != theme_name:
+                self._show_restart_message()
 
     def toggle_dark_light(self):
         """Bascule entre dark et light"""
@@ -213,6 +218,20 @@ class ThemeManager:
         """Applique le thème à customtkinter"""
         theme = self.get_current_theme()
         ctk.set_appearance_mode(theme['mode'])
+
+    def _show_restart_message(self):
+        """Affiche un message demandant de redémarrer l'application"""
+        try:
+            from tkinter import messagebox
+            messagebox.showinfo(
+                "Changement de thème",
+                "Le thème a été changé.\n\n"
+                "Pour appliquer complètement les nouvelles couleurs,\n"
+                "veuillez redémarrer l'application.",
+                icon='info'
+            )
+        except Exception as e:
+            print(f"Erreur affichage message restart: {e}")
 
     def register_callback(self, callback: Callable[[Dict], None]):
         """Enregistre un callback pour les changements de thème"""
