@@ -4,8 +4,8 @@ Support de Touch ID/Face ID (macOS) et Windows Hello (Windows)
 """
 
 import platform
-from typing import Optional, Callable
 import threading
+from collections.abc import Callable
 
 
 class BiometricAuth:
@@ -23,9 +23,10 @@ class BiometricAuth:
         self._winrt_available = False
 
         # Vérifier si winrt est disponible sur Windows
-        if self.platform == 'Windows':
+        if self.platform == "Windows":
             try:
                 import winrt
+
                 self._winrt_available = True
             except ImportError:
                 pass
@@ -37,9 +38,9 @@ class BiometricAuth:
         Returns:
             True si Touch ID/Face ID/Windows Hello est disponible
         """
-        if self.platform == 'Darwin':  # macOS
+        if self.platform == "Darwin":  # macOS
             return self._is_available_macos()
-        elif self.platform == 'Windows':
+        elif self.platform == "Windows":
             return self._is_available_windows()
         else:
             return False
@@ -47,7 +48,7 @@ class BiometricAuth:
     def authenticate(
         self,
         reason: str = "HelixOne souhaite accéder à vos identifiants",
-        callback: Optional[Callable[[bool, Optional[str]], None]] = None
+        callback: Callable[[bool, str | None], None] | None = None,
     ) -> bool:
         """
         Demander l'authentification biométrique
@@ -59,7 +60,7 @@ class BiometricAuth:
         Returns:
             True si authentification réussie (mode synchrone uniquement)
         """
-        if self.platform == 'Darwin':
+        if self.platform == "Darwin":
             if callback:
                 # Mode asynchrone (recommandé pour GUI)
                 self._authenticate_macos_async(reason, callback)
@@ -67,7 +68,7 @@ class BiometricAuth:
             else:
                 # Mode synchrone
                 return self._authenticate_macos_sync(reason)
-        elif self.platform == 'Windows':
+        elif self.platform == "Windows":
             if callback:
                 # Mode asynchrone (recommandé pour GUI)
                 self._authenticate_windows_async(reason, callback)
@@ -85,12 +86,14 @@ class BiometricAuth:
     def _is_available_macos(self) -> bool:
         """Vérifier si Touch ID/Face ID est disponible sur macOS"""
         try:
-            from LocalAuthentication import LAContext, LAPolicyDeviceOwnerAuthenticationWithBiometrics
+            from LocalAuthentication import (
+                LAContext,
+                LAPolicyDeviceOwnerAuthenticationWithBiometrics,
+            )
 
             context = LAContext.alloc().init()
             can_evaluate, error = context.canEvaluatePolicy_error_(
-                LAPolicyDeviceOwnerAuthenticationWithBiometrics,
-                None
+                LAPolicyDeviceOwnerAuthenticationWithBiometrics, None
             )
 
             return can_evaluate
@@ -109,8 +112,11 @@ class BiometricAuth:
         ATTENTION: Peut bloquer l'interface, préférer la version async
         """
         try:
-            from LocalAuthentication import LAContext, LAPolicyDeviceOwnerAuthenticationWithBiometrics
             import objc
+            from LocalAuthentication import (
+                LAContext,
+                LAPolicyDeviceOwnerAuthenticationWithBiometrics,
+            )
 
             context = LAContext.alloc().init()
 
@@ -118,37 +124,38 @@ class BiometricAuth:
             context.setLocalizedFallbackTitle_("")  # Masquer "Entrer mot de passe"
 
             # Variable pour stocker le résultat
-            result = {'success': False, 'done': False}
+            result = {"success": False, "done": False}
 
             def completion_handler(success, error):
-                result['success'] = success
-                result['done'] = True
+                result["success"] = success
+                result["done"] = True
 
             # Lancer l'authentification
             context.evaluatePolicy_localizedReason_reply_(
-                LAPolicyDeviceOwnerAuthenticationWithBiometrics,
-                reason,
-                completion_handler
+                LAPolicyDeviceOwnerAuthenticationWithBiometrics, reason, completion_handler
             )
 
             # Attendre la réponse (timeout 30s)
             import time
+
             timeout = 30
             elapsed = 0
-            while not result['done'] and elapsed < timeout:
+            while not result["done"] and elapsed < timeout:
                 time.sleep(0.1)
                 elapsed += 0.1
 
-            return result['success']
+            return result["success"]
 
         except ImportError:
-            print("❌ PyObjC pas installé. Installez: pip install pyobjc-framework-LocalAuthentication")
+            print(
+                "❌ PyObjC pas installé. Installez: pip install pyobjc-framework-LocalAuthentication"
+            )
             return False
         except Exception as e:
             print(f"Erreur authentification biométrique macOS: {e}")
             return False
 
-    def _authenticate_macos_async(self, reason: str, callback: Callable[[bool, Optional[str]], None]):
+    def _authenticate_macos_async(self, reason: str, callback: Callable[[bool, str | None], None]):
         """
         Authentifier avec Touch ID/Face ID (asynchrone)
 
@@ -156,25 +163,42 @@ class BiometricAuth:
             reason: Message affiché
             callback: Fonction appelée avec (success, error_message)
         """
+
         def run_auth():
             try:
-                from LocalAuthentication import LAContext, LAPolicyDeviceOwnerAuthenticationWithBiometrics
+                import time
+
+                from LocalAuthentication import (
+                    LAContext,
+                    LAPolicyDeviceOwnerAuthenticationWithBiometrics,
+                )
 
                 context = LAContext.alloc().init()
                 context.setLocalizedFallbackTitle_("")
+
+                result = {"done": False}
 
                 def completion_handler(success, error):
                     error_msg = None
                     if error:
                         error_msg = str(error.localizedDescription())
                     callback(success, error_msg)
+                    result["done"] = True
 
                 # Lancer l'authentification
                 context.evaluatePolicy_localizedReason_reply_(
-                    LAPolicyDeviceOwnerAuthenticationWithBiometrics,
-                    reason,
-                    completion_handler
+                    LAPolicyDeviceOwnerAuthenticationWithBiometrics, reason, completion_handler
                 )
+
+                # Attendre que le callback soit appelé (timeout 60s)
+                timeout = 60
+                elapsed = 0
+                while not result["done"] and elapsed < timeout:
+                    time.sleep(0.1)
+                    elapsed += 0.1
+
+                if not result["done"]:
+                    callback(False, "Timeout - authentification annulée")
 
             except ImportError:
                 callback(False, "PyObjC pas installé")
@@ -193,6 +217,7 @@ class BiometricAuth:
             # Essayer sans winrt - simplement vérifier si Windows 10+
             try:
                 import sys
+
                 if sys.getwindowsversion().build >= 10240:  # Windows 10 build 10240+
                     return True
             except:
@@ -200,7 +225,10 @@ class BiometricAuth:
             return False
 
         try:
-            from winrt.windows.security.credentials.ui import UserConsentVerifier, UserConsentVerifierAvailability
+            from winrt.windows.security.credentials.ui import (
+                UserConsentVerifier,
+                UserConsentVerifierAvailability,
+            )
 
             # Vérifier la disponibilité
             availability = UserConsentVerifier.check_availability_async().get()
@@ -217,7 +245,10 @@ class BiometricAuth:
             return False
 
         try:
-            from winrt.windows.security.credentials.ui import UserConsentVerifier, UserConsentVerificationResult
+            from winrt.windows.security.credentials.ui import (
+                UserConsentVerificationResult,
+                UserConsentVerifier,
+            )
 
             # Demander l'authentification
             result = UserConsentVerifier.request_verification_async(reason).get()
@@ -228,20 +259,26 @@ class BiometricAuth:
             print(f"Erreur authentification Windows Hello: {e}")
             return False
 
-    def _authenticate_windows_async(self, reason: str, callback: Callable[[bool, Optional[str]], None]):
+    def _authenticate_windows_async(
+        self, reason: str, callback: Callable[[bool, str | None], None]
+    ):
         """Authentifier avec Windows Hello (asynchrone)"""
+
         def run_auth():
             if not self._winrt_available:
                 callback(False, "winrt non installé. Installez: pip install winrt-runtime")
                 return
 
             try:
-                from winrt.windows.security.credentials.ui import UserConsentVerifier, UserConsentVerificationResult
+                from winrt.windows.security.credentials.ui import (
+                    UserConsentVerificationResult,
+                    UserConsentVerifier,
+                )
 
                 # Demander l'authentification
                 result = UserConsentVerifier.request_verification_async(reason).get()
 
-                success = (result == UserConsentVerificationResult.VERIFIED)
+                success = result == UserConsentVerificationResult.VERIFIED
                 error_msg = None if success else "Authentification refusée ou annulée"
 
                 callback(success, error_msg)
@@ -262,9 +299,9 @@ class BiometricAuth:
         Returns:
             "touchid", "faceid", "windowshello", "none"
         """
-        if self.platform == 'Darwin':
+        if self.platform == "Darwin":
             return self._get_biometry_type_macos()
-        elif self.platform == 'Windows':
+        elif self.platform == "Windows":
             return "windowshello" if self._is_available_windows() else "none"
         return "none"
 
@@ -276,7 +313,7 @@ class BiometricAuth:
             context = LAContext.alloc().init()
 
             # biometryType disponible depuis macOS 10.13.2
-            if hasattr(context, 'biometryType'):
+            if hasattr(context, "biometryType"):
                 biometry_type = context.biometryType()
 
                 # 1 = Touch ID, 2 = Face ID
@@ -302,7 +339,7 @@ def is_biometric_available() -> bool:
 
 def authenticate_with_biometric(
     reason: str = "HelixOne souhaite accéder à vos identifiants",
-    callback: Optional[Callable[[bool, Optional[str]], None]] = None
+    callback: Callable[[bool, str | None], None] | None = None,
 ) -> bool:
     """Raccourci pour s'authentifier avec biométrie"""
     return _biometric_auth.authenticate(reason, callback)
@@ -331,13 +368,11 @@ if __name__ == "__main__":
             else:
                 print(f"❌ Authentification échouée: {error}")
 
-        bio.authenticate(
-            reason="Test HelixOne - Authentification biométrique",
-            callback=on_result
-        )
+        bio.authenticate(reason="Test HelixOne - Authentification biométrique", callback=on_result)
 
         # Attendre le résultat
         import time
+
         time.sleep(5)
     else:
         print("\n⚠️ Biométrie non disponible sur cet appareil")
