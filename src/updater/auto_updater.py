@@ -4,15 +4,15 @@ Checks for updates, downloads, and installs new versions automatically.
 Supports macOS (.dmg) and Windows (.exe).
 """
 
-import os
-import sys
 import json
 import logging
+import os
+import subprocess  # nosec B404 - needed for installer launch
+import sys
 import tempfile
-import subprocess
 import threading
-from typing import Optional, Callable, Dict, Any
-from pathlib import Path
+from collections.abc import Callable
+from typing import Any
 
 import requests
 
@@ -31,23 +31,23 @@ class AutoUpdater:
             updater.show_update_dialog()
     """
 
-    # Update manifest URL - JSON file with latest version info
-    # Format: {"version": "1.1.0", "mandatory": false, "changelog": [...],
-    #          "download_url_mac": "...", "download_url_windows": "..."}
-    VERSION_URL = "https://helixone.fr/api/version.json"
+    # GitHub repository for releases
+    GITHUB_REPO = "paulchurch2004/helixoneapp"
+    # GitHub API URL for latest release
+    VERSION_URL = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 
     REQUEST_TIMEOUT = 10
     CHUNK_SIZE = 8192
 
     def __init__(self):
         self.current_version = CURRENT_VERSION
-        self.remote_version_info: Optional[Dict] = None
+        self.remote_version_info: dict | None = None
         self._download_progress = 0
         self._download_cancelled = False
 
-    def check_for_updates(self) -> Optional[Dict[str, Any]]:
+    def check_for_updates(self) -> dict[str, Any] | None:
         """
-        Check if a new version is available.
+        Check if a new version is available via GitHub Releases API.
 
         Returns:
             Version info dict if update available, None otherwise
@@ -58,15 +58,55 @@ class AutoUpdater:
             response = requests.get(
                 self.VERSION_URL,
                 timeout=self.REQUEST_TIMEOUT,
-                headers={'User-Agent': f'HelixOne/{self.current_version}'}
+                headers={
+                    "User-Agent": f"HelixOne/{self.current_version}",
+                    "Accept": "application/vnd.github.v3+json",
+                },
             )
             response.raise_for_status()
 
-            self.remote_version_info = response.json()
-            remote_version = self.remote_version_info.get('version', '0.0.0')
+            release_data = response.json()
+
+            # Extract version from tag_name (e.g., "v1.0.6" -> "1.0.6")
+            tag_name = release_data.get("tag_name", "v0.0.0")
+            remote_version = tag_name.lstrip("v")
 
             if is_update_available(remote_version):
                 logger.info(f"Update available: {remote_version}")
+
+                # Transform GitHub release data to our format
+                assets = release_data.get("assets", [])
+                download_url_mac = None
+                download_url_windows = None
+
+                for asset in assets:
+                    name = asset["name"].lower()
+                    if name.endswith(".dmg"):
+                        download_url_mac = asset["browser_download_url"]
+                    elif name.endswith(".exe"):
+                        download_url_windows = asset["browser_download_url"]
+
+                # Parse changelog from release body
+                changelog = []
+                body = release_data.get("body", "")
+                if body:
+                    # Extract bullet points from markdown
+                    for line in body.split("\n"):
+                        line = line.strip()
+                        if line.startswith("- ") or line.startswith("* "):
+                            changelog.append(line[2:])
+
+                self.remote_version_info = {
+                    "version": remote_version,
+                    "tag_name": tag_name,
+                    "mandatory": False,  # Can be set based on release metadata
+                    "changelog": changelog,
+                    "download_url_mac": download_url_mac,
+                    "download_url_windows": download_url_windows,
+                    "release_url": release_data.get("html_url", ""),
+                    "published_at": release_data.get("published_at", ""),
+                }
+
                 return self.remote_version_info
             else:
                 logger.info("No update available")
@@ -78,35 +118,33 @@ class AutoUpdater:
         except requests.exceptions.RequestException as e:
             logger.error(f"Error checking for updates: {e}")
             return None
-        except json.JSONDecodeError as e:
+        except (json.JSONDecodeError, KeyError) as e:
             logger.error(f"Invalid version info received: {e}")
             return None
 
-    def get_download_url(self) -> Optional[str]:
+    def get_download_url(self) -> str | None:
         """Get the download URL for the current platform."""
         if not self.remote_version_info:
             return None
 
-        if sys.platform == 'darwin':
-            return self.remote_version_info.get('download_url_mac')
-        elif sys.platform == 'win32':
-            return self.remote_version_info.get('download_url_windows')
+        if sys.platform == "darwin":
+            return self.remote_version_info.get("download_url_mac")
+        elif sys.platform == "win32":
+            return self.remote_version_info.get("download_url_windows")
 
         # Fallback
-        return self.remote_version_info.get('download_url')
+        return self.remote_version_info.get("download_url")
 
     def _get_installer_filename(self) -> str:
         """Get the appropriate installer filename for the current platform."""
-        if sys.platform == 'darwin':
+        if sys.platform == "darwin":
             return "HelixOne.dmg"
         else:
             return "HelixOne_Setup.exe"
 
     def download_update(
-        self,
-        download_url: str,
-        progress_callback: Optional[Callable[[int], None]] = None
-    ) -> Optional[str]:
+        self, download_url: str, progress_callback: Callable[[int], None] | None = None
+    ) -> str | None:
         """
         Download the update installer.
 
@@ -130,14 +168,14 @@ class AutoUpdater:
                 download_url,
                 stream=True,
                 timeout=300,
-                headers={'User-Agent': f'HelixOne/{self.current_version}'}
+                headers={"User-Agent": f"HelixOne/{self.current_version}"},
             )
             response.raise_for_status()
 
-            total_size = int(response.headers.get('content-length', 0))
+            total_size = int(response.headers.get("content-length", 0))
             downloaded = 0
 
-            with open(installer_path, 'wb') as f:
+            with open(installer_path, "wb") as f:
                 for chunk in response.iter_content(chunk_size=self.CHUNK_SIZE):
                     if self._download_cancelled:
                         logger.info("Download cancelled by user")
@@ -158,7 +196,7 @@ class AutoUpdater:
         except requests.exceptions.RequestException as e:
             logger.error(f"Error downloading update: {e}")
             return None
-        except IOError as e:
+        except OSError as e:
             logger.error(f"Error saving update file: {e}")
             return None
 
@@ -184,27 +222,27 @@ class AutoUpdater:
 
             logger.info(f"Launching installer: {installer_path}")
 
-            if sys.platform == 'darwin':
+            if sys.platform == "darwin":
                 # macOS: open the .dmg file (mounts it and shows in Finder)
-                subprocess.Popen(['open', installer_path], close_fds=True)
+                subprocess.Popen(["open", installer_path], close_fds=True)  # nosec B603 B607
                 logger.info("DMG opened - user will drag to Applications")
                 sys.exit(0)
 
-            elif sys.platform == 'win32':
+            elif sys.platform == "win32":
                 cmd = [installer_path]
                 if silent:
-                    cmd.append('/SILENT')
-                subprocess.Popen(
+                    cmd.append("/SILENT")
+                subprocess.Popen(  # nosec B603 - verified installer path
                     cmd,
                     creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS,
-                    close_fds=True
+                    close_fds=True,
                 )
                 logger.info("Exiting for update installation...")
                 sys.exit(0)
 
             else:
                 # Linux or other
-                subprocess.Popen([installer_path], close_fds=True)
+                subprocess.Popen([installer_path], close_fds=True)  # nosec B603
                 sys.exit(0)
 
         except Exception as e:
@@ -214,23 +252,24 @@ class AutoUpdater:
     def get_changelog(self) -> list:
         """Get changelog from remote version info"""
         if self.remote_version_info:
-            return self.remote_version_info.get('changelog', [])
+            return self.remote_version_info.get("changelog", [])
         return []
 
     def is_mandatory_update(self) -> bool:
         """Check if update is mandatory"""
         if self.remote_version_info:
-            return self.remote_version_info.get('mandatory', False)
+            return self.remote_version_info.get("mandatory", False)
         return False
 
 
-def check_for_updates_async(callback: Callable[[Optional[Dict]], None]):
+def check_for_updates_async(callback: Callable[[dict | None], None]):
     """
     Check for updates in background thread.
 
     Args:
         callback: Function to call with update info (or None if no update)
     """
+
     def _check():
         updater = AutoUpdater()
         result = updater.check_for_updates()
@@ -240,7 +279,7 @@ def check_for_updates_async(callback: Callable[[Optional[Dict]], None]):
     thread.start()
 
 
-def show_update_dialog_ctk(parent, version_info: Dict) -> bool:
+def show_update_dialog_ctk(parent, version_info: dict) -> bool:
     """
     Show modern update dialog using CustomTkinter.
 
@@ -253,13 +292,12 @@ def show_update_dialog_ctk(parent, version_info: Dict) -> bool:
     """
     try:
         import customtkinter as ctk
-        import tkinter as tk
 
-        version = version_info.get('version', 'Unknown')
-        changelog = version_info.get('changelog', [])
-        mandatory = version_info.get('mandatory', False)
+        version = version_info.get("version", "Unknown")
+        changelog = version_info.get("changelog", [])
+        mandatory = version_info.get("mandatory", False)
 
-        result = {'update': False}
+        result = {"update": False}
 
         # Créer une fenêtre toplevel moderne
         dialog = ctk.CTkToplevel(parent)
@@ -283,16 +321,13 @@ def show_update_dialog_ctk(parent, version_info: Dict) -> bool:
         title_label = ctk.CTkLabel(
             main_frame,
             text=f"🚀 Nouvelle version disponible : v{version}",
-            font=("Arial", 18, "bold")
+            font=("Arial", 18, "bold"),
         )
         title_label.pack(pady=(0, 20))
 
         # Changelog
         changelog_label = ctk.CTkLabel(
-            main_frame,
-            text="Nouveautés :",
-            font=("Arial", 14, "bold"),
-            anchor="w"
+            main_frame, text="Nouveautés :", font=("Arial", 14, "bold"), anchor="w"
         )
         changelog_label.pack(anchor="w", pady=(0, 10))
 
@@ -302,11 +337,7 @@ def show_update_dialog_ctk(parent, version_info: Dict) -> bool:
 
         for item in changelog:
             item_label = ctk.CTkLabel(
-                changelog_frame,
-                text=f"• {item}",
-                font=("Arial", 12),
-                anchor="w",
-                wraplength=400
+                changelog_frame, text=f"• {item}", font=("Arial", 12), anchor="w", wraplength=400
             )
             item_label.pack(anchor="w", pady=2)
 
@@ -316,7 +347,7 @@ def show_update_dialog_ctk(parent, version_info: Dict) -> bool:
                 main_frame,
                 text="⚠️ Cette mise à jour est obligatoire",
                 font=("Arial", 12, "bold"),
-                text_color="#FF6B6B"
+                text_color="#FF6B6B",
             )
             mandatory_label.pack(pady=(0, 10))
 
@@ -325,12 +356,12 @@ def show_update_dialog_ctk(parent, version_info: Dict) -> bool:
         button_frame.pack(fill="x", pady=(10, 0))
 
         def on_update():
-            result['update'] = True
+            result["update"] = True
             dialog.destroy()
 
         def on_cancel():
             if not mandatory:
-                result['update'] = False
+                result["update"] = False
                 dialog.destroy()
 
         update_btn = ctk.CTkButton(
@@ -340,7 +371,7 @@ def show_update_dialog_ctk(parent, version_info: Dict) -> bool:
             fg_color="#4CAF50",
             hover_color="#45a049",
             height=40,
-            font=("Arial", 14, "bold")
+            font=("Arial", 14, "bold"),
         )
         update_btn.pack(side="left", expand=True, fill="x", padx=(0, 5))
 
@@ -352,27 +383,28 @@ def show_update_dialog_ctk(parent, version_info: Dict) -> bool:
                 fg_color="gray40",
                 hover_color="gray30",
                 height=40,
-                font=("Arial", 14)
+                font=("Arial", 14),
             )
             cancel_btn.pack(side="right", expand=True, fill="x", padx=(5, 0))
 
         # Attendre la fermeture du dialogue
         dialog.wait_window()
 
-        return result['update']
+        return result["update"]
 
     except Exception as e:
         logger.error(f"Error showing update dialog: {e}")
         # Fallback sur messagebox basique
         try:
             from tkinter import messagebox
-            version = version_info.get('version', 'Unknown')
+
+            version = version_info.get("version", "Unknown")
             return messagebox.askyesno(
                 "Mise à jour disponible",
                 f"Version {version} disponible.\nMettre à jour maintenant?",
-                parent=parent
+                parent=parent,
             )
-        except:
+        except Exception:
             return False
 
 
@@ -389,10 +421,11 @@ def show_download_progress_dialog(parent, updater: AutoUpdater, download_url: st
         Path to downloaded installer, or None if cancelled/failed
     """
     try:
-        import customtkinter as ctk
         import threading
 
-        result = {'installer_path': None}
+        import customtkinter as ctk
+
+        result = {"installer_path": None}
 
         # Créer le dialogue de progression
         dialog = ctk.CTkToplevel(parent)
@@ -412,9 +445,7 @@ def show_download_progress_dialog(parent, updater: AutoUpdater, download_url: st
 
         # Label statut
         status_label = ctk.CTkLabel(
-            main_frame,
-            text="Téléchargement en cours...",
-            font=("Arial", 14)
+            main_frame, text="Téléchargement en cours...", font=("Arial", 14)
         )
         status_label.pack(pady=(0, 20))
 
@@ -424,11 +455,7 @@ def show_download_progress_dialog(parent, updater: AutoUpdater, download_url: st
         progress_bar.set(0)
 
         # Label pourcentage
-        percent_label = ctk.CTkLabel(
-            main_frame,
-            text="0%",
-            font=("Arial", 12)
-        )
+        percent_label = ctk.CTkLabel(main_frame, text="0%", font=("Arial", 12))
         percent_label.pack(pady=(0, 20))
 
         # Bouton annuler
@@ -437,7 +464,7 @@ def show_download_progress_dialog(parent, updater: AutoUpdater, download_url: st
             text="Annuler",
             command=lambda: updater.cancel_download(),
             fg_color="gray40",
-            hover_color="gray30"
+            hover_color="gray30",
         )
         cancel_btn.pack()
 
@@ -450,7 +477,7 @@ def show_download_progress_dialog(parent, updater: AutoUpdater, download_url: st
         # Télécharger dans un thread séparé
         def download_thread():
             installer = updater.download_update(download_url, progress_callback=update_progress)
-            result['installer_path'] = installer
+            result["installer_path"] = installer
             if dialog.winfo_exists():
                 dialog.destroy()
 
@@ -460,7 +487,7 @@ def show_download_progress_dialog(parent, updater: AutoUpdater, download_url: st
         # Attendre la fermeture
         dialog.wait_window()
 
-        return result['installer_path']
+        return result["installer_path"]
 
     except Exception as e:
         logger.error(f"Error showing download progress: {e}")
@@ -476,6 +503,7 @@ def check_updates_on_startup(parent=None, auto_install: bool = False):
         parent: Optional parent window for dialogs
         auto_install: If True, automatically start download and install
     """
+
     def _handle_update(version_info):
         if version_info is None:
             return
