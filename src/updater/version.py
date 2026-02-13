@@ -3,11 +3,12 @@ HelixOne Version Management
 """
 
 # Current application version
-CURRENT_VERSION = "1.0.5"
+CURRENT_VERSION = "1.0.6"
 
 # Build info
-BUILD_DATE = "2026-02-12"
+BUILD_DATE = "2026-02-13"
 BUILD_NUMBER = 1
+
 
 def get_version_info() -> dict:
     """Get complete version information"""
@@ -18,13 +19,15 @@ def get_version_info() -> dict:
         "full_version": f"{CURRENT_VERSION}.{BUILD_NUMBER}",
     }
 
+
 def parse_version(version_string: str) -> tuple:
     """Parse version string to tuple for comparison"""
     try:
-        parts = version_string.split('.')
+        parts = version_string.split(".")
         return tuple(int(p) for p in parts)
     except (ValueError, AttributeError):
         return (0, 0, 0)
+
 
 def compare_versions(v1: str, v2: str) -> int:
     """
@@ -43,6 +46,7 @@ def compare_versions(v1: str, v2: str) -> int:
         return 1
     else:
         return 0
+
 
 def is_update_available(remote_version: str) -> bool:
     """Check if remote version is newer than current"""
