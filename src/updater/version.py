@@ -3,7 +3,7 @@ HelixOne Version Management
 """
 
 # Current application version
-CURRENT_VERSION = "1.0.6"
+CURRENT_VERSION = "1.0.7"
 
 # Build info
 BUILD_DATE = "2026-02-13"
