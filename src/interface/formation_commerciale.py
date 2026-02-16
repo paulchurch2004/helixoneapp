@@ -3,13 +3,13 @@ HelixOne Academy - Interface de Formation Complète
 Version 3.0 - Badges, Certifications et Gamification
 """
 
-import customtkinter as ctk
-from tkinter import messagebox
 import json
 import os
-import sys
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional
+from datetime import datetime
+from tkinter import messagebox
+
+import customtkinter as ctk
+
 from src.asset_path import get_base_path
 from src.formation_sync import FormationSyncService
 
@@ -27,11 +27,40 @@ BADGES = {
 
 # Définition des certifications
 CERTIFICATIONS = {
-    "user": {"name": "HelixOne Certified User", "icon": "📜", "level": 1, "parcours": "debutant", "min_score": 80, "color": "#00D9FF"},
-    "trader": {"name": "HelixOne Certified Trader", "icon": "📜", "level": 2, "parcours": "intermediaire", "min_score": 80, "color": "#FFA500"},
-    "expert": {"name": "HelixOne Certified Expert", "icon": "📜", "level": 3, "parcours": "avance", "min_score": 85, "color": "#FF4444"},
-    "master": {"name": "HelixOne Master", "icon": "🏅", "level": 4, "parcours": "expert", "min_score": 90, "color": "#FFD700"},
+    "user": {
+        "name": "HelixOne Certified User",
+        "icon": "📜",
+        "level": 1,
+        "parcours": "debutant",
+        "min_score": 80,
+        "color": "#00D9FF",
+    },
+    "trader": {
+        "name": "HelixOne Certified Trader",
+        "icon": "📜",
+        "level": 2,
+        "parcours": "intermediaire",
+        "min_score": 80,
+        "color": "#FFA500",
+    },
+    "expert": {
+        "name": "HelixOne Certified Expert",
+        "icon": "📜",
+        "level": 3,
+        "parcours": "avance",
+        "min_score": 85,
+        "color": "#FF4444",
+    },
+    "master": {
+        "name": "HelixOne Master",
+        "icon": "🏅",
+        "level": 4,
+        "parcours": "expert",
+        "min_score": 90,
+        "color": "#FFD700",
+    },
 }
+
 
 class FormationAcademy(ctk.CTkFrame):
     """Interface principale de formation HelixOne"""
@@ -62,17 +91,14 @@ class FormationAcademy(ctk.CTkFrame):
     def load_modules(self):
         """Charge tous les modules depuis le JSON"""
         try:
-            json_path = os.path.join(get_base_path(), "data", "formation_commerciale", "modules_complets.json")
-            with open(json_path, 'r', encoding='utf-8') as f:
+            json_path = os.path.join(
+                get_base_path(), "data", "formation_commerciale", "modules_complets.json"
+            )
+            with open(json_path, encoding="utf-8") as f:
                 modules = json.load(f)
 
             # Organiser par parcours (4 niveaux)
-            organized = {
-                "debutant": [],
-                "intermediaire": [],
-                "avance": [],
-                "expert": []
-            }
+            organized = {"debutant": [], "intermediaire": [], "avance": [], "expert": []}
 
             # Map pour normaliser les parcours (gérer les accents)
             parcours_map = {
@@ -82,7 +108,7 @@ class FormationAcademy(ctk.CTkFrame):
                 "intermediaire": "intermediaire",
                 "avancé": "avance",
                 "avance": "avance",
-                "expert": "expert"
+                "expert": "expert",
             }
 
             for module in modules:
@@ -94,12 +120,15 @@ class FormationAcademy(ctk.CTkFrame):
                     organized[parcours].append(module)
 
             total = sum(len(v) for v in organized.values())
-            print(f"[✓] {total} modules chargés (Débutant: {len(organized['debutant'])}, Intermédiaire: {len(organized['intermediaire'])}, Avancé: {len(organized['avance'])}, Expert: {len(organized['expert'])})")
+            print(
+                f"[✓] {total} modules chargés (Débutant: {len(organized['debutant'])}, Intermédiaire: {len(organized['intermediaire'])}, Avancé: {len(organized['avance'])}, Expert: {len(organized['expert'])})"
+            )
             return organized
 
         except Exception as e:
             print(f"[✗] Erreur chargement modules: {e}")
             import traceback
+
             traceback.print_exc()
             return {"debutant": [], "intermediaire": [], "avance": [], "expert": []}
 
@@ -118,7 +147,7 @@ class FormationAcademy(ctk.CTkFrame):
             "quiz_scores": {},
             "total_xp": 0,
             "level": 1,
-            "current_parcours": "debutant"
+            "current_parcours": "debutant",
         }
 
         for field, default_value in default_fields.items():
@@ -127,7 +156,7 @@ class FormationAcademy(ctk.CTkFrame):
 
         return progress
 
-    def check_and_award_badges(self) -> List[str]:
+    def check_and_award_badges(self) -> list[str]:
         """Vérifie et attribue les badges mérités"""
         new_badges = []
 
@@ -152,7 +181,10 @@ class FormationAcademy(ctk.CTkFrame):
 
         # Badge: Champion (tous les parcours)
         if "champion" not in self.user_progress["badges"]:
-            all_complete = all(self.is_parcours_complete(p) for p in ["debutant", "intermediaire", "avance", "expert"])
+            all_complete = all(
+                self.is_parcours_complete(p)
+                for p in ["debutant", "intermediaire", "avance", "expert"]
+            )
             if all_complete:
                 new_badges.append("champion")
 
@@ -278,7 +310,7 @@ class FormationAcademy(ctk.CTkFrame):
         try:
             success = self.sync_service.save_progress(self.user_progress)
             if not success:
-                print(f"[✗] Erreur sauvegarde progression")
+                print("[✗] Erreur sauvegarde progression")
         except Exception as e:
             print(f"[✗] Erreur sauvegarde progression: {e}")
 
@@ -297,7 +329,7 @@ class FormationAcademy(ctk.CTkFrame):
             segmented_button_selected_hover_color="#00B8E6",
             segmented_button_unselected_color="#1c2028",
             segmented_button_unselected_hover_color="#2a2d36",
-            corner_radius=10
+            corner_radius=10,
         )
         self.tabs.pack(fill="both", expand=True, padx=10, pady=(0, 10))
 
@@ -331,10 +363,7 @@ class FormationAcademy(ctk.CTkFrame):
 
         # Titre compact
         title_label = ctk.CTkLabel(
-            header,
-            text="Academy",
-            font=("Arial", 18, "bold"),
-            text_color="#00D9FF"
+            header, text="Academy", font=("Arial", 18, "bold"), text_color="#00D9FF"
         )
         title_label.pack(side="left", padx=20, pady=10)
 
@@ -345,10 +374,7 @@ class FormationAcademy(ctk.CTkFrame):
         # Badges count
         badges_count = len(self.user_progress.get("badges", []))
         ctk.CTkLabel(
-            stats_frame,
-            text=f"Badges: {badges_count}",
-            font=("Arial", 12),
-            text_color="#FF9500"
+            stats_frame, text=f"Badges: {badges_count}", font=("Arial", 12), text_color="#FF9500"
         ).pack(side="left", padx=10)
 
         # XP
@@ -356,7 +382,7 @@ class FormationAcademy(ctk.CTkFrame):
             stats_frame,
             text=f"{self.user_progress['total_xp']} XP",
             font=("Arial", 12, "bold"),
-            text_color="#FFD700"
+            text_color="#FFD700",
         ).pack(side="left", padx=10)
 
         # Level
@@ -364,28 +390,31 @@ class FormationAcademy(ctk.CTkFrame):
             stats_frame,
             text=f"Lv.{self.user_progress['level']}",
             font=("Arial", 13, "bold"),
-            text_color="#00FF88"
+            text_color="#00FF88",
         ).pack(side="left", padx=10)
 
         return header
 
     def _start_tab_polling(self):
         """Demarre le polling pour detecter les changements d'onglet"""
+
         def check_tab():
             try:
                 if not self.winfo_exists():
                     return
                 current_tab = self.tabs.get()
                 if current_tab != self._last_tab:
-                    print(f"[Formation] Polling detected tab change: {self._last_tab} -> {current_tab}")
+                    print(
+                        f"[Formation] Polling detected tab change: {self._last_tab} -> {current_tab}"
+                    )
                     self._last_tab = current_tab
                     self._on_tab_change(current_tab)
-                # Verifier toutes les 200ms
-                self.after(200, check_tab)
+                # Verifier toutes les 1000ms (optimisé pour performance maximale)
+                self.after(1000, check_tab)
             except Exception as e:
                 print(f"[Formation] Polling error: {e}")
 
-        self.after(500, check_tab)
+        self.after(1000, check_tab)
 
     def _on_tab_change(self, tab_name=None):
         """Gère le changement d'onglet"""
@@ -399,7 +428,7 @@ class FormationAcademy(ctk.CTkFrame):
         print(f"[Formation] Tab change: '{tab_name}'")
 
         # Eviter les appels recursifs
-        if hasattr(self, '_changing_tab') and self._changing_tab:
+        if hasattr(self, "_changing_tab") and self._changing_tab:
             return
 
         # Mettre a jour _last_tab AVANT de changer pour eviter boucle infinie avec polling
@@ -422,6 +451,7 @@ class FormationAcademy(ctk.CTkFrame):
         except Exception as e:
             print(f"[Formation] Error: {e}")
             import traceback
+
             traceback.print_exc()
         finally:
             self._changing_tab = False
@@ -439,7 +469,7 @@ class FormationAcademy(ctk.CTkFrame):
             "debutant": "Débutant",
             "intermediaire": "Intermédiaire",
             "avance": "Avancé",
-            "expert": "Expert"
+            "expert": "Expert",
         }
         tab_name = tab_names.get(parcours_id, "Débutant")
         self.content_area = self.tabs.tab(tab_name)
@@ -486,18 +516,12 @@ class FormationAcademy(ctk.CTkFrame):
             self.show_badge_notification(new_badges)
 
         # Scroll frame
-        scroll = ctk.CTkScrollableFrame(
-            self.content_area,
-            fg_color="transparent"
-        )
+        scroll = ctk.CTkScrollableFrame(self.content_area, fg_color="transparent")
         scroll.pack(fill="both", expand=True, padx=20, pady=20)
 
         # Titre
         title = ctk.CTkLabel(
-            scroll,
-            text="Votre Progression",
-            font=("Arial", 28, "bold"),
-            text_color="#00D9FF"
+            scroll, text="Votre Progression", font=("Arial", 28, "bold"), text_color="#00D9FF"
         )
         title.pack(pady=(0, 30))
 
@@ -507,17 +531,17 @@ class FormationAcademy(ctk.CTkFrame):
 
         # Calculer les stats
         total_modules = sum(len(modules) for modules in self.modules_data.values())
-        completed = len(self.user_progress['completed_modules'])
-        progress_pct = int((completed / total_modules * 100)) if total_modules > 0 else 0
-        badges_count = len(self.user_progress.get('badges', []))
-        certs_count = len(self.user_progress.get('certifications', []))
+        completed = len(self.user_progress["completed_modules"])
+        progress_pct = int(completed / total_modules * 100) if total_modules > 0 else 0
+        badges_count = len(self.user_progress.get("badges", []))
+        certs_count = len(self.user_progress.get("certifications", []))
 
         stats = [
             ("Modules Complétés", f"{completed}/{total_modules}", "#00FF88"),
             ("Progression Globale", f"{progress_pct}%", "#00D9FF"),
             ("XP Total", f"{self.user_progress['total_xp']}", "#FFD700"),
             ("Badges", f"{badges_count}/8", "#FF6B6B"),
-            ("Certifications", f"{certs_count}/4", "#9B59B6")
+            ("Certifications", f"{certs_count}/4", "#9B59B6"),
         ]
 
         for i, (label, value, color) in enumerate(stats):
@@ -533,10 +557,7 @@ class FormationAcademy(ctk.CTkFrame):
 
         # Parcours disponibles
         parcours_title = ctk.CTkLabel(
-            scroll,
-            text="Parcours de Formation",
-            font=("Arial", 22, "bold"),
-            text_color="#FFFFFF"
+            scroll, text="Parcours de Formation", font=("Arial", 22, "bold"), text_color="#FFFFFF"
         )
         parcours_title.pack(pady=(30, 20))
 
@@ -544,8 +565,14 @@ class FormationAcademy(ctk.CTkFrame):
         for parcours_id, parcours_name, color, level_num, locked in [
             ("debutant", "Trader Débutant", "#00D9FF", "1", False),
             ("intermediaire", "Trader Confirmé", "#FFA500", "2", False),
-            ("avance", "Trader Avancé", "#FF4444", "3", not self.is_parcours_complete("intermediaire")),
-            ("expert", "Trader Expert", "#9B59B6", "4", not self.is_parcours_complete("avance"))
+            (
+                "avance",
+                "Trader Avancé",
+                "#FF4444",
+                "3",
+                not self.is_parcours_complete("intermediaire"),
+            ),
+            ("expert", "Trader Expert", "#9B59B6", "4", not self.is_parcours_complete("avance")),
         ]:
             self.create_parcours_card(scroll, parcours_id, parcours_name, color, level_num, locked)
 
@@ -561,7 +588,7 @@ class FormationAcademy(ctk.CTkFrame):
             header,
             text="🏆 Badges & Réalisations",
             font=("Arial", 20, "bold"),
-            text_color="#FFD700"
+            text_color="#FFD700",
         ).pack(side="left")
 
         user_badges = self.user_progress.get("badges", [])
@@ -569,12 +596,12 @@ class FormationAcademy(ctk.CTkFrame):
         total_badges = len(BADGES)
 
         # Compteur avec pourcentage
-        progress_pct = int((badges_count / total_badges * 100))
+        progress_pct = int(badges_count / total_badges * 100)
         ctk.CTkLabel(
             header,
             text=f"{badges_count}/{total_badges} ({progress_pct}%)",
             font=("Arial", 14, "bold"),
-            text_color="#00FF88"
+            text_color="#00FF88",
         ).pack(side="right")
 
         # Barre de progression horizontale
@@ -583,29 +610,23 @@ class FormationAcademy(ctk.CTkFrame):
 
         # Fond de la barre
         progress_bg = ctk.CTkFrame(
-            progress_container,
-            fg_color="#2a2d36",
-            height=30,
-            corner_radius=15
+            progress_container, fg_color="#2a2d36", height=30, corner_radius=15
         )
         progress_bg.pack(fill="x")
 
         # Barre de progression remplie
         if progress_pct > 0:
             progress_fill = ctk.CTkFrame(
-                progress_bg,
-                fg_color="#FFD700",
-                height=30,
-                corner_radius=15
+                progress_bg, fg_color="#FFD700", height=30, corner_radius=15
             )
-            progress_fill.place(relx=0, rely=0, relwidth=progress_pct/100, relheight=1)
+            progress_fill.place(relx=0, rely=0, relwidth=progress_pct / 100, relheight=1)
 
             # Texte sur la barre
             ctk.CTkLabel(
                 progress_bg,
                 text=f"{badges_count} badge{'s' if badges_count > 1 else ''} déverrouillé{'s' if badges_count > 1 else ''}",
                 font=("Arial", 12, "bold"),
-                text_color="#000000" if progress_pct > 30 else "#FFFFFF"
+                text_color="#000000" if progress_pct > 30 else "#FFFFFF",
             ).place(relx=0.5, rely=0.5, anchor="center")
 
         # Grille des badges (2 lignes de 4)
@@ -635,7 +656,7 @@ class FormationAcademy(ctk.CTkFrame):
             border_color=border_color,
             corner_radius=12,
             width=160,
-            height=110
+            height=110,
         )
         frame.grid(row=row, column=col, padx=8, pady=8, sticky="ew")
         frame.grid_propagate(False)
@@ -651,17 +672,14 @@ class FormationAcademy(ctk.CTkFrame):
             fg_color="#FFD700" if is_earned else "#2a2d36",
             corner_radius=30,
             width=50,
-            height=50
+            height=50,
         )
         icon_bg.pack(pady=(0, 8))
         icon_bg.pack_propagate(False)
 
         icon_color = "#000000" if is_earned else "#555555"
         ctk.CTkLabel(
-            icon_bg,
-            text=badge_data["icon"],
-            font=("Arial", 24),
-            text_color=icon_color
+            icon_bg, text=badge_data["icon"], font=("Arial", 24), text_color=icon_color
         ).place(relx=0.5, rely=0.5, anchor="center")
 
         # Nom du badge
@@ -671,7 +689,7 @@ class FormationAcademy(ctk.CTkFrame):
             text=badge_data["name"],
             font=("Arial", 11, "bold"),
             text_color=name_color,
-            wraplength=140
+            wraplength=140,
         ).pack()
 
         # XP ou condition
@@ -680,15 +698,12 @@ class FormationAcademy(ctk.CTkFrame):
                 inner,
                 text=f"✓ +{badge_data['xp']} XP",
                 font=("Arial", 9, "bold"),
-                text_color="#00FF88"
+                text_color="#00FF88",
             ).pack(pady=(2, 0))
         else:
-            ctk.CTkLabel(
-                inner,
-                text="🔒 Verrouillé",
-                font=("Arial", 9),
-                text_color="#666666"
-            ).pack(pady=(2, 0))
+            ctk.CTkLabel(inner, text="🔒 Verrouillé", font=("Arial", 9), text_color="#666666").pack(
+                pady=(2, 0)
+            )
 
     def create_certifications_section(self, parent):
         """Crée la section des certifications"""
@@ -699,18 +714,12 @@ class FormationAcademy(ctk.CTkFrame):
         header.pack(fill="x", padx=20, pady=(15, 10))
 
         ctk.CTkLabel(
-            header,
-            text="Certifications",
-            font=("Arial", 20, "bold"),
-            text_color="#9B59B6"
+            header, text="Certifications", font=("Arial", 20, "bold"), text_color="#9B59B6"
         ).pack(side="left")
 
         user_certs = self.user_progress.get("certifications", [])
         ctk.CTkLabel(
-            header,
-            text=f"{len(user_certs)}/4",
-            font=("Arial", 14),
-            text_color="#888888"
+            header, text=f"{len(user_certs)}/4", font=("Arial", 14), text_color="#888888"
         ).pack(side="right")
 
         # Liste des certifications
@@ -720,14 +729,14 @@ class FormationAcademy(ctk.CTkFrame):
         for cert_id, cert_data in CERTIFICATIONS.items():
             is_earned = cert_id in user_certs
             eligible, reason = self.check_certification_eligibility(cert_id)
-            self.create_certification_widget(certs_frame, cert_id, cert_data, is_earned, eligible, reason)
+            self.create_certification_widget(
+                certs_frame, cert_id, cert_data, is_earned, eligible, reason
+            )
 
     def create_certification_widget(self, parent, cert_id, cert_data, is_earned, eligible, reason):
         """Crée un widget de certification"""
         frame = ctk.CTkFrame(
-            parent,
-            fg_color="#2a2d36" if is_earned else "#16181c",
-            corner_radius=10
+            parent, fg_color="#2a2d36" if is_earned else "#16181c", corner_radius=10
         )
         frame.pack(fill="x", pady=5)
 
@@ -739,18 +748,11 @@ class FormationAcademy(ctk.CTkFrame):
         left.pack(side="left")
 
         icon_text = cert_data["icon"] if is_earned else "🔒"
-        ctk.CTkLabel(
-            left,
-            text=icon_text,
-            font=("Arial", 24)
-        ).pack(side="left", padx=(0, 10))
+        ctk.CTkLabel(left, text=icon_text, font=("Arial", 24)).pack(side="left", padx=(0, 10))
 
         name_color = cert_data["color"] if is_earned else "#666666"
         ctk.CTkLabel(
-            left,
-            text=cert_data["name"],
-            font=("Arial", 14, "bold"),
-            text_color=name_color
+            left, text=cert_data["name"], font=("Arial", 14, "bold"), text_color=name_color
         ).pack(side="left")
 
         # Statut
@@ -758,12 +760,7 @@ class FormationAcademy(ctk.CTkFrame):
         right.pack(side="right")
 
         if is_earned:
-            ctk.CTkLabel(
-                right,
-                text="✓ Obtenue",
-                font=("Arial", 12),
-                text_color="#00FF88"
-            ).pack()
+            ctk.CTkLabel(right, text="✓ Obtenue", font=("Arial", 12), text_color="#00FF88").pack()
         elif eligible:
             btn = ctk.CTkButton(
                 right,
@@ -772,16 +769,11 @@ class FormationAcademy(ctk.CTkFrame):
                 fg_color=cert_data["color"],
                 width=80,
                 height=30,
-                command=lambda c=cert_id: self.claim_certification(c)
+                command=lambda c=cert_id: self.claim_certification(c),
             )
             btn.pack()
         else:
-            ctk.CTkLabel(
-                right,
-                text=reason,
-                font=("Arial", 10),
-                text_color="#888888"
-            ).pack()
+            ctk.CTkLabel(right, text=reason, font=("Arial", 10), text_color="#888888").pack()
 
     def claim_certification(self, cert_id):
         """Réclame une certification"""
@@ -789,7 +781,7 @@ class FormationAcademy(ctk.CTkFrame):
             cert = CERTIFICATIONS[cert_id]
             messagebox.showinfo(
                 "Certification Obtenue!",
-                f"Félicitations! Vous avez obtenu la certification:\n\n{cert['icon']} {cert['name']}\n\n+250 XP"
+                f"Félicitations! Vous avez obtenu la certification:\n\n{cert['icon']} {cert['name']}\n\n+250 XP",
             )
             self.show_dashboard()
         else:
@@ -799,8 +791,7 @@ class FormationAcademy(ctk.CTkFrame):
         """Affiche une notification pour les nouveaux badges"""
         badge_names = [f"{BADGES[b]['icon']} {BADGES[b]['name']}" for b in badge_ids]
         messagebox.showinfo(
-            "🏆 Nouveau Badge!",
-            f"Félicitations! Vous avez obtenu:\n\n" + "\n".join(badge_names)
+            "🏆 Nouveau Badge!", "Félicitations! Vous avez obtenu:\n\n" + "\n".join(badge_names)
         )
         # Note: Ne pas recharger le dashboard ici car on est déjà en train de le construire
 
@@ -808,30 +799,24 @@ class FormationAcademy(ctk.CTkFrame):
         """Crée une carte de statistique"""
         card = ctk.CTkFrame(parent, fg_color="#1c2028", corner_radius=10)
 
-        label_widget = ctk.CTkLabel(
-            card,
-            text=label,
-            font=("Arial", 12),
-            text_color="#888888"
-        )
+        label_widget = ctk.CTkLabel(card, text=label, font=("Arial", 12), text_color="#888888")
         label_widget.pack(pady=(15, 5))
 
-        value_widget = ctk.CTkLabel(
-            card,
-            text=value,
-            font=("Arial", 28, "bold"),
-            text_color=color
-        )
+        value_widget = ctk.CTkLabel(card, text=value, font=("Arial", 28, "bold"), text_color=color)
         value_widget.pack(pady=(0, 15))
 
         return card
 
-    def create_parcours_card(self, parent, parcours_id, parcours_name, color, level_num, locked=False):
+    def create_parcours_card(
+        self, parent, parcours_id, parcours_name, color, level_num, locked=False
+    ):
         """Crée une carte de parcours avec bordure distinctive"""
         modules = self.modules_data.get(parcours_id, [])
-        completed = len([m for m in modules if m.get('id') in self.user_progress['completed_modules']])
+        completed = len(
+            [m for m in modules if m.get("id") in self.user_progress["completed_modules"]]
+        )
         total = len(modules)
-        progress = int((completed / total * 100)) if total > 0 else 0
+        progress = int(completed / total * 100) if total > 0 else 0
         is_complete = completed == total and total > 0
 
         # Bordure selon l'état: vert si complet, couleur de niveau si en cours, gris si verrouillé
@@ -846,11 +831,7 @@ class FormationAcademy(ctk.CTkFrame):
             bg_color = "#1c2028"
 
         card = ctk.CTkFrame(
-            parent,
-            fg_color=bg_color,
-            corner_radius=12,
-            border_width=2,
-            border_color=border_color
+            parent, fg_color=bg_color, corner_radius=12, border_width=2, border_color=border_color
         )
         card.pack(fill="x", pady=8)
 
@@ -872,30 +853,20 @@ class FormationAcademy(ctk.CTkFrame):
         badge_bg = badge_colors.get(color, "#1a1a2a") if not locked else "#1a1a1a"
         badge_fg = color if not locked else "#555555"
         level_badge = ctk.CTkFrame(
-            title_frame,
-            fg_color=badge_bg,
-            corner_radius=6,
-            width=36,
-            height=36
+            title_frame, fg_color=badge_bg, corner_radius=6, width=36, height=36
         )
         level_badge.pack(side="left", padx=(0, 12))
         level_badge.pack_propagate(False)
 
         level_label = ctk.CTkLabel(
-            level_badge,
-            text=level_num,
-            font=("Arial", 16, "bold"),
-            text_color=badge_fg
+            level_badge, text=level_num, font=("Arial", 16, "bold"), text_color=badge_fg
         )
         level_label.place(relx=0.5, rely=0.5, anchor="center")
 
         title_color = color if not locked else "#555555"
         title_text = parcours_name if not locked else f"{parcours_name} (Verrouillé)"
         title = ctk.CTkLabel(
-            title_frame,
-            text=title_text,
-            font=("Arial", 18, "bold"),
-            text_color=title_color
+            title_frame, text=title_text, font=("Arial", 18, "bold"), text_color=title_color
         )
         title.pack(side="left")
 
@@ -904,7 +875,7 @@ class FormationAcademy(ctk.CTkFrame):
             header_frame,
             text=status_text,
             font=("Arial", 14),
-            text_color="#888888" if not locked else "#555555"
+            text_color="#888888" if not locked else "#555555",
         )
         status.pack(side="right")
 
@@ -913,9 +884,7 @@ class FormationAcademy(ctk.CTkFrame):
         progress_frame.pack(fill="x", padx=20, pady=(0, 10))
 
         progress_bar = ctk.CTkProgressBar(
-            progress_frame,
-            height=10,
-            progress_color=color if not locked else "#333333"
+            progress_frame, height=10, progress_color=color if not locked else "#333333"
         )
         progress_bar.pack(fill="x")
         progress_bar.set(progress / 100 if not locked else 0)
@@ -925,14 +894,14 @@ class FormationAcademy(ctk.CTkFrame):
                 progress_frame,
                 text="Complétez le parcours précédent pour débloquer",
                 font=("Arial", 11),
-                text_color="#666666"
+                text_color="#666666",
             )
         else:
             progress_label = ctk.CTkLabel(
                 progress_frame,
                 text=f"{progress}% complété",
                 font=("Arial", 12),
-                text_color="#CCCCCC"
+                text_color="#CCCCCC",
             )
         progress_label.pack(pady=(5, 0))
 
@@ -946,7 +915,7 @@ class FormationAcademy(ctk.CTkFrame):
                 hover_color="#333333",
                 height=38,
                 corner_radius=8,
-                state="disabled"
+                state="disabled",
             )
         else:
             btn = ctk.CTkButton(
@@ -956,7 +925,7 @@ class FormationAcademy(ctk.CTkFrame):
                 fg_color=color,
                 hover_color=color,
                 height=40,
-                command=lambda: self.show_parcours(parcours_id)
+                command=lambda: self.show_parcours(parcours_id),
             )
         btn.pack(pady=(10, 20), padx=20)
 
@@ -967,7 +936,7 @@ class FormationAcademy(ctk.CTkFrame):
             "debutant": "Débutant",
             "intermediaire": "Intermédiaire",
             "avance": "Avancé",
-            "expert": "Expert"
+            "expert": "Expert",
         }
         tab_name = tab_names.get(parcours_id, "Débutant")
         self._last_tab = tab_name  # Mettre a jour pour eviter double appel
@@ -981,7 +950,7 @@ class FormationAcademy(ctk.CTkFrame):
             self._changing_tab = False
 
     def _build_parcours_content(self, parcours_id):
-        """Construit le contenu d'un parcours"""
+        """Construit le contenu d'un parcours avec VRAI lazy loading (virtual scrolling)"""
         modules = self.modules_data.get(parcours_id, [])
 
         if not modules:
@@ -989,44 +958,53 @@ class FormationAcademy(ctk.CTkFrame):
                 self.content_area,
                 text="Aucun module disponible pour ce parcours",
                 font=("Helvetica", 16),
-                text_color="#6B7280"
+                text_color="#6B7280",
             )
             empty_label.pack(expand=True)
             return
 
         # Scroll frame
-        scroll = ctk.CTkScrollableFrame(
-            self.content_area,
-            fg_color="transparent"
-        )
+        scroll = ctk.CTkScrollableFrame(self.content_area, fg_color="transparent")
         scroll.pack(fill="both", expand=True, padx=20, pady=20)
 
         # Titre du parcours
         parcours_info = {
-            "debutant": ("Formation Débutant", "#00D9FF", "Apprenez les bases du trading et des marchés financiers"),
-            "intermediaire": ("Formation Intermédiaire", "#FFA500", "Approfondissez vos connaissances avec l'analyse technique"),
-            "avance": ("Formation Avancé", "#FF6B6B", "Maîtrisez les stratégies avancées de trading"),
-            "expert": ("Formation Expert", "#C084FC", "Devenez un trader professionnel")
+            "debutant": (
+                "Formation Débutant",
+                "#00D9FF",
+                "Apprenez les bases du trading et des marchés financiers",
+            ),
+            "intermediaire": (
+                "Formation Intermédiaire",
+                "#FFA500",
+                "Approfondissez vos connaissances avec l'analyse technique",
+            ),
+            "avance": (
+                "Formation Avancé",
+                "#FF6B6B",
+                "Maîtrisez les stratégies avancées de trading",
+            ),
+            "expert": ("Formation Expert", "#C084FC", "Devenez un trader professionnel"),
         }
 
         name, color, subtitle = parcours_info.get(parcours_id, ("Formation", "#00D9FF", ""))
 
         # Compteur progression
-        completed = sum(1 for m in modules if m.get('id', '') in self.user_progress['completed_modules'])
+        completed = sum(
+            1 for m in modules if m.get("id", "") in self.user_progress["completed_modules"]
+        )
         total = len(modules)
 
         title_area = ctk.CTkFrame(scroll, fg_color="transparent")
         title_area.pack(fill="x", pady=(0, 8))
 
         ctk.CTkLabel(
-            title_area, text=name,
-            font=("Helvetica", 28, "bold"), text_color="#FFFFFF"
+            title_area, text=name, font=("Helvetica", 28, "bold"), text_color="#FFFFFF"
         ).pack(anchor="w")
 
         if subtitle:
             ctk.CTkLabel(
-                title_area, text=subtitle,
-                font=("Helvetica", 14), text_color="#8B949E"
+                title_area, text=subtitle, font=("Helvetica", 14), text_color="#8B949E"
             ).pack(anchor="w", pady=(4, 0))
 
         # Barre de progression du parcours
@@ -1034,8 +1012,10 @@ class FormationAcademy(ctk.CTkFrame):
         progress_frame.pack(fill="x", pady=(10, 20))
 
         ctk.CTkLabel(
-            progress_frame, text=f"{completed}/{total} modules complétés",
-            font=("Helvetica", 12), text_color="#8B949E"
+            progress_frame,
+            text=f"{completed}/{total} modules complétés",
+            font=("Helvetica", 12),
+            text_color="#8B949E",
         ).pack(anchor="w", pady=(0, 6))
 
         bar_bg = ctk.CTkFrame(progress_frame, fg_color="#21262d", height=6, corner_radius=3)
@@ -1046,120 +1026,237 @@ class FormationAcademy(ctk.CTkFrame):
             bar_fg = ctk.CTkFrame(bar_bg, fg_color=color, height=6, corner_radius=3)
             bar_fg.place(relx=0, rely=0, relwidth=max(ratio, 0.0), relheight=1.0)
 
-        # Afficher chaque module
-        for i, module in enumerate(modules, 1):
-            self.create_module_card(scroll, module, i)
+        # === VIRTUAL SCROLLING : Configuration ===
+        self._vs_modules = modules  # Tous les modules en mémoire
+        self._vs_container = scroll  # Container scrollable
+        self._vs_modules_container = ctk.CTkFrame(scroll, fg_color="transparent")
+        self._vs_modules_container.pack(fill="x", pady=(0, 0))
 
-    def create_module_card(self, parent, module, index):
-        """Crée une carte de module avec design soigné"""
-        module_id = module.get('id', '')
-        is_completed = module_id in self.user_progress['completed_modules']
+        # Configuration du virtual scrolling
+        self._vs_card_height = 70  # Hauteur estimée par carte
+        self._vs_visible_count = 12  # Nombre de modules visibles à l'écran
+        self._vs_buffer = 3  # Buffer au-dessus et en-dessous
+        self._vs_current_start = 0  # Index de début actuel
+        self._vs_rendered_widgets = {}  # Widgets actuellement rendus {index: widget}
+        self._vs_is_updating = False  # Flag pour éviter les mises à jour simultanées
 
-        # Quiz score si disponible
-        quiz_score = self.user_progress.get('quiz_scores', {}).get(module_id, None)
+        # Charger les premiers modules (seulement ceux visibles)
+        self._vs_render_visible_modules()
 
+        # Bind sur le scroll pour détecter les changements
+        try:
+            canvas = scroll._parent_canvas
+            canvas.bind("<MouseWheel>", lambda e: self.after(50, self._vs_on_scroll))
+            canvas.bind("<Button-4>", lambda e: self.after(50, self._vs_on_scroll))
+            canvas.bind("<Button-5>", lambda e: self.after(50, self._vs_on_scroll))
+            scroll.bind("<Configure>", lambda e: self.after(100, self._vs_on_scroll))
+        except Exception:
+            pass  # Fallback silencieux si binding échoue
+
+    def _vs_render_visible_modules(self):
+        """Rend uniquement les modules visibles (Virtual Scrolling)"""
+        if self._vs_is_updating:
+            return
+
+        self._vs_is_updating = True
+
+        try:
+            # Calculer quels modules doivent être visibles
+            start_idx = max(0, self._vs_current_start - self._vs_buffer)
+            end_idx = min(
+                len(self._vs_modules),
+                self._vs_current_start + self._vs_visible_count + self._vs_buffer,
+            )
+
+            # Détruire les widgets hors de la plage visible
+            widgets_to_remove = []
+            for idx in list(self._vs_rendered_widgets.keys()):
+                if idx < start_idx or idx >= end_idx:
+                    widget = self._vs_rendered_widgets[idx]
+                    widget.destroy()
+                    widgets_to_remove.append(idx)
+
+            for idx in widgets_to_remove:
+                del self._vs_rendered_widgets[idx]
+
+            # Créer les nouveaux widgets dans la plage visible
+            for idx in range(start_idx, end_idx):
+                if idx not in self._vs_rendered_widgets:
+                    module = self._vs_modules[idx]
+                    card = self._create_virtual_module_card(
+                        self._vs_modules_container, module, idx + 1
+                    )
+                    self._vs_rendered_widgets[idx] = card
+
+            print(
+                f"[VirtualScroll] Rendered {len(self._vs_rendered_widgets)} modules (start={start_idx}, end={end_idx})"
+            )
+
+        finally:
+            self._vs_is_updating = False
+
+    def _vs_on_scroll(self):
+        """Callback appelé lors du scroll pour mettre à jour les modules visibles"""
+        if not hasattr(self, "_vs_container") or not hasattr(self, "_vs_modules"):
+            return
+
+        try:
+            # Calculer la position de scroll actuelle
+            canvas = self._vs_container._parent_canvas
+            scroll_pos = canvas.yview()
+
+            # Calculer l'index de début approximatif basé sur la position de scroll
+            total_height = len(self._vs_modules) * self._vs_card_height
+            scroll_offset = scroll_pos[0] * total_height
+            new_start = max(0, int(scroll_offset / self._vs_card_height))
+
+            # Si le début a changé significativement, re-render
+            if abs(new_start - self._vs_current_start) > 2:
+                self._vs_current_start = new_start
+                self._vs_render_visible_modules()
+
+        except Exception:
+            # Ignorer les erreurs silencieusement
+            pass
+
+    def _create_virtual_module_card(self, parent, module, index):
+        """Crée une carte de module pour le virtual scrolling (retourne le widget)"""
+        module_id = module.get("id", "")
+        is_completed = module_id in self.user_progress["completed_modules"]
+
+        # Card principale - ULTRA SIMPLIFIÉE pour performance
         card = ctk.CTkFrame(
             parent,
             fg_color="#161b22",
-            corner_radius=12,
+            corner_radius=8,
             border_width=1,
-            border_color="#238636" if is_completed else "#1e2734"
+            border_color="#238636" if is_completed else "#1e2734",
+            height=self._vs_card_height,
         )
-        card.pack(fill="x", pady=6)
+        card.pack(fill="x", pady=4)
+        card.pack_propagate(False)  # Forcer la hauteur fixe
 
-        # Container principal
+        # Container principal - UN SEUL niveau
         content_frame = ctk.CTkFrame(card, fg_color="transparent")
-        content_frame.pack(fill="x", padx=20, pady=18)
+        content_frame.pack(fill="both", expand=True, padx=12, pady=8)
 
-        # Numéro et statut
-        left_frame = ctk.CTkFrame(content_frame, fg_color="transparent", width=52)
-        left_frame.pack(side="left", anchor="n")
-        left_frame.pack_propagate(False)
-
-        number_bg = "#1a3a2a" if is_completed else "#21262d"
-        number_fg = "#3fb950" if is_completed else "#8B949E"
-
-        number_badge = ctk.CTkFrame(
-            left_frame, fg_color=number_bg, corner_radius=26,
-            width=46, height=46
-        )
-        number_badge.pack(pady=(0, 4))
-        number_badge.pack_propagate(False)
+        # Icône de statut
+        status_icon = "✓" if is_completed else str(index)
+        status_color = "#3fb950" if is_completed else "#8B949E"
 
         ctk.CTkLabel(
-            number_badge, text=str(index),
-            font=("Helvetica", 18, "bold"), text_color=number_fg
-        ).place(relx=0.5, rely=0.5, anchor="center")
+            content_frame,
+            text=status_icon,
+            font=("Helvetica", 18, "bold"),
+            text_color=status_color,
+            width=35,
+        ).pack(side="left", padx=(0, 10))
 
-        if is_completed:
-            ctk.CTkLabel(
-                left_frame, text="Fait",
-                font=("Helvetica", 10), text_color="#3fb950"
-            ).pack()
-
-        # Détails du module
-        details_frame = ctk.CTkFrame(content_frame, fg_color="transparent")
-        details_frame.pack(side="left", fill="both", expand=True, padx=(16, 0))
-
+        # Titre
+        title_text = module.get("titre", "Module sans titre")
         ctk.CTkLabel(
-            details_frame,
-            text=module.get('titre', 'Module sans titre'),
-            font=("Helvetica", 17, "bold"),
+            content_frame,
+            text=title_text,
+            font=("Helvetica", 14, "bold"),
             text_color="#FFFFFF",
-            anchor="w"
-        ).pack(fill="x")
+            anchor="w",
+        ).pack(side="left", fill="x", expand=True)
 
-        desc = module.get('description', '')
-        if desc:
-            ctk.CTkLabel(
-                details_frame, text=desc,
-                font=("Helvetica", 13), text_color="#8B949E",
-                anchor="w", wraplength=520, justify="left"
-            ).pack(fill="x", pady=(4, 10))
-
-        # Tags d'info (durée, difficulté, XP)
-        info_frame = ctk.CTkFrame(details_frame, fg_color="transparent")
-        info_frame.pack(fill="x")
-
-        duree = module.get('duree', '') or module.get('durée', '')
-        difficulte = module.get('difficulte', '') or module.get('difficulté', '')
-        xp = module.get('points_xp', 0)
-
-        tags = []
-        if duree:
-            tags.append(duree)
-        if difficulte:
-            tags.append(difficulte)
-        if xp:
-            tags.append(f"{xp} XP")
-        if quiz_score is not None:
-            tags.append(f"Quiz: {quiz_score}%")
-
-        for tag_text in tags:
-            tag = ctk.CTkFrame(info_frame, fg_color="#21262d", corner_radius=6)
-            tag.pack(side="left", padx=(0, 8))
-
-            ctk.CTkLabel(
-                tag, text=tag_text,
-                font=("Helvetica", 11), text_color="#8B949E"
-            ).pack(padx=10, pady=4)
-
-        # Bouton d'action
-        if is_completed:
-            btn_text, btn_fg, btn_hover = "Revoir", "#21262d", "#30363d"
-            btn_text_color = "#8B949E"
-        else:
-            btn_text, btn_fg, btn_hover = "Commencer", "#238636", "#2ea043"
-            btn_text_color = "#FFFFFF"
+        # Bouton compact
+        btn_text = "✓" if is_completed else "▶"
+        btn_fg = "#21262d" if is_completed else "#238636"
 
         ctk.CTkButton(
-            content_frame, text=btn_text,
-            font=("Helvetica", 13, "bold"),
-            fg_color=btn_fg, hover_color=btn_hover,
-            text_color=btn_text_color,
-            width=110, height=38, corner_radius=8,
-            command=lambda: self.open_module(module)
-        ).pack(side="right", anchor="n")
+            content_frame,
+            text=btn_text,
+            font=("Helvetica", 12, "bold"),
+            fg_color=btn_fg,
+            hover_color="#2ea043" if not is_completed else "#30363d",
+            text_color="#8B949E" if is_completed else "#FFFFFF",
+            width=45,
+            height=30,
+            corner_radius=6,
+            command=lambda: self.open_module(module),
+        ).pack(side="right")
+
+        return card
+
+    def create_module_card(self, parent, module, index):
+        """Crée une carte de module optimisée pour performance maximale"""
+        module_id = module.get("id", "")
+        is_completed = module_id in self.user_progress["completed_modules"]
+
+        # Card principale - SIMPLIFIÉE
+        card = ctk.CTkFrame(
+            parent,
+            fg_color="#161b22",
+            corner_radius=10,
+            border_width=1,
+            border_color="#238636" if is_completed else "#1e2734",
+        )
+        card.pack(fill="x", pady=5)
+
+        # Container principal - UN SEUL niveau de frame
+        content_frame = ctk.CTkFrame(card, fg_color="transparent")
+        content_frame.pack(fill="x", padx=15, pady=12)
+
+        # Numéro simplifié (juste un label, pas de frame)
+        status_icon = "✓" if is_completed else str(index)
+        status_color = "#3fb950" if is_completed else "#8B949E"
+
+        ctk.CTkLabel(
+            content_frame,
+            text=status_icon,
+            font=("Helvetica", 20, "bold"),
+            text_color=status_color,
+            width=40,
+        ).pack(side="left", padx=(0, 12))
+
+        # Détails - directement dans content_frame, pas de frame supplémentaire
+        title_text = module.get("titre", "Module sans titre")
+
+        ctk.CTkLabel(
+            content_frame,
+            text=title_text,
+            font=("Helvetica", 16, "bold"),
+            text_color="#FFFFFF",
+            anchor="w",
+        ).pack(side="left", fill="x", expand=True)
+
+        # Tags simplifiés - UN SEUL label au lieu de frames multiples
+        duree = module.get("duree", "") or module.get("durée", "")
+        xp = module.get("points_xp", 0)
+
+        tags_text = []
+        if duree:
+            tags_text.append(duree)
+        if xp:
+            tags_text.append(f"{xp} XP")
+
+        if tags_text:
+            ctk.CTkLabel(
+                content_frame,
+                text=" • ".join(tags_text),
+                font=("Helvetica", 10),
+                text_color="#8B949E",
+            ).pack(side="left", padx=10)
+
+        # Bouton d'action
+        btn_text = "✓" if is_completed else "▶"
+        btn_fg = "#21262d" if is_completed else "#238636"
+
+        ctk.CTkButton(
+            content_frame,
+            text=btn_text,
+            font=("Helvetica", 14, "bold"),
+            fg_color=btn_fg,
+            hover_color="#2ea043" if not is_completed else "#30363d",
+            text_color="#8B949E" if is_completed else "#FFFFFF",
+            width=50,
+            height=35,
+            corner_radius=8,
+            command=lambda: self.open_module(module),
+        ).pack(side="right", padx=(10, 0))
 
     def open_module(self, module):
         """Ouvre un module pour le visualiser"""
@@ -1171,12 +1268,12 @@ class FormationAcademy(ctk.CTkFrame):
 
     def mark_module_completed(self, module_id, xp_earned):
         """Marque un module comme complété"""
-        if module_id not in self.user_progress['completed_modules']:
-            self.user_progress['completed_modules'].append(module_id)
-            self.user_progress['total_xp'] += xp_earned
+        if module_id not in self.user_progress["completed_modules"]:
+            self.user_progress["completed_modules"].append(module_id)
+            self.user_progress["total_xp"] += xp_earned
 
             # Calculer le nouveau niveau (1 niveau tous les 500 XP)
-            self.user_progress['level'] = (self.user_progress['total_xp'] // 500) + 1
+            self.user_progress["level"] = (self.user_progress["total_xp"] // 500) + 1
 
             self.save_user_progress()
 
@@ -1185,7 +1282,7 @@ class FormationAcademy(ctk.CTkFrame):
 
             messagebox.showinfo(
                 "Module Complété!",
-                f"Félicitations! Vous avez gagné {xp_earned} XP!\n\nTotal XP: {self.user_progress['total_xp']}"
+                f"Félicitations! Vous avez gagné {xp_earned} XP!\n\nTotal XP: {self.user_progress['total_xp']}",
             )
 
     def _refresh_header(self):
@@ -1196,6 +1293,7 @@ class FormationAcademy(ctk.CTkFrame):
             self.header.pack(fill="x", padx=10, pady=(10, 5), before=self.tabs)
         except Exception:
             pass
+
 
 class ModuleViewer(ctk.CTkFrame):
     """Visualiseur de module complet"""
@@ -1223,7 +1321,7 @@ class ModuleViewer(ctk.CTkFrame):
             width=90,
             height=34,
             corner_radius=8,
-            command=self.go_back
+            command=self.go_back,
         )
         back_btn.pack(side="left", padx=(0, 18))
 
@@ -1233,28 +1331,25 @@ class ModuleViewer(ctk.CTkFrame):
 
         ctk.CTkLabel(
             title_frame,
-            text=module.get('titre', 'Module'),
+            text=module.get("titre", "Module"),
             font=("Helvetica", 24, "bold"),
             text_color="#FFFFFF",
-            anchor="w"
+            anchor="w",
         ).pack(anchor="w")
 
         # Sous-titre avec description courte
-        desc = module.get('description', '')
+        desc = module.get("description", "")
         if desc:
             ctk.CTkLabel(
                 title_frame,
-                text=desc[:120] + ('...' if len(desc) > 120 else ''),
+                text=desc[:120] + ("..." if len(desc) > 120 else ""),
                 font=("Helvetica", 13),
                 text_color="#8B949E",
-                anchor="w"
+                anchor="w",
             ).pack(anchor="w", pady=(4, 0))
 
         # Zone de contenu scrollable
-        self.scroll = ctk.CTkScrollableFrame(
-            self,
-            fg_color="transparent"
-        )
+        self.scroll = ctk.CTkScrollableFrame(self, fg_color="transparent")
         self.scroll.pack(fill="both", expand=True, padx=20, pady=10)
 
         # Afficher le contenu du module
@@ -1265,8 +1360,8 @@ class ModuleViewer(ctk.CTkFrame):
 
     def display_module_content(self):
         """Affiche le contenu complet du module avec une présentation soignée"""
-        contenu = self.module.get('contenu', {})
-        sections = contenu.get('sections', [])
+        contenu = self.module.get("contenu", {})
+        sections = contenu.get("sections", [])
         total_sections = len(sections)
 
         # --- Bandeau d'info du module ---
@@ -1277,16 +1372,18 @@ class ModuleViewer(ctk.CTkFrame):
         info_inner.pack(fill="x", padx=25, pady=16)
 
         # Difficulté, durée, XP
-        parcours = self.module.get('parcours', '').capitalize()
-        duree = self.module.get('duree', '')
-        xp = self.module.get('points_xp', 0)
-        difficulte = self.module.get('difficulte', '')
+        parcours = self.module.get("parcours", "").capitalize()
+        duree = self.module.get("duree", "")
+        xp = self.module.get("points_xp", 0)
+        difficulte = self.module.get("difficulte", "")
 
         parcours_colors = {
-            'Debutant': '#00D9FF', 'Intermediaire': '#FFA500',
-            'Avance': '#FF6B6B', 'Expert': '#C084FC'
+            "Debutant": "#00D9FF",
+            "Intermediaire": "#FFA500",
+            "Avance": "#FF6B6B",
+            "Expert": "#C084FC",
         }
-        accent = parcours_colors.get(parcours, '#00D9FF')
+        accent = parcours_colors.get(parcours, "#00D9FF")
 
         meta_items = []
         if difficulte:
@@ -1299,10 +1396,9 @@ class ModuleViewer(ctk.CTkFrame):
             meta_items.append(f"{total_sections} sections")
 
         meta_text = "   |   ".join(meta_items)
-        ctk.CTkLabel(
-            info_inner, text=meta_text,
-            font=("Helvetica", 13), text_color="#8899AA"
-        ).pack(anchor="w")
+        ctk.CTkLabel(info_inner, text=meta_text, font=("Helvetica", 13), text_color="#8899AA").pack(
+            anchor="w"
+        )
 
         # Barre de progression visuelle (accent colorée)
         bar_bg = ctk.CTkFrame(info_bar, fg_color="#0d1117", height=4, corner_radius=2)
@@ -1311,7 +1407,7 @@ class ModuleViewer(ctk.CTkFrame):
         bar_fg.place(relx=0, rely=0, relwidth=1.0, relheight=1.0)
 
         # --- Introduction ---
-        intro = contenu.get('introduction', '')
+        intro = contenu.get("introduction", "")
         if intro:
             intro_frame = ctk.CTkFrame(self.scroll, fg_color="#161b22", corner_radius=12)
             intro_frame.pack(fill="x", pady=(0, 20))
@@ -1320,19 +1416,25 @@ class ModuleViewer(ctk.CTkFrame):
             intro_header = ctk.CTkFrame(intro_frame, fg_color="transparent")
             intro_header.pack(fill="x", padx=25, pady=(22, 0))
 
-            ctk.CTkFrame(
-                intro_header, fg_color=accent, width=4, height=22, corner_radius=2
-            ).pack(side="left", padx=(0, 12))
+            ctk.CTkFrame(intro_header, fg_color=accent, width=4, height=22, corner_radius=2).pack(
+                side="left", padx=(0, 12)
+            )
 
             ctk.CTkLabel(
-                intro_header, text="Introduction",
-                font=("Helvetica", 20, "bold"), text_color="#FFFFFF"
+                intro_header,
+                text="Introduction",
+                font=("Helvetica", 20, "bold"),
+                text_color="#FFFFFF",
             ).pack(side="left")
 
             ctk.CTkLabel(
-                intro_frame, text=intro,
-                font=("Helvetica", 14), text_color="#C8D1DA",
-                wraplength=720, justify="left", anchor="nw"
+                intro_frame,
+                text=intro,
+                font=("Helvetica", 14),
+                text_color="#C8D1DA",
+                wraplength=720,
+                justify="left",
+                anchor="nw",
             ).pack(fill="x", padx=25, pady=(14, 24))
 
         # --- Sections ---
@@ -1340,7 +1442,7 @@ class ModuleViewer(ctk.CTkFrame):
             self._render_section(section, i, total_sections, accent)
 
         # --- Résumé ---
-        resume = contenu.get('resume', '')
+        resume = contenu.get("resume", "")
         if resume:
             resume_frame = ctk.CTkFrame(self.scroll, fg_color="#161b22", corner_radius=12)
             resume_frame.pack(fill="x", pady=(10, 20))
@@ -1353,8 +1455,7 @@ class ModuleViewer(ctk.CTkFrame):
             ).pack(side="left", padx=(0, 12))
 
             ctk.CTkLabel(
-                resume_header, text="Résumé",
-                font=("Helvetica", 20, "bold"), text_color="#FFFFFF"
+                resume_header, text="Résumé", font=("Helvetica", 20, "bold"), text_color="#FFFFFF"
             ).pack(side="left")
 
             # Encadré résumé avec fond légèrement distinct
@@ -1362,13 +1463,17 @@ class ModuleViewer(ctk.CTkFrame):
             resume_box.pack(fill="x", padx=25, pady=(14, 24))
 
             ctk.CTkLabel(
-                resume_box, text=resume,
-                font=("Helvetica", 14), text_color="#C8D1DA",
-                wraplength=690, justify="left", anchor="nw"
+                resume_box,
+                text=resume,
+                font=("Helvetica", 14),
+                text_color="#C8D1DA",
+                wraplength=690,
+                justify="left",
+                anchor="nw",
             ).pack(fill="x", padx=18, pady=16)
 
         # --- Ressources complémentaires ---
-        ressources = contenu.get('ressources_complementaires', [])
+        ressources = contenu.get("ressources_complementaires", [])
         if ressources:
             res_frame = ctk.CTkFrame(self.scroll, fg_color="#161b22", corner_radius=12)
             res_frame.pack(fill="x", pady=(0, 20))
@@ -1376,13 +1481,15 @@ class ModuleViewer(ctk.CTkFrame):
             res_header = ctk.CTkFrame(res_frame, fg_color="transparent")
             res_header.pack(fill="x", padx=25, pady=(22, 0))
 
-            ctk.CTkFrame(
-                res_header, fg_color="#FFA500", width=4, height=22, corner_radius=2
-            ).pack(side="left", padx=(0, 12))
+            ctk.CTkFrame(res_header, fg_color="#FFA500", width=4, height=22, corner_radius=2).pack(
+                side="left", padx=(0, 12)
+            )
 
             ctk.CTkLabel(
-                res_header, text="Ressources Complémentaires",
-                font=("Helvetica", 18, "bold"), text_color="#FFFFFF"
+                res_header,
+                text="Ressources Complémentaires",
+                font=("Helvetica", 18, "bold"),
+                text_color="#FFFFFF",
             ).pack(side="left")
 
             for ressource in ressources:
@@ -1390,14 +1497,17 @@ class ModuleViewer(ctk.CTkFrame):
                 row.pack(fill="x", padx=35, pady=4)
 
                 ctk.CTkLabel(
-                    row, text="→", font=("Helvetica", 14, "bold"),
-                    text_color="#FFA500", width=20
+                    row, text="→", font=("Helvetica", 14, "bold"), text_color="#FFA500", width=20
                 ).pack(side="left")
 
                 ctk.CTkLabel(
-                    row, text=ressource,
-                    font=("Helvetica", 13), text_color="#AAB8C8",
-                    anchor="w", wraplength=680, justify="left"
+                    row,
+                    text=ressource,
+                    font=("Helvetica", 13),
+                    text_color="#AAB8C8",
+                    anchor="w",
+                    wraplength=680,
+                    justify="left",
                 ).pack(side="left", padx=(8, 0))
 
             # Espacement bas
@@ -1421,21 +1531,21 @@ class ModuleViewer(ctk.CTkFrame):
         num_badge.pack_propagate(False)
 
         ctk.CTkLabel(
-            num_badge, text=str(index),
-            font=("Helvetica", 15, "bold"), text_color="#FFFFFF"
+            num_badge, text=str(index), font=("Helvetica", 15, "bold"), text_color="#FFFFFF"
         ).place(relx=0.5, rely=0.5, anchor="center")
 
         # Titre de section
         ctk.CTkLabel(
-            header, text=section.get('titre', 'Section'),
-            font=("Helvetica", 19, "bold"), text_color="#FFFFFF",
-            anchor="w"
+            header,
+            text=section.get("titre", "Section"),
+            font=("Helvetica", 19, "bold"),
+            text_color="#FFFFFF",
+            anchor="w",
         ).pack(side="left", fill="x", expand=True)
 
         # Indicateur léger (section X sur Y)
         ctk.CTkLabel(
-            header, text=f"{index}/{total}",
-            font=("Helvetica", 12), text_color="#556677"
+            header, text=f"{index}/{total}", font=("Helvetica", 12), text_color="#556677"
         ).pack(side="right")
 
         # Trait séparateur sous le titre
@@ -1443,44 +1553,59 @@ class ModuleViewer(ctk.CTkFrame):
         sep.pack(fill="x", padx=25, pady=(14, 0))
 
         # --- Contenu principal ---
-        section_content = section.get('contenu', '')
+        section_content = section.get("contenu", "")
         if section_content:
             # Découper le contenu en paragraphes pour une meilleure lisibilité
-            paragraphs = [p.strip() for p in section_content.split('\n') if p.strip()]
+            paragraphs = [p.strip() for p in section_content.split("\n") if p.strip()]
 
             content_area = ctk.CTkFrame(section_frame, fg_color="transparent")
             content_area.pack(fill="x", padx=25, pady=(16, 0))
 
             for paragraph in paragraphs:
                 ctk.CTkLabel(
-                    content_area, text=paragraph,
-                    font=("Helvetica", 14), text_color="#C8D1DA",
-                    wraplength=720, justify="left", anchor="nw"
+                    content_area,
+                    text=paragraph,
+                    font=("Helvetica", 14),
+                    text_color="#C8D1DA",
+                    wraplength=720,
+                    justify="left",
+                    anchor="nw",
                 ).pack(fill="x", anchor="w", pady=(0, 10))
 
         # --- Exemple pratique ---
-        exemple = section.get('exemple_pratique', '')
+        exemple = section.get("exemple_pratique", "")
         if exemple:
-            ex_frame = ctk.CTkFrame(section_frame, fg_color="#0d1117", corner_radius=10,
-                                     border_width=1, border_color="#1e2734")
+            ex_frame = ctk.CTkFrame(
+                section_frame,
+                fg_color="#0d1117",
+                corner_radius=10,
+                border_width=1,
+                border_color="#1e2734",
+            )
             ex_frame.pack(fill="x", padx=25, pady=(12, 0))
 
             ex_header = ctk.CTkFrame(ex_frame, fg_color="transparent")
             ex_header.pack(fill="x", padx=16, pady=(14, 0))
 
             ctk.CTkLabel(
-                ex_header, text="Exemple pratique",
-                font=("Helvetica", 14, "bold"), text_color="#FFC857"
+                ex_header,
+                text="Exemple pratique",
+                font=("Helvetica", 14, "bold"),
+                text_color="#FFC857",
             ).pack(side="left")
 
             ctk.CTkLabel(
-                ex_frame, text=exemple,
-                font=("Helvetica", 13), text_color="#B0BFCF",
-                wraplength=680, justify="left", anchor="nw"
+                ex_frame,
+                text=exemple,
+                font=("Helvetica", 13),
+                text_color="#B0BFCF",
+                wraplength=680,
+                justify="left",
+                anchor="nw",
             ).pack(fill="x", padx=16, pady=(10, 16))
 
         # --- Points clés ---
-        points_cles = section.get('points_cles', [])
+        points_cles = section.get("points_cles", [])
         if points_cles:
             pc_frame = ctk.CTkFrame(section_frame, fg_color="#0f1923", corner_radius=10)
             pc_frame.pack(fill="x", padx=25, pady=(14, 0))
@@ -1489,8 +1614,10 @@ class ModuleViewer(ctk.CTkFrame):
             pc_header.pack(fill="x", padx=16, pady=(14, 8))
 
             ctk.CTkLabel(
-                pc_header, text="Points Clés à Retenir",
-                font=("Helvetica", 15, "bold"), text_color="#00E68C"
+                pc_header,
+                text="Points Clés à Retenir",
+                font=("Helvetica", 15, "bold"),
+                text_color="#00E68C",
             ).pack(side="left")
 
             for point in points_cles:
@@ -1498,14 +1625,17 @@ class ModuleViewer(ctk.CTkFrame):
                 point_row.pack(fill="x", padx=16, pady=3)
 
                 ctk.CTkLabel(
-                    point_row, text="●",
-                    font=("Helvetica", 8), text_color="#00E68C", width=16
+                    point_row, text="●", font=("Helvetica", 8), text_color="#00E68C", width=16
                 ).pack(side="left", anchor="n", pady=(5, 0))
 
                 ctk.CTkLabel(
-                    point_row, text=point,
-                    font=("Helvetica", 13), text_color="#D0D8E0",
-                    wraplength=670, justify="left", anchor="nw"
+                    point_row,
+                    text=point,
+                    font=("Helvetica", 13),
+                    text_color="#D0D8E0",
+                    wraplength=670,
+                    justify="left",
+                    anchor="nw",
                 ).pack(side="left", fill="x", padx=(6, 0))
 
             # Espacement bas
@@ -1526,15 +1656,15 @@ class ModuleViewer(ctk.CTkFrame):
         qa_header_left = ctk.CTkFrame(header, fg_color="transparent")
         qa_header_left.pack(side="left")
 
-        ctk.CTkFrame(
-            qa_header_left, fg_color="#58A6FF", width=4, height=22, corner_radius=2
-        ).pack(side="left", padx=(0, 12))
+        ctk.CTkFrame(qa_header_left, fg_color="#58A6FF", width=4, height=22, corner_radius=2).pack(
+            side="left", padx=(0, 12)
+        )
 
         ctk.CTkLabel(
             qa_header_left,
             text="Questions & Réponses",
             font=("Helvetica", 18, "bold"),
-            text_color="#FFFFFF"
+            text_color="#FFFFFF",
         ).pack(side="left")
 
         # Bouton poser une question
@@ -1548,7 +1678,7 @@ class ModuleViewer(ctk.CTkFrame):
             hover_color="#30363d",
             text_color="#58A6FF",
             corner_radius=8,
-            command=self.open_ask_question_dialog
+            command=self.open_ask_question_dialog,
         ).pack(side="right")
 
         # Liste des Q&A
@@ -1556,7 +1686,7 @@ class ModuleViewer(ctk.CTkFrame):
         qa_list.pack(fill="x", padx=25, pady=(0, 22))
 
         # Charger les questions pour ce module
-        module_id = self.module.get('id', '')
+        module_id = self.module.get("id", "")
         questions = self.load_module_questions(module_id)
 
         if not questions:
@@ -1565,7 +1695,7 @@ class ModuleViewer(ctk.CTkFrame):
                 text="Aucune question pour ce module.\nSoyez le premier à poser une question!",
                 font=("Arial", 12),
                 text_color="#888888",
-                justify="center"
+                justify="center",
             ).pack(pady=20)
         else:
             for q in questions[:5]:  # Afficher max 5 questions
@@ -1578,13 +1708,14 @@ class ModuleViewer(ctk.CTkFrame):
                     fg_color="transparent",
                     text_color="#00D9FF",
                     hover_color="#1c2028",
-                    command=lambda: self.show_all_questions(module_id)
+                    command=lambda: self.show_all_questions(module_id),
                 ).pack(pady=10)
 
     def create_qa_card(self, parent, question: dict):
         """Crée une carte de question"""
-        card = ctk.CTkFrame(parent, fg_color="#0d1117", corner_radius=10,
-                            border_width=1, border_color="#1e2734")
+        card = ctk.CTkFrame(
+            parent, fg_color="#0d1117", corner_radius=10, border_width=1, border_color="#1e2734"
+        )
         card.pack(fill="x", pady=5)
 
         # Question
@@ -1598,7 +1729,7 @@ class ModuleViewer(ctk.CTkFrame):
             text_color="#FFFFFF",
             wraplength=650,
             justify="left",
-            anchor="w"
+            anchor="w",
         ).pack(anchor="w")
 
         # Métadonnées (auteur, date)
@@ -1609,20 +1740,20 @@ class ModuleViewer(ctk.CTkFrame):
             meta_frame,
             text=f"Par {question.get('author', 'Anonyme')} • {question.get('date', '')}",
             font=("Arial", 10),
-            text_color="#888888"
+            text_color="#888888",
         ).pack(side="left")
 
         # Nombre de réponses
-        answers_count = len(question.get('answers', []))
+        answers_count = len(question.get("answers", []))
         ctk.CTkLabel(
             meta_frame,
             text=f"{answers_count} réponse{'s' if answers_count != 1 else ''}",
             font=("Arial", 10),
-            text_color="#00D9FF"
+            text_color="#00D9FF",
         ).pack(side="right")
 
         # Réponses (si présentes)
-        answers = question.get('answers', [])
+        answers = question.get("answers", [])
         if answers:
             for answer in answers[:2]:  # Max 2 réponses visibles
                 a_frame = ctk.CTkFrame(card, fg_color="#1c2028", corner_radius=8)
@@ -1635,14 +1766,14 @@ class ModuleViewer(ctk.CTkFrame):
                     text_color="#CCCCCC",
                     wraplength=620,
                     justify="left",
-                    anchor="w"
+                    anchor="w",
                 ).pack(anchor="w", padx=10, pady=(10, 5))
 
                 ctk.CTkLabel(
                     a_frame,
                     text=f"— {answer.get('author', 'Anonyme')}",
                     font=("Arial", 10),
-                    text_color="#00FF88"
+                    text_color="#00FF88",
                 ).pack(anchor="e", padx=10, pady=(0, 10))
 
         # Bouton répondre
@@ -1654,7 +1785,7 @@ class ModuleViewer(ctk.CTkFrame):
             font=("Arial", 10),
             fg_color="#333333",
             hover_color="#444444",
-            command=lambda q=question: self.open_answer_dialog(q)
+            command=lambda q=question: self.open_answer_dialog(q),
         ).pack(anchor="e", padx=15, pady=(5, 15))
 
     def load_module_questions(self, module_id: str) -> list:
@@ -1671,23 +1802,29 @@ class ModuleViewer(ctk.CTkFrame):
 
             with sqlite3.connect(db_path) as conn:
                 conn.row_factory = sqlite3.Row
-                cursor = conn.execute("""
+                cursor = conn.execute(
+                    """
                     SELECT q.*,
                            (SELECT COUNT(*) FROM answers WHERE question_id = q.id) as answer_count
                     FROM questions q
                     WHERE q.module_id = ?
                     ORDER BY q.created_at DESC
-                """, (module_id,))
+                """,
+                    (module_id,),
+                )
 
                 questions = []
                 for row in cursor.fetchall():
                     q_dict = dict(row)
                     # Charger les réponses
-                    answers_cursor = conn.execute("""
+                    answers_cursor = conn.execute(
+                        """
                         SELECT * FROM answers WHERE question_id = ?
                         ORDER BY created_at ASC
-                    """, (q_dict['id'],))
-                    q_dict['answers'] = [dict(a) for a in answers_cursor.fetchall()]
+                    """,
+                        (q_dict["id"],),
+                    )
+                    q_dict["answers"] = [dict(a) for a in answers_cursor.fetchall()]
                     questions.append(q_dict)
 
                 return questions
@@ -1698,10 +1835,12 @@ class ModuleViewer(ctk.CTkFrame):
     def _init_qa_database(self, db_path):
         """Initialise la base de données Q&A"""
         import sqlite3
+
         db_path.parent.mkdir(parents=True, exist_ok=True)
 
         with sqlite3.connect(db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 CREATE TABLE IF NOT EXISTS questions (
                     id TEXT PRIMARY KEY,
                     module_id TEXT NOT NULL,
@@ -1710,8 +1849,10 @@ class ModuleViewer(ctk.CTkFrame):
                     date TEXT NOT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
-            """)
-            conn.execute("""
+            """
+            )
+            conn.execute(
+                """
                 CREATE TABLE IF NOT EXISTS answers (
                     id TEXT PRIMARY KEY,
                     question_id TEXT NOT NULL,
@@ -1720,7 +1861,8 @@ class ModuleViewer(ctk.CTkFrame):
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (question_id) REFERENCES questions(id)
                 )
-            """)
+            """
+            )
             conn.commit()
 
     def open_ask_question_dialog(self):
@@ -1732,19 +1874,11 @@ class ModuleViewer(ctk.CTkFrame):
         dialog.grab_set()
 
         ctk.CTkLabel(
-            dialog,
-            text="Poser une Question",
-            font=("Arial", 18, "bold"),
-            text_color="#00BFFF"
+            dialog, text="Poser une Question", font=("Arial", 18, "bold"), text_color="#00BFFF"
         ).pack(pady=20)
 
         # Zone de texte
-        question_text = ctk.CTkTextbox(
-            dialog,
-            height=120,
-            font=("Arial", 12),
-            fg_color="#1c2028"
-        )
+        question_text = ctk.CTkTextbox(dialog, height=120, font=("Arial", 12), fg_color="#1c2028")
         question_text.pack(fill="x", padx=30, pady=10)
 
         def submit_question():
@@ -1753,9 +1887,9 @@ class ModuleViewer(ctk.CTkFrame):
                 self.save_question(question)
                 dialog.destroy()
                 # Rafraîchir la section Q&A
-                self.master.after(100, lambda: self.master.show_module(
-                    self.module, self.master.formation
-                ))
+                self.master.after(
+                    100, lambda: self.master.show_module(self.module, self.master.formation)
+                )
 
         ctk.CTkButton(
             dialog,
@@ -1764,7 +1898,7 @@ class ModuleViewer(ctk.CTkFrame):
             height=40,
             fg_color="#00D9FF",
             hover_color="#00AACC",
-            command=submit_question
+            command=submit_question,
         ).pack(pady=20)
 
     def save_question(self, question_text: str):
@@ -1772,23 +1906,26 @@ class ModuleViewer(ctk.CTkFrame):
         try:
             import sqlite3
             import uuid
-            from pathlib import Path
             from datetime import datetime
+            from pathlib import Path
 
             db_path = Path(os.path.join(get_base_path(), "data", "formation_commerciale", "qa.db"))
             self._init_qa_database(db_path)
 
             with sqlite3.connect(db_path) as conn:
-                conn.execute("""
+                conn.execute(
+                    """
                     INSERT INTO questions (id, module_id, question, author, date)
                     VALUES (?, ?, ?, ?, ?)
-                """, (
-                    str(uuid.uuid4()),
-                    self.module.get('id', ''),
-                    question_text,
-                    self.master.user_profile.get('username', 'Utilisateur'),
-                    datetime.now().strftime("%d/%m/%Y")
-                ))
+                """,
+                    (
+                        str(uuid.uuid4()),
+                        self.module.get("id", ""),
+                        question_text,
+                        self.master.user_profile.get("username", "Utilisateur"),
+                        datetime.now().strftime("%d/%m/%Y"),
+                    ),
+                )
                 conn.commit()
         except Exception as e:
             print(f"Erreur sauvegarde question: {e}")
@@ -1802,10 +1939,7 @@ class ModuleViewer(ctk.CTkFrame):
         dialog.grab_set()
 
         ctk.CTkLabel(
-            dialog,
-            text="Répondre à la Question",
-            font=("Arial", 18, "bold"),
-            text_color="#00FF88"
+            dialog, text="Répondre à la Question", font=("Arial", 18, "bold"), text_color="#00FF88"
         ).pack(pady=15)
 
         # Afficher la question
@@ -1818,27 +1952,22 @@ class ModuleViewer(ctk.CTkFrame):
             font=("Arial", 11),
             text_color="#CCCCCC",
             wraplength=420,
-            justify="left"
+            justify="left",
         ).pack(padx=15, pady=15)
 
         # Zone de réponse
-        answer_text = ctk.CTkTextbox(
-            dialog,
-            height=100,
-            font=("Arial", 12),
-            fg_color="#1c2028"
-        )
+        answer_text = ctk.CTkTextbox(dialog, height=100, font=("Arial", 12), fg_color="#1c2028")
         answer_text.pack(fill="x", padx=30, pady=10)
 
         def submit_answer():
             answer = answer_text.get("1.0", "end-1c").strip()
             if answer:
-                self.save_answer(question.get('id'), answer)
+                self.save_answer(question.get("id"), answer)
                 dialog.destroy()
                 # Rafraîchir
-                self.master.after(100, lambda: self.master.show_module(
-                    self.module, self.master.formation
-                ))
+                self.master.after(
+                    100, lambda: self.master.show_module(self.module, self.master.formation)
+                )
 
         ctk.CTkButton(
             dialog,
@@ -1847,7 +1976,7 @@ class ModuleViewer(ctk.CTkFrame):
             height=40,
             fg_color="#00FF88",
             hover_color="#00CC6A",
-            command=submit_answer
+            command=submit_answer,
         ).pack(pady=15)
 
     def save_answer(self, question_id: str, answer_text: str):
@@ -1860,15 +1989,18 @@ class ModuleViewer(ctk.CTkFrame):
             db_path = Path(os.path.join(get_base_path(), "data", "formation_commerciale", "qa.db"))
 
             with sqlite3.connect(db_path) as conn:
-                conn.execute("""
+                conn.execute(
+                    """
                     INSERT INTO answers (id, question_id, content, author)
                     VALUES (?, ?, ?, ?)
-                """, (
-                    str(uuid.uuid4()),
-                    question_id,
-                    answer_text,
-                    self.master.user_profile.get('username', 'Utilisateur')
-                ))
+                """,
+                    (
+                        str(uuid.uuid4()),
+                        question_id,
+                        answer_text,
+                        self.master.user_profile.get("username", "Utilisateur"),
+                    ),
+                )
                 conn.commit()
         except Exception as e:
             print(f"Erreur sauvegarde réponse: {e}")
@@ -1881,10 +2013,7 @@ class ModuleViewer(ctk.CTkFrame):
         qa_win.configure(fg_color="#0a0e12")
 
         ctk.CTkLabel(
-            qa_win,
-            text="Toutes les Questions",
-            font=("Arial", 20, "bold"),
-            text_color="#00BFFF"
+            qa_win, text="Toutes les Questions", font=("Arial", 20, "bold"), text_color="#00BFFF"
         ).pack(pady=20)
 
         scroll = ctk.CTkScrollableFrame(qa_win, fg_color="#161920")
@@ -1913,7 +2042,7 @@ class ModuleViewer(ctk.CTkFrame):
             width=220,
             height=42,
             corner_radius=8,
-            command=self.mark_completed
+            command=self.mark_completed,
         )
         complete_btn.pack(side="left", padx=10)
 
@@ -1928,10 +2057,9 @@ class ModuleViewer(ctk.CTkFrame):
             width=180,
             height=42,
             corner_radius=8,
-            command=self.start_quiz
+            command=self.start_quiz,
         )
         quiz_btn.pack(side="left", padx=10)
-
 
     def go_back(self):
         """Retour à la liste des modules"""
@@ -1940,15 +2068,15 @@ class ModuleViewer(ctk.CTkFrame):
 
     def mark_completed(self):
         """Marque le module comme complété"""
-        module_id = self.module.get('id')
-        xp = self.module.get('points_xp', 0)
+        module_id = self.module.get("id")
+        xp = self.module.get("points_xp", 0)
 
         self.academy.mark_module_completed(module_id, xp)
         self.go_back()
 
     def start_quiz(self):
         """Lance le quiz du module"""
-        quiz_questions = self.module.get('quiz', [])
+        quiz_questions = self.module.get("quiz", [])
 
         if not quiz_questions:
             messagebox.showinfo("Quiz", "Aucun quiz disponible pour ce module.")
@@ -1961,6 +2089,7 @@ class ModuleViewer(ctk.CTkFrame):
         # Cacher le viewer actuel
         self.pack_forget()
 
+
 class QuizInterface(ctk.CTkFrame):
     """Interface interactive de quiz"""
 
@@ -1970,7 +2099,7 @@ class QuizInterface(ctk.CTkFrame):
         self.module = module
         self.academy = academy
         self.module_viewer = module_viewer
-        self.quiz_questions = module.get('quiz', [])
+        self.quiz_questions = module.get("quiz", [])
         self.current_question = 0
         self.score = 0
         self.user_answers = []
@@ -1987,7 +2116,7 @@ class QuizInterface(ctk.CTkFrame):
             hover_color="#3a3d46",
             width=150,
             height=35,
-            command=self.go_back
+            command=self.go_back,
         )
         back_btn.pack(side="left", padx=20, pady=15)
 
@@ -1995,7 +2124,7 @@ class QuizInterface(ctk.CTkFrame):
             header,
             text=f"Quiz: {module.get('titre', 'Module')}",
             font=("Arial", 22, "bold"),
-            text_color="#00D9FF"
+            text_color="#00D9FF",
         )
         title.pack(side="left", padx=20)
 
@@ -2025,19 +2154,12 @@ class QuizInterface(ctk.CTkFrame):
         # Progress
         progress_text = f"Question {self.current_question + 1}/{len(self.quiz_questions)}"
         progress_label = ctk.CTkLabel(
-            question_container,
-            text=progress_text,
-            font=("Arial", 14),
-            text_color="#888888"
+            question_container, text=progress_text, font=("Arial", 14), text_color="#888888"
         )
         progress_label.pack(pady=(20, 10))
 
         # Barre de progression
-        progress_bar = ctk.CTkProgressBar(
-            question_container,
-            width=400,
-            progress_color="#00D9FF"
-        )
+        progress_bar = ctk.CTkProgressBar(question_container, width=400, progress_color="#00D9FF")
         progress_bar.pack(pady=(0, 20))
         progress_bar.set((self.current_question + 1) / len(self.quiz_questions))
 
@@ -2047,17 +2169,17 @@ class QuizInterface(ctk.CTkFrame):
 
         question_label = ctk.CTkLabel(
             question_frame,
-            text=question_data.get('question', ''),
+            text=question_data.get("question", ""),
             font=("Arial", 18, "bold"),
             text_color="#FFFFFF",
             wraplength=700,
-            justify="left"
+            justify="left",
         )
         question_label.pack(padx=30, pady=30)
 
         # Options
         self.selected_option = ctk.IntVar(value=-1)
-        options = question_data.get('options', [])
+        options = question_data.get("options", [])
 
         options_frame = ctk.CTkFrame(question_container, fg_color="transparent")
         options_frame.pack(fill="x", padx=60, pady=20)
@@ -2071,7 +2193,7 @@ class QuizInterface(ctk.CTkFrame):
                 font=("Arial", 14),
                 text_color="#CCCCCC",
                 fg_color="#00D9FF",
-                hover_color="#00B0CC"
+                hover_color="#00B0CC",
             )
             option_btn.pack(anchor="w", pady=8, padx=20)
 
@@ -2084,7 +2206,7 @@ class QuizInterface(ctk.CTkFrame):
             hover_color="#00B0CC",
             width=200,
             height=50,
-            command=self.validate_answer
+            command=self.validate_answer,
         )
         validate_btn.pack(pady=30)
 
@@ -2097,15 +2219,17 @@ class QuizInterface(ctk.CTkFrame):
             return
 
         question_data = self.quiz_questions[self.current_question]
-        correct_answer = question_data.get('bonne_reponse', 0)
+        correct_answer = question_data.get("bonne_reponse", 0)
 
         # Sauvegarder la réponse
-        self.user_answers.append({
-            'question': question_data.get('question'),
-            'selected': selected,
-            'correct': correct_answer,
-            'is_correct': selected == correct_answer
-        })
+        self.user_answers.append(
+            {
+                "question": question_data.get("question"),
+                "selected": selected,
+                "correct": correct_answer,
+                "is_correct": selected == correct_answer,
+            }
+        )
 
         # Calculer le score
         if selected == correct_answer:
@@ -2128,24 +2252,18 @@ class QuizInterface(ctk.CTkFrame):
         result_text = "✓ Correct!" if is_correct else "✗ Incorrect"
 
         result_label = ctk.CTkLabel(
-            result_container,
-            text=result_text,
-            font=("Arial", 32, "bold"),
-            text_color=result_color
+            result_container, text=result_text, font=("Arial", 32, "bold"), text_color=result_color
         )
         result_label.pack(pady=(40, 20))
 
         # Explication
-        explanation = question_data.get('explication', 'Pas d\'explication disponible.')
+        explanation = question_data.get("explication", "Pas d'explication disponible.")
 
         explanation_frame = ctk.CTkFrame(result_container, fg_color="#0f1318", corner_radius=10)
         explanation_frame.pack(fill="x", padx=60, pady=20)
 
         explanation_title = ctk.CTkLabel(
-            explanation_frame,
-            text="Explication",
-            font=("Arial", 18, "bold"),
-            text_color="#00D9FF"
+            explanation_frame, text="Explication", font=("Arial", 18, "bold"), text_color="#00D9FF"
         )
         explanation_title.pack(pady=(20, 10), padx=30)
 
@@ -2155,7 +2273,7 @@ class QuizInterface(ctk.CTkFrame):
             font=("Arial", 14),
             text_color="#CCCCCC",
             wraplength=700,
-            justify="left"
+            justify="left",
         )
         explanation_text.pack(pady=(0, 20), padx=30)
 
@@ -2168,7 +2286,7 @@ class QuizInterface(ctk.CTkFrame):
             hover_color="#00B0CC",
             width=200,
             height=50,
-            command=self.next_question
+            command=self.next_question,
         )
         next_btn.pack(pady=40)
 
@@ -2191,7 +2309,7 @@ class QuizInterface(ctk.CTkFrame):
             result_container,
             text="🎉 Quiz Terminé!",
             font=("Arial", 32, "bold"),
-            text_color="#00D9FF"
+            text_color="#00D9FF",
         )
         title_label.pack(pady=(40, 20))
 
@@ -2206,15 +2324,14 @@ class QuizInterface(ctk.CTkFrame):
             score_frame,
             text=score_text,
             font=("Arial", 48, "bold"),
-            text_color="#00FF88" if percentage >= 70 else "#FFA500" if percentage >= 50 else "#FF6B6B"
+            text_color=(
+                "#00FF88" if percentage >= 70 else "#FFA500" if percentage >= 50 else "#FF6B6B"
+            ),
         )
         score_label.pack(pady=30)
 
         percentage_label = ctk.CTkLabel(
-            score_frame,
-            text=f"{percentage}%",
-            font=("Arial", 24),
-            text_color="#CCCCCC"
+            score_frame, text=f"{percentage}%", font=("Arial", 24), text_color="#CCCCCC"
         )
         percentage_label.pack(pady=(0, 30))
 
@@ -2230,17 +2347,13 @@ class QuizInterface(ctk.CTkFrame):
             color = "#FFA500"
 
         message_label = ctk.CTkLabel(
-            result_container,
-            text=message,
-            font=("Arial", 16),
-            text_color=color,
-            wraplength=600
+            result_container, text=message, font=("Arial", 16), text_color=color, wraplength=600
         )
         message_label.pack(pady=20)
 
         # Sauvegarder le score
-        module_id = self.module.get('id')
-        self.academy.user_progress['quiz_scores'][module_id] = percentage
+        module_id = self.module.get("id")
+        self.academy.user_progress["quiz_scores"][module_id] = percentage
         self.academy.save_user_progress()
 
         # Boutons d'action
@@ -2255,7 +2368,7 @@ class QuizInterface(ctk.CTkFrame):
             hover_color="#FF8800",
             width=180,
             height=45,
-            command=self.retry_quiz
+            command=self.retry_quiz,
         )
         retry_btn.pack(side="left", padx=10)
 
@@ -2267,7 +2380,7 @@ class QuizInterface(ctk.CTkFrame):
             hover_color="#00B0CC",
             width=180,
             height=45,
-            command=self.go_back
+            command=self.go_back,
         )
         back_btn.pack(side="left", padx=10)
 
@@ -2302,6 +2415,7 @@ def afficher_formation_commerciale(parent, user_email=None):
     except Exception as e:
         print(f"[✗] Erreur chargement academy: {e}")
         import traceback
+
         traceback.print_exc()
 
         # Afficher l'erreur
@@ -2312,7 +2426,7 @@ def afficher_formation_commerciale(parent, user_email=None):
             error_frame,
             text=f"Erreur de chargement:\n{str(e)}",
             font=("Arial", 14),
-            text_color="#FF6666"
+            text_color="#FF6666",
         )
         error_label.pack(pady=50)
 
