@@ -31,10 +31,13 @@ class AutoUpdater:
             updater.show_update_dialog()
     """
 
-    # GitHub repository for releases
+    # HelixOne update server
+    # Point this to your server's version.json file
+    VERSION_URL = "https://helixone.fr/downloads/version.json"
+
+    # Fallback: GitHub repository for releases
     GITHUB_REPO = "paulchurch2004/helixoneapp"
-    # GitHub API URL for latest release
-    VERSION_URL = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
+    GITHUB_VERSION_URL = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 
     REQUEST_TIMEOUT = 10
     CHUNK_SIZE = 8192
@@ -47,7 +50,7 @@ class AutoUpdater:
 
     def check_for_updates(self) -> dict[str, Any] | None:
         """
-        Check if a new version is available via GitHub Releases API.
+        Check if a new version is available via helixone.fr version.json.
 
         Returns:
             Version info dict if update available, None otherwise
@@ -58,53 +61,28 @@ class AutoUpdater:
             response = requests.get(
                 self.VERSION_URL,
                 timeout=self.REQUEST_TIMEOUT,
-                headers={
-                    "User-Agent": f"HelixOne/{self.current_version}",
-                    "Accept": "application/vnd.github.v3+json",
-                },
+                headers={"User-Agent": f"HelixOne/{self.current_version}"},
             )
             response.raise_for_status()
 
-            release_data = response.json()
+            version_data = response.json()
 
-            # Extract version from tag_name (e.g., "v1.0.6" -> "1.0.6")
-            tag_name = release_data.get("tag_name", "v0.0.0")
-            remote_version = tag_name.lstrip("v")
+            # Get remote version (simple format: "1.0.8")
+            remote_version = version_data.get("version", "0.0.0")
 
             if is_update_available(remote_version):
                 logger.info(f"Update available: {remote_version}")
 
-                # Transform GitHub release data to our format
-                assets = release_data.get("assets", [])
-                download_url_mac = None
-                download_url_windows = None
-
-                for asset in assets:
-                    name = asset["name"].lower()
-                    if name.endswith(".dmg"):
-                        download_url_mac = asset["browser_download_url"]
-                    elif name.endswith(".exe"):
-                        download_url_windows = asset["browser_download_url"]
-
-                # Parse changelog from release body
-                changelog = []
-                body = release_data.get("body", "")
-                if body:
-                    # Extract bullet points from markdown
-                    for line in body.split("\n"):
-                        line = line.strip()
-                        if line.startswith("- ") or line.startswith("* "):
-                            changelog.append(line[2:])
-
+                # Direct format - no transformation needed
                 self.remote_version_info = {
                     "version": remote_version,
-                    "tag_name": tag_name,
-                    "mandatory": False,  # Can be set based on release metadata
-                    "changelog": changelog,
-                    "download_url_mac": download_url_mac,
-                    "download_url_windows": download_url_windows,
-                    "release_url": release_data.get("html_url", ""),
-                    "published_at": release_data.get("published_at", ""),
+                    "tag_name": f"v{remote_version}",
+                    "mandatory": version_data.get("mandatory", False),
+                    "changelog": version_data.get("changelog", []),
+                    "download_url_mac": version_data.get("download_url_mac"),
+                    "download_url_windows": version_data.get("download_url_windows"),
+                    "release_url": version_data.get("release_url", "https://helixone.fr"),
+                    "published_at": version_data.get("published_at", ""),
                 }
 
                 return self.remote_version_info
